@@ -1,8 +1,8 @@
 # YOVI_en3b - Game Y at UniOvi
 
-[![Release — Test, Build, Publish, Deploy](https://github.com/arquisoft/yovi_0/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/arquisoft/yovi_0/actions/workflows/release-deploy.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_0&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_0&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
+[![Release — Test, Build, Publish, Deploy](https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/arquisoft/yovi_0/actions/workflows/release-deploy.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
 
 This project is a template with some basic functionality for the ASW labs.
 
