@@ -39,29 +39,65 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== <Runtime Scenario 1>
+=== <Full game>
 
-
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
-
-It is possible to use a sequence diagram:
+This diagram represents a full game, from when the user logs to when the user ends the game
 
 [plantuml,"Sequence diagram",png]
 ----
-actor Alice
-actor Bob
-database Pod as "Bob's Pod"
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
-Alice  --> Pod: Store route
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+@startuml
+actor User
+participant WebApp
+participant RustModule
+database Db
+
+User -> WebApp: Log in
+WebApp -> Db: Checks credentials
+Db --> WebApp: Returns data of the user
+User -> WebApp: Selects board size, difficulty...
+WebApp -> RustModule: Create board
+RustModule --> WebApp: Board created
+loop
+    User -> WebApp: Plays their turn
+    WebApp -> RustModule: Checks if there is a winner
+
+    break There is a winner  
+        RustModule --> WebApp: Returns result of the game
+        WebApp --> User: Shows result of the gmae
+    end
+
+    WebApp -> RustModule: Asks the machine to play
+    RustModule --> WebApp: Returns machine's play
+    WebApp --> User: Shows what the machine has done
+end
+WebApp -> Db: Save data of the game
+@enduml
 ----
 
-=== <Runtime Scenario 2>
+=== <Asking for a hint>
 
-=== ...
+This diagram represents the user asking for a hint
+
+[plantuml,"Sequence diagram",png]
+
+@startuml
+actor User
+participant WebApp
+participant RustModule
+database Db
+
+User -> WebApp: Log in
+WebApp -> Db: Checks credentials
+Db --> WebApp: Returns data of the user
+User -> WebApp: Selects board size, difficulty...
+WebApp -> RustModule: Create board
+RustModule --> WebApp: Board created
+
+User -> WebApp: Asks for a hint
+WebApp -> RustModule: Requests the hint
+RustModule --> WebApp: Returns in YEN notation the movement hint
+WebApp --> User: Returns the hint graphically
+
+@enduml
 
 === <Runtime Scenario n>
