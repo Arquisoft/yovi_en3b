@@ -69,6 +69,34 @@ A table with quality goals and concrete scenarios, ordered by priorities
 ****
 endif::arc42help[]
 
+The following table presents the top five quality goals for the YOVI architecture, ordered by priority. These goals have been identified based on stakeholder expectations and the ISO 25010 quality model. They represent the most critical quality attributes that will guide architectural decisions throughout the project and serve as the primary criteria for evaluating the success of the system.
+
+[options="header",cols="1,2,3"]
+|===
+|Priority|Quality Goal|Concrete Scenario
+
+|1
+|**Performance Efficiency**
+|The Rust engine must respond to move validation and AI suggestions in under 200ms, ensuring a smooth gameplay experience even during peak usage.
+
+|2
+|**Compatibility (Interoperability)**
+|The system must allow external bots to connect via a well-documented JSON API (YEN notation), enabling third-party developers to create their own game clients.
+
+|3
+|**Functional Suitability**
+|The Rust engine must accurately implement all "Game Y" rules, and the web frontend must cover all user stories including registration, gameplay, and statistics.
+
+|4
+|**Maintainability**
+|The architecture must keep Rust logic independent from the TypeScript layer, with clear ADRs and >80% code coverage, allowing evaluators and future developers to understand and modify the system.
+
+|5
+|**Transferability**
+|The complete system must be deployable with a single Docker command, ensuring evaluators can easily install and test the application on any modern environment.
+
+|===
+
 === Stakeholders
 
 ifdef::arc42help[]
