@@ -93,9 +93,56 @@ Table with role names, person names, and their expectations with respect to the 
 ****
 endif::arc42help[]
 
-[options="header",cols="1,2,2"]
+[options="header",cols="1,2,1,1,3"]
 |===
-|Role/Name|Contact|Expectations
-| _<Role-1>_ | _<Contact-1>_ | _<Expectation-1>_
-| _<Role-2>_ | _<Contact-2>_ | _<Expectation-2>_
+|Category|Stakeholder|Impact|Influence|Key Interests & Expectations
+
+|1. Primary Owners
+|Micrati
+|Critical
+|High
+|Successful delivery of the YOVI suite based on "Game Y".
+
+|2. End Users
+|Human Players
+|High
+|Medium
+|Smooth UX, web-based matches, and accurate statistics.
+
+|
+|Bot Developers
+|Medium
+|Medium
+|Robust external API and clear technical documentation.
+
+|3. Technical Team
+|Project Team
+|Critical
+|High
+|Proper implementation of TypeScript and Rust subsystems.
+
+|
+|Architects
+|High
+|High
+|Structural integrity, ADR maintenance, and quality attributes.
+
+|
+|DevOps/SysAdmin
+|Medium
+|Medium
+|Seamless CI/CD, deployment, and system monitoring.
+
+|4. External
+|Competing Teams
+|Low
+|Low
+|Interoperability and compatibility for optional matches.
+
+|5. Academic
+|Evaluators
+|Critical
+|High
+|Test coverage, documentation quality, and project management.
+
 |===
