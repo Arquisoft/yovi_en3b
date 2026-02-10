@@ -39,14 +39,9 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== <Runtime Scenario 1>
+=== <Full game>
 
-
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
-
-It is possible to use a sequence diagram:
+This diagram represents a full game, from when the user logs to when the user ends the game
 
 [plantuml,"Sequence diagram",png]
 ----
@@ -79,7 +74,11 @@ WebApp -> Db: Save data of the game
 @enduml
 ----
 
-=== <Runtime Scenario 2>
+=== <Asking for a hint>
+
+This diagram represents the user asking for a hint
+
+[plantuml,"Sequence diagram",png]
 
 @startuml
 actor User
