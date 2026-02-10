@@ -93,6 +93,8 @@ Table with role names, person names, and their expectations with respect to the 
 ****
 endif::arc42help[]
 
+This section provides an explicit overview of the stakeholders of the system. Stakeholders include all persons, roles, or organizations that should know the architecture, need to be convinced of it, have to work with the architecture or codebase, require the documentation for their work, or are involved in making decisions about the system and its development. We have identified the following stakeholders related to our project:
+
 [options="header",cols="1,2,1,1,3"]
 |===
 |Category|Stakeholder|Impact|Influence|Key Interests & Expectations
