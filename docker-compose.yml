@@ -6,6 +6,12 @@ services:
     image: ghcr.io/arquisoft/yovi_en3b-users:latest
     ports:
       - "3000:3000"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=db
     networks:
       - monitor-net
 
@@ -65,6 +71,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./users/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - monitor-net
 
 networks:
   monitor-net:

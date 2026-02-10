@@ -24,11 +24,10 @@ const createUser = async (data) => {
     // 4. Call the repo to save
     const newUser = await userRepository.createUser({
         username: data.username,
-        email: "", //data.email
-        password: "" //securePassword
+        email: "" + Math.random(), //data.email
+        password: "", //securePassword
     });
     
-
     return newUser;
 };
 

@@ -2,11 +2,11 @@ const db = require('../../db/db.js');
 
 const createUser = async (userData) => {
     const query = `
-        INSERT INTO users (username, email, password_hash)
+        INSERT INTO users (username, email, password)
         VALUES ($1, $2, $3)
         RETURNING id, username, email, created_at; 
     `;
-    const values = [userData.username, userData.email, userData.passwordHash];
+    const values = [userData.username, userData.email, userData.password];
     const { rows } = await db.query(query, values);
     return rows[0];
 };
