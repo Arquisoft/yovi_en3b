@@ -1,5 +1,5 @@
 
-const userRepository = require('./userRepository');
+const userRepository = require('../data-access/userRepository');
 
 const createUser = async (data) => {
     // 1. Check password constraints

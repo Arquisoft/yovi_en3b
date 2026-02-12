@@ -1,11 +1,28 @@
 
 services:
+  db:
+      image: postgres:15-alpine
+      container_name: mi_postgres_db
+      restart: always
+      environment:
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DB_NAME}
+      ports:
+        - "5432:5432"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+        - ./users/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      networks:
+        - monitor-net
   users:
     build: ./users
     container_name: users
     image: ghcr.io/arquisoft/yovi_en3b-users:latest
     ports:
       - "3000:3000"
+    depends_on:
+      - db
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -58,21 +75,7 @@ services:
     networks:
       - monitor-net
       
-  db:
-    image: postgres:15-alpine
-    container_name: mi_postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./users/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - monitor-net
+  
 
 networks:
   monitor-net:

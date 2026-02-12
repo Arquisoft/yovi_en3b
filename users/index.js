@@ -40,15 +40,4 @@ module.exports = app
 
 
 
-// app.post('/createuser', async (req, res) => {
-//   const username = req.body && req.body.username;
-//   try {
-//     // Simulate a 1 second delay to mimic processing/network latency
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-//     const message = `Hello ${username}! welcome to the course!`;
-//     res.json({ message });
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
