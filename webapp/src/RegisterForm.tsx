@@ -41,6 +41,18 @@ const RegisterForm: React.FC = () => {
     }
   };
 
+  async function testConection() {
+    try {
+          const API_URL = import.meta.env.VITE_GAMEY_URL ?? 'http://localhost:4000'
+          const res = await fetch(`${API_URL}`); 
+          console.log("✅ Conexión establecida con el servidor Rust");
+          console.log("Status recibido:", res.status);
+      } catch(error){
+        console.log(error);
+  }
+  };
+  testConection();
+
   return (
     <form onSubmit={handleSubmit} className="register-form">
       <div className="form-group">
