@@ -14,7 +14,7 @@ const createUser = async (data) => {
     // 2. Check non-repeted e-mail
     // const existingUser = await userRepository.findUserByEmail(data.email);
     // if (existingUser) {
-    //     throw new Error("El email ya está registrado");
+    //     throw new Error("The email is already used");
     // }
 
     // 3. Encript password (future modifications)
