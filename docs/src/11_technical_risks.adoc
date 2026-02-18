@@ -1,76 +1,42 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-[[section-technical-risks]]
-== Risks and Technical Debts
+[[section-risks-and-technical-debt]]
+== Risks and Technical Debt
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-A list of identified technical risks or technical debts, ordered by priority.
+=== Risk Mitigation Table
 
-.Motivation
-“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.) 
-
-.Form
-According to the arc42 standard, we have identified the following risks. These are categorized into Project/Human Resources, Technical, and Requirements risks.
-
-[cols="1,2,2,2", options="header"]
+[cols="1,2,2" options="header"]
 |===
-| Risk Category | Risk Description | Proactive Measure (Prevention) | Contingent Measure (Reaction)
+|Risk |Proactive Measure |Contingent Measure
 
-| *Project / HR* | *Team Attrition:* Members dropping the course or abandoning the project. 
-| Maintain updated documentation and clean code so any member can take over a task. 
-| Redistribute the workload using GitHub Issues and reduce the scope to an MVP.
+|**Team Attrition**
+|Maintain clean code and updated documentation so any member can take over.
+|Redistribute tasks among remaining members; focus on MVP features.
 
-| *Project / HR* | *Uneven Learning Curves:* Members struggling with Rust or other technologies. 
-| Conduct internal knowledge-sharing sessions and use "Pair Programming" for difficult modules. 
-| Reassign tasks based on individual strengths and simplify the complexity of the affected module.
+|**Uneven Learning Curves**
+|Conduct internal "Pair Programming" sessions for difficult modules (Rust).
+|Reassign tasks based on individual strengths and simplify complexity.
 
-| *Project / HR* | *Final Exam Pressure:* Development stall during the final weeks of the semester. 
-| Establish an internal deadline for the "Base Project" 2 weeks before the official deadline. 
-| Shift to "Maintenance Mode," focusing only on fixing critical bugs and documentation.
+|**Rust Learning Curve**
+|Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early.
+|Use simpler AI strategies (e.g., Random Move) if logic becomes a bottleneck.
 
-| *Project / HR* | *Git/Merge Conflicts:* Major regressions due to lack of coordination. 
-| Use a "Feature Branch" workflow and require at least one peer review for every Pull Request. 
-| Perform emergency "Pair Programming" sessions to manually resolve conflicts and restore stability.
+|**Integration Failures**
+|Define a shared JSON Schema for YEN validation between TS and Rust.
+|Hold emergency integration meetings to align data formats and parsers.
 
-| *Technical* | *Rust Learning Curve:* Failure to implement complex AI due to ownership/borrowing difficulty. 
-| Start with small POCs (Proof of Concept) to master YEN parsing and basic Rust logic early. 
-| Implement a basic "Random Move" strategy first and use simpler Rust crates to meet requirements.
+|**Final Exam Pressure**
+|Set internal deadlines 2 weeks before the official delivery date.
+|Shift focus to critical bug fixes and mandatory documentation only.
 
-| *Technical* | *Integration Failures:* Misinterpretation of the *YEN notation* format. 
-| Define a shared JSON Schema for YEN messages that both TS and Rust must validate against. 
-| Conduct an integration meeting to align the interfaces and fix the parser/generator logic.
+|**Deployment Failures**
+|Configure and test CI/CD pipelines (GitHub Actions) in the first month.
+|Perform manual deployments to alternative providers (e.g., Fly.io or Render).
 
-| *Technical* | *Deployment Bottlenecks:* CI/CD or cloud provider issues preventing public access. 
-| Perform a "Hello World" deployment in the first month to test the pipeline. 
-| Manually deploy to an alternative provider.
-
-| *Technical* | *Algorithm Complexity:* Poorly optimized Rust algorithms causing timeouts/crashes. 
-| Set performance benchmarks for the logic engine and conduct load tests on the validator. 
-| Limit the maximum board size in the UI to prevent the server from hanging.
-
-| *Requirements* | *Incomplete Feature Set:* Prioritizing UI over mandatory AI strategies. 
-| Use a GitHub board to ensure "more than one strategy" is prioritized in the backlog. 
-| Pivot resources from UI polish to back-end logic to ensure all grading criteria are met.
-
-| *Requirements* | *API Security:* Bot API vulnerability to spam or unauthorized access. 
-| Implement basic rate-limiting and API key validation for the external bot interface. 
-| Temporarily disable the public API or increase server resources if stability is compromised.
-
-| *Requirements* | *Scalability Debt:* Hard-coding rules, making variants (Tabu Y, etc.) impossible. 
-| Use the "Strategy Pattern" in Rust to keep game rules separate from the core engine. 
-| Refactor only the core logic needed for the mandatory variants if time allows.
 |===
 
-.Technical Debt
-* [ ] *AI Strategies:* Currently planning basic algorithms; advanced heuristics remain as debt.
-* [ ] *Test Coverage:* Goal is >80% coverage; current debt includes edge-case testing for YEN.
-* [ ] *Code Refactoring:* Some "quick fixes" in the Rust engine need to be modularized for better scalability.
+=== Technical Debt
 
-.Further Information
-See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 documentation.
-
-****
-endif::arc42help[]
+* **AI Complexity:** Initial AI versions will use basic heuristics; advanced algorithms are considered debt for later sprints.
+* **Test Coverage:** Reaching 80% automated coverage is a pending goal while focusing on core features.
+* **YEN Robustness:** Deep validation for malformed JSON from external bots is yet to be fully implemented.
