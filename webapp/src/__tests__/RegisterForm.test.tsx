@@ -26,7 +26,7 @@ describe('RegisterForm', () => {
     // Mock fetch to resolve automatically
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ message: 'Hello Pablo! Welcome to the course!' }),
+      json: async () => ({ message: 'Hello Pablo' }),
     } as Response)
 
     render(<RegisterForm />)
@@ -38,7 +38,7 @@ describe('RegisterForm', () => {
 
       // Response message should appear
       expect(
-        screen.getByText(/hello pablo! welcome to the course!/i)
+        screen.getByText(/hello pablo/i)
       ).toBeInTheDocument()
     })
   })
