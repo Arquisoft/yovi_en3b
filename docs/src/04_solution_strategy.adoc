@@ -52,6 +52,9 @@ endif::arc42help[]
 
 === Organizational & Development Strategy
 
-* **Task Distribution:** Divided into Frontend, Backend, and Rust/Docs sub-groups.
-* **Review Process:** Cross-group Pull Request reviews to ensure the whole team understands the full stack.
-* **Continuous Integration:** Automated testing and deployment to catch integration errors between the TS and Rust modules early.
+Decisions regarding team coordination and workflow to ensure project quality:
+
+* **Task Distribution:** Work is divided into fixed sub-groups of 2-3 people (Frontend, Backend, Rust/Docs) to ensure code reviews and knowledge sharing.
+* **GitHub Workflow:**
+** Pull Requests are reviewed by the sub-group (Frontend/Backend) NOT related to the topic itself, ensuring shared understanding of project upgrades among team members.
+* **Documentation:** Developed collaboratively and consolidated in specific sessions.
