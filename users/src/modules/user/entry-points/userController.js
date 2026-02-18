@@ -4,7 +4,8 @@ const userService = require('../domain/userService');
 const createUser = async (req, res) => {
     try {
         const result = await userService.createUser(req.body);
-        res.status(201).json(result);
+        const message = `Welcome ${result.username}`;
+        res.status(200).json({message});
     } catch (error) {
         console.log(error);
         res.status(400).json({ error: error.message });
