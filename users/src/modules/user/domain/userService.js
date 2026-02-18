@@ -1,5 +1,5 @@
 
-const userRepository = require('./userRepository');
+const userRepository = require('../data-access/userRepository');
 
 const createUser = async (data) => {
     // 1. Check password constraints
@@ -14,7 +14,7 @@ const createUser = async (data) => {
     // 2. Check non-repeted e-mail
     // const existingUser = await userRepository.findUserByEmail(data.email);
     // if (existingUser) {
-    //     throw new Error("El email ya está registrado");
+    //     throw new Error("The email is already used");
     // }
 
     // 3. Encript password (future modifications)
@@ -24,7 +24,7 @@ const createUser = async (data) => {
     // 4. Call the repo to save
     const newUser = await userRepository.createUser({
         username: data.username,
-        email: "" + Math.random(), //data.email
+        email: data.username, //data.email
         password: "", //securePassword
     });
     
