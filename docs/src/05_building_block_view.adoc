@@ -1,91 +1,87 @@
 ifndef::imagesdir[:imagesdir: ../images]
-
 [[section-building-block-view]]
 == Building Block View
+
+The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, etc.) as well as their dependencies. In analogy to a house, this is the floor plan.
 
 === Whitebox Overall System
 
 image::level-1-overview.png["YOVI Level 1 Overview Diagram"]
 
 Motivation::
-The YOVI system is designed according to the principle of Separation of Concerns. A modern Web layer (TypeScript) was chosen for the user interface and bot access, a scalable microservice (Node.js) for data management, and a low-level system language (Rust) for high-performance game logic/AI calculations. This hybrid structure optimizes development speed and runtime performance.
+The YOVI system follows the **Separation of Concerns** principle. It uses a modern React frontend for user interaction, a Node.js microservice for user data management, and a high-performance Rust engine for game logic. This hybrid architecture ensures scalability and runtime efficiency.
 
 Contained Building Blocks::
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| **Webapp** | React-based user interface. Visualizes the game board, handles user registration, and provides an external API (REST) for bots.
-| **Users Service** | Backend service that manages user profiles, authentication processes, and game statistics.
-| **Gamey Engine** | Game engine written in Rust. Performs move validation, checks if the game is won, and generates bot move suggestions (AI).
-| **PostgreSQL** | Relational database where user data and match results are permanently stored.
+| **Webapp** | React-based frontend. Visualizes the game board, manages user registration, and provides a REST API for bot interactions.
+| **Users Service** | Node.js backend managing user profiles, authentication, and game history metrics.
+| **Gamey Engine** | Rust-based engine that validates Game Y rules, checks win conditions, and generates AI moves.
+| **PostgreSQL** | Relational database for persistent storage of user profiles and match statistics.
 |===
 
 Important Interfaces::
-* **YEN Notation:** Standard JSON format carrying board state and move information between the Webapp and Gamey Engine.
-* **REST API (Internal):** Endpoints enabling the Webapp to communicate with the Users Service.
+* **YEN Notation:** Standard JSON format carrying board states between the Webapp and Gamey Engine.
+* **REST API (Internal):** Endpoints enabling communication between the Webapp and Users Service.
 
 ==== Webapp (Black Box)
-Purpose/Responsibility:: 
-Providing the user interface and providing system access for external bots.
 
-Interface(s):: 
-Web GUI (HTML/CSS/TS), External Bot REST API.
-
-Directory/File Location:: 
-`/webapp`
-
-Fulfilled Requirements:: 
-Web frontend (Classic Game Y), Bot interaction API, User registration.
+Purpose/Responsibility:: Providing the user interface and system access for human players and external bots.
+Interface(s):: Web GUI (HTML/CSS/TS), External Bot REST API (JSON).
+Directory/File Location:: `/webapp`
+Fulfilled Requirements:: Web frontend, Bot interaction API, User registration.
 
 ==== Users Service (Black Box)
-Purpose/Responsibility:: 
-Managing user information and game history (metrics) by communicating with the database.
 
-Interface(s):: 
-Internal REST API (Node.js/Express).
-
-Directory/File Location:: 
-`/users`
-
-Fulfilled Requirements:: 
-Registration system, View match history, win/loss statistics.
+Purpose/Responsibility:: Managing user information and game metrics through database communication.
+Interface(s):: Internal REST API (Node.js/Express over Port 3000).
+Directory/File Location:: `/users`
+Fulfilled Requirements:: Registration system, Match history, Win/Loss statistics.
 
 ==== Gamey Engine (Black Box)
-Purpose/Responsibility:: 
-Flawless execution of game rules (Game Y) and provision of AI strategies at different difficulty levels.
 
-Interface(s):: 
-YEN Service Interface (JSON/HTTP).
-
-Quality/Performance Characteristics:: 
-High calculation speed (Rust), Memory safety and high concurrency support.
-
-Directory/File Location:: 
-`/gamey`
-
-Fulfilled Requirements:: 
-Verify match status, Suggest next move, Multiple strategies (AI).
+Purpose/Responsibility:: Execution of Game Y rules and providing AI strategies at multiple difficulty levels.
+Interface(s):: YEN Service Interface (JSON/HTTP over Port 4000).
+Quality Characteristics:: High calculation speed (Rust), Memory safety, and high concurrency.
+Directory/File Location:: `/gamey`
+Fulfilled Requirements:: Rule validation, Next move suggestions, Multiple AI strategies.
 
 ---
 
-=== Level 2
+=== 5.2 Level 2
 
-==== White Box Gamey Engine
-Since the Gamey Engine is the system's most complex logic unit, its internal structure is detailed below.
+==== 5.2.1 White Box Gamey Engine
+Since the Gamey Engine handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.
 
 image::level-2-gamey.png["Gamey Engine White Box Diagram"]
 
-Contained Building Blocks (Black Boxes)::
+**Contained Building Blocks (Black Boxes):**
 
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **Web Interface** | The REST controller that receives YEN-encoded requests from the Webapp.
+| **Core Logic** | The engine's core that validates Game Y rules and determines game outcomes.
+| **Strategy Registry** | Manages various AI difficulty levels and provides next-move suggestions.
+| **YEN Parser** | Translates between JSON-based YEN notation and internal Rust data structures.
 |===
 
+==== 5.2.2 White Box Webapp
+The Webapp is the primary interface for users. Its internal architecture separates visual components from communication logic.
+
+image::level-2-webapp.png["Webapp White Box Diagram"]
+
+**Contained Building Blocks (Black Boxes):**
+
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| **UI Components** | React views including the Game Board, Register Form, and Statistics dashboard.
+| **State Management** | Centralized client-side store maintaining the current game state and user session.
+| **API Client** | Orchestrates asynchronous HTTP communication with Users Service and Gamey Engine.
 |===
 
-==== White Box Webapp
-
-
-Contained Building Blocks (Black Boxes)::
-
-|===
-
-|===
+Important Interfaces::
+* **External Bot API:** A direct endpoint in the API Client that allows bot actors to interact with the system without using the GUI.
+* **Service Connectors:** Outbound connections from the API Client to external microservices (Users/Gamey).
