@@ -38,7 +38,7 @@ describe('RegisterForm', () => {
 
       // Response message should appear
       expect(
-        screen.getByText(/hello pablo/i)
+        screen.getByText(/Welcome Pablo/i)
       ).toBeInTheDocument()
     })
   })
