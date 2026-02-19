@@ -463,8 +463,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#section-building-block-view">5. Building Block View</a>
 <ul class="sectlevel2">
 <li><a href="#_whitebox_overall_system">5.1. Whitebox Overall System</a></li>
-<li><a href="#_level_2">5.2. Level 2</a></li>
-<li><a href="#_level_3">5.3. Level 3</a></li>
+<li><a href="#_5_2_level_2">5.2. 5.2 Level 2</a></li>
 </ul>
 </li>
 <li><a href="#section-runtime-view">6. Runtime View</a>
@@ -888,118 +887,24 @@ Refer to details in the following sections.</p>
 <div class="sect1">
 <h2 id="section-building-block-view">5. Building Block View</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<div class="title">Content</div>
-<p>The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations, data structures, &#8230;&#8203;) as well as their dependencies (relationships, associations, &#8230;&#8203;)</p>
-</div>
-<div class="paragraph">
-<p>This view is mandatory for every architecture documentation.
-In analogy to a house this is the <em>floor plan</em>.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Maintain an overview of your source code by making its structure understandable through
-abstraction.</p>
-</div>
-<div class="paragraph">
-<p>This allows you to communicate with your stakeholder on an abstract level without disclosing implementation details.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>The building block view is a hierarchical collection of black boxes and white boxes
-(see figure below) and their descriptions.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/05_building_blocks-EN.png" alt="Hierarchy of building blocks">
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Level 1</strong> is the white box description of the overall system together with black
-box descriptions of all contained building blocks.</p>
-</div>
-<div class="paragraph">
-<p><strong>Level 2</strong> zooms into some building blocks of level 1.
-Thus it contains the white box description of selected building blocks of level 1, together with black box descriptions of their internal building blocks.</p>
-</div>
-<div class="paragraph">
-<p><strong>Level 3</strong> zooms into selected building blocks of level 2, and so on.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-5/">Building Block View</a> in the arc42 documentation.</p>
-</div>
-</div>
+<p>The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, etc.) as well as their dependencies. In analogy to a house, this is the floor plan.</p>
 </div>
 <div class="sect2">
 <h3 id="_whitebox_overall_system">5.1. Whitebox Overall System</h3>
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
-<div class="paragraph">
-<p>Here you describe the decomposition of the overall system using the following white box template. It contains</p>
+<img src="./images/level-1-overview.png" alt="YOVI Level 1 Overview Diagram">
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>an overview diagram</p>
-</li>
-<li>
-<p>a motivation for the decomposition</p>
-</li>
-<li>
-<p>black box descriptions of the contained building blocks. For these we offer you alternatives:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>use <em>one</em> table for a short and pragmatic overview of all contained building blocks and their interfaces</p>
-</li>
-<li>
-<p>use a list of black box descriptions of the building blocks according to the black box template (see below).
-Depending on your choice of tool this list could be sub-chapters (in text files), sub-pages (in a Wiki) or nested elements (in a modeling tool).</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>(optional:) important interfaces, that are not explained in the black box templates of a building block, but are very important for understanding the white box.
-Since there are so many ways to specify interfaces why do not provide a specific template for them.
- In the worst case you have to specify and describe syntax, semantics, protocols, error handling,
- restrictions, versions, qualities, necessary compatibilities and many things more.
-In the best case you will get away with examples or simple signatures.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;text explanation&gt;</em></p>
+<p>The YOVI system follows the <strong>Separation of Concerns</strong> principle. It uses a modern React frontend for user interaction, a Node.js microservice for user data management, and a high-performance Rust engine for game logic. This hybrid architecture ensures scalability and runtime efficiency.</p>
 </dd>
 <dt class="hdlist1">Contained Building Blocks</dt>
-<dd>
-<p><em>&lt;Description of contained building block (black boxes)&gt;</em></p>
-</dd>
-<dt class="hdlist1">Important Interfaces</dt>
-<dd>
-<p><em>&lt;Description of important interfaces&gt;</em></p>
-</dd>
 </dl>
-</div>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<p>Insert your explanations of black boxes from level 1:</p>
-</div>
-<div class="paragraph">
-<p>If you use tabular form you will only describe your black boxes with name and
-responsibility according to the following schema:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1014,174 +919,216 @@ responsibility according to the following schema:</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;black box 1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"> <em>&lt;Text&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Webapp</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">React-based frontend. Visualizes the game board, manages user registration, and provides a REST API for bot interactions.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;black box 2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"> <em>&lt;Text&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Users Service</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Node.js backend managing user profiles, authentication, and game history metrics.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gamey Engine</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rust-based engine that validates Game Y rules, checks win conditions, and generates AI moves.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PostgreSQL</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Relational database for persistent storage of user profiles and match statistics.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
-Its headline is the name of the black box.</p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_name_black_box_1">5.1.1. &lt;Name black box 1&gt;</h4>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<p>Here you describe &lt;black box 1&gt;
-according the the following black box template:</p>
-</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Important Interfaces</dt>
+<dd>
 <div class="ulist">
 <ul>
 <li>
-<p>Purpose/Responsibility</p>
+<p><strong>YEN Notation:</strong> Standard JSON format carrying board states between the Webapp and Gamey Engine.</p>
 </li>
 <li>
-<p>Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.</p>
-</li>
-<li>
-<p>(Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, &#8230;&#8203;.</p>
-</li>
-<li>
-<p>(Optional) directory/file location</p>
-</li>
-<li>
-<p>(Optional) Fulfilled requirements (if you need traceability to requirements).</p>
-</li>
-<li>
-<p>(Optional) Open issues/problems/risks</p>
+<p><strong>REST API (Internal):</strong> Endpoints enabling communication between the Webapp and Users Service.</p>
 </li>
 </ul>
 </div>
+</dd>
+</dl>
 </div>
-</div>
-<div class="paragraph">
-<p><em>&lt;Purpose/Responsibility&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;Interface(s)&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Quality/Performance Characteristics&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Directory/File Location&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Fulfilled Requirements&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(optional) Open Issues/Problems/Risks&gt;</em></p>
+<div class="sect3">
+<h4 id="_webapp_black_box">5.1.1. Webapp (Black Box)</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Purpose/Responsibility</dt>
+<dd>
+<p>Providing the user interface and system access for human players and external bots.</p>
+</dd>
+<dt class="hdlist1">Interface(s)</dt>
+<dd>
+<p>Web GUI (HTML/CSS/TS), External Bot REST API (JSON).</p>
+</dd>
+<dt class="hdlist1">Directory/File Location</dt>
+<dd>
+<p><code>/webapp</code></p>
+</dd>
+<dt class="hdlist1">Fulfilled Requirements</dt>
+<dd>
+<p>Web frontend, Bot interaction API, User registration.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_2">5.1.2. &lt;Name black box 2&gt;</h4>
-<div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<h4 id="_users_service_black_box">5.1.2. Users Service (Black Box)</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Purpose/Responsibility</dt>
+<dd>
+<p>Managing user information and game metrics through database communication.</p>
+</dd>
+<dt class="hdlist1">Interface(s)</dt>
+<dd>
+<p>Internal REST API (Node.js/Express over Port 3000).</p>
+</dd>
+<dt class="hdlist1">Directory/File Location</dt>
+<dd>
+<p><code>/users</code></p>
+</dd>
+<dt class="hdlist1">Fulfilled Requirements</dt>
+<dd>
+<p>Registration system, Match history, Win/Loss statistics.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_n">5.1.3. &lt;Name black box n&gt;</h4>
-<div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<h4 id="_gamey_engine_black_box">5.1.3. Gamey Engine (Black Box)</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Purpose/Responsibility</dt>
+<dd>
+<p>Execution of Game Y rules and providing AI strategies at multiple difficulty levels.</p>
+</dd>
+<dt class="hdlist1">Interface(s)</dt>
+<dd>
+<p>YEN Service Interface (JSON/HTTP over Port 4000).</p>
+</dd>
+<dt class="hdlist1">Quality Characteristics</dt>
+<dd>
+<p>High calculation speed (Rust), Memory safety, and high concurrency.</p>
+</dd>
+<dt class="hdlist1">Directory/File Location</dt>
+<dd>
+<p><code>/gamey</code></p>
+</dd>
+<dt class="hdlist1">Fulfilled Requirements</dt>
+<dd>
+<p>Rule validation, Next move suggestions, Multiple AI strategies.</p>
+</dd>
+</dl>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_1">5.1.4. &lt;Name interface 1&gt;</h4>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_m">5.1.5. &lt;Name interface m&gt;</h4>
-
+<hr>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_level_2">5.2. Level 2</h3>
-<div class="sidebarblock arc42help">
+<h3 id="_5_2_level_2">5.2. 5.2 Level 2</h3>
+<div class="sect3">
+<h4 id="_5_2_1_white_box_gamey_engine">5.2.1. 5.2.1 White Box Gamey Engine</h4>
+<div class="paragraph">
+<p>Since the Gamey Engine handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.</p>
+</div>
+<div class="imageblock">
 <div class="content">
+<img src="./images/level-2-gamey.png" alt="Gamey Engine White Box Diagram">
+</div>
+</div>
 <div class="paragraph">
-<p>Here you can specify the inner structure of (some) building blocks from level 1 as white boxes.</p>
+<p><strong>Contained Building Blocks (Black Boxes):</strong></p>
 </div>
-<div class="paragraph">
-<p>You have to decide which building blocks of your system are important enough to justify such a detailed description.
-Please prefer relevance over completeness. Specify important, surprising, risky, complex or volatile building blocks.
-Leave out normal, simple, boring or standardized parts of your system</p>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Responsibility</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Web Interface</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The REST controller that receives YEN-encoded requests from the Webapp.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Core Logic</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The engine&#8217;s core that validates Game Y rules and determines game outcomes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Strategy Registry</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Manages various AI difficulty levels and provides next-move suggestions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>YEN Parser</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Translates between JSON-based YEN notation and internal Rust data structures.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_1">5.2.1. White Box <em>&lt;building block 1&gt;</em></h4>
-<div class="sidebarblock arc42help">
+<h4 id="_5_2_2_white_box_webapp">5.2.2. 5.2.2 White Box Webapp</h4>
+<div class="paragraph">
+<p>The Webapp is the primary interface for users. Its internal architecture separates visual components from communication logic.</p>
+</div>
+<div class="imageblock">
 <div class="content">
-<div class="paragraph">
-<p>&#8230;&#8203;describes the internal structure of <em>building block 1</em>.</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_white_box_building_block_2">5.2.2. White Box <em>&lt;building block 2&gt;</em></h4>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
-</div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_white_box_building_block_m">5.2.3. White Box <em>&lt;building block m&gt;</em></h4>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_level_3">5.3. Level 3</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<p>Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.</p>
-</div>
-<div class="paragraph">
-<p>When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.</p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_white_box_building_block_x_1">5.3.1. White Box &lt;_building block x.1_&gt;</h4>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<p>Specifies the internal structure of <em>building block x.1</em>.</p>
-</div>
+<img src="./images/level-2-webapp.png" alt="Webapp White Box Diagram">
 </div>
 </div>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p><strong>Contained Building Blocks (Black Boxes):</strong></p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Responsibility</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>UI Components</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">React views including the Game Board, Register Form, and Statistics dashboard.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>State Management</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Centralized client-side store maintaining the current game state and user session.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>API Client</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrates asynchronous HTTP communication with Users Service and Gamey Engine.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Important Interfaces</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>External Bot API:</strong> A direct endpoint in the API Client that allows bot actors to interact with the system without using the GUI.</p>
+</li>
+<li>
+<p><strong>Service Connectors:</strong> Outbound connections from the API Client to external microservices (Users/Gamey).</p>
+</li>
+</ul>
 </div>
-<div class="sect3">
-<h4 id="_white_box_building_block_x_2">5.3.2. White Box &lt;_building block x.2_&gt;</h4>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_white_box_building_block_y_1">5.3.3. White Box &lt;_building block y.1_&gt;</h4>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+</dd>
+</dl>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -1374,22 +1321,48 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
+<div class="imageblock">
+<div class="content">
+<img src="./images/deployment_level1.png" alt="Infrastructure Level 1 Overview">
+</div>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
+<p>The system is designed as a distributed web application. A central server hosts all the application logic and data (backend, game engine, database), while users access the game via standard web browsers. This centralized structure ensures data consistency and simplifies updates.</p>
 </dd>
 <dt class="hdlist1">Quality and/or Performance Features</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Scalability:</strong> The server uses Docker, allowing easy scaling of resources if the number of players increases.</p>
+</li>
+<li>
+<p><strong>Accessibility:</strong> Users do not need to install any specific software; a web browser is sufficient.</p>
+</li>
+<li>
+<p><strong>Availability:</strong> The server is accessible 24/7 via the internet.</p>
+</li>
+</ul>
+</div>
 </dd>
 <dt class="hdlist1">Mapping of Building Blocks to Infrastructure</dt>
 <dd>
-<p><em>&lt;description of the mapping&gt;</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Client Device:</strong> Runs the <code>Frontend Application</code> (React) inside the browser.</p>
+</li>
+<li>
+<p><strong>External Bot Device:</strong> Runs custom bot scripts developed by third parties.</p>
+</li>
+<li>
+<p><strong>YOVI Server:</strong> Runs the <code>Backend (Users Service)</code>, <code>Game Engine (Rust)</code>, and <code>Database</code>.</p>
+</li>
+</ul>
+</div>
 </dd>
 </dl>
 </div>
@@ -1407,24 +1380,81 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_1">7.2.1. <em>&lt;Infrastructure Element 1&gt;</em></h4>
+<h4 id="_docker_host_server">7.2.1. Docker Host (Server)</h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/deployment_server.png" alt="Docker Host Detail">
+</div>
+</div>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<p>This diagram illustrates the internal structure of the Server. The entire system is containerized using Docker, which ensures consistency across development and production environments.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Docker Host:</strong> The physical or virtual server running the Docker Engine.</p>
+</li>
+<li>
+<p><strong>WebApp Container:</strong> Hosts the React frontend application. It acts as the entry point for users and external bots. It forwards API requests to the backend services.</p>
+</li>
+<li>
+<p><strong>Users Service Container:</strong> A Node.js/Express application that handles user authentication and history management. It is not directly accessible from the outside; it only accepts requests from the WebApp.</p>
+</li>
+<li>
+<p><strong>GameY Service Container:</strong> The core game engine written in Rust. It processes game logic and validates moves. Like the Users Service, it is internal and accessed via the WebApp.</p>
+</li>
+<li>
+<p><strong>Database Container:</strong> A PostgreSQL instance used for persistent storage of user data and game history. It is strictly isolated and only accessible by the Users Service via TCP port 5432.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_2">7.2.2. <em>&lt;Infrastructure Element 2&gt;</em></h4>
-<div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<h4 id="_client_device">7.2.2. Client Device</h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/deployment_client.png" alt="User Device Detail">
+</div>
 </div>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p>This diagram illustrates the client-side deployment.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Client Device:</strong> Represents the physical hardware (PC or Mobile) used by the player.</p>
+</li>
+<li>
+<p><strong>Web Browser:</strong> The execution environment (e.g., Chrome, Firefox) that renders the application.</p>
+</li>
+<li>
+<p><strong>YOVI Web Client:</strong> The React/TypeScript application artifact downloaded from the server and executed within the browser.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_n">7.2.3. <em>&lt;Infrastructure Element n&gt;</em></h4>
+<h4 id="_external_bot_device">7.2.3. External Bot Device</h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/deployment_bot.png" alt="External Bot Device Detail">
+</div>
+</div>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<p>This diagram illustrates the deployment of an external bot that interacts with the YOVI system. Unlike human players, bots do not use a web browser; instead, they run as standalone scripts or applications.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>External Bot Device:</strong> Represents any machine (local computer or server) hosting a third-party bot.</p>
+</li>
+<li>
+<p><strong>Bot Runtime:</strong> The environment required to execute the bot logic (e.g., Python Interpreter, Java Virtual Machine, or Node.js Runtime).</p>
+</li>
+<li>
+<p><strong>Bot Application:</strong> The actual code developed by third parties (or the development team for testing). It communicates with the <strong>YOVI System</strong> exclusively via the HTTP/REST API (JSON) provided by the Web Application.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -1804,7 +1834,7 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-02-05 12:11:49 +0100
+Last updated 2026-02-19 12:11:59 +0100
 </div>
 </div>
 </body>
