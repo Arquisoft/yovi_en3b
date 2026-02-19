@@ -1,27 +1,42 @@
 ifndef::imagesdir[:imagesdir: ../images]
 
-[[section-technical-risks]]
-== Risks and Technical Debts
+[[section-risks-and-technical-debt]]
+== Risks and Technical Debt
 
+=== Risk Mitigation Table
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-A list of identified technical risks or technical debts, ordered by priority
+[cols="1,2,2" options="header"]
+|===
+|Risk |Proactive Measure |Contingent Measure
 
-.Motivation
-“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.) 
+|**Team Attrition**
+|Maintain clean code and updated documentation so any member can take over.
+|Redistribute tasks among remaining members; focus on MVP features.
 
-This should be your motto for systematic detection and evaluation of risks and technical debts in the architecture, which will be needed by management stakeholders (e.g. project managers, product owners) as part of the overall risk analysis and measurement planning.
+|**Uneven Learning Curves**
+|Conduct internal "Pair Programming" sessions for difficult modules (Rust).
+|Reassign tasks based on individual strengths and simplify complexity.
 
-.Form
-List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.
+|**Rust Learning Curve**
+|Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early.
+|Use simpler AI strategies (e.g., Random Move) if logic becomes a bottleneck.
 
+|**Integration Failures**
+|Define a shared JSON Schema for YEN validation between TS and Rust.
+|Hold emergency integration meetings to align data formats and parsers.
 
-.Further Information
+|**Final Exam Pressure**
+|Set internal deadlines 2 weeks before the official delivery date.
+|Shift focus to critical bug fixes and mandatory documentation only.
 
-See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 documentation.
+|**Deployment Failures**
+|Configure and test CI/CD pipelines (GitHub Actions) in the first month.
+|Perform manual deployments to alternative providers (e.g., Fly.io or Render).
 
-****
-endif::arc42help[]
+|===
+
+=== Technical Debt
+
+* **AI Complexity:** Initial AI versions will use basic heuristics; advanced algorithms are considered debt for later sprints.
+* **Test Coverage:** Reaching 80% automated coverage is a pending goal while focusing on core features.
+* **YEN Robustness:** Deep validation for malformed JSON from external bots is yet to be fully implemented.
