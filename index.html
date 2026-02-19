@@ -455,11 +455,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#section-architecture-constraints">2. Architecture Constraints</a></li>
 <li><a href="#section-context-and-scope">3. Context and Scope</a>
 <ul class="sectlevel2">
-<li><a href="#_business_context">3.1. Business Context</a></li>
-<li><a href="#_technical_context">3.2. Technical Context</a></li>
+<li><a href="#_technical_context">3.1. Technical Context</a></li>
 </ul>
 </li>
-<li><a href="#section-solution-strategy">4. Solution Strategy</a></li>
+<li><a href="#section-solution-strategy">4. Solution Strategy</a>
+<ul class="sectlevel2">
+<li><a href="#_strategic_decisions">4.1. Strategic Decisions</a></li>
+<li><a href="#_organizational_development_strategy">4.2. Organizational &amp; Development Strategy</a></li>
+</ul>
+</li>
 <li><a href="#section-building-block-view">5. Building Block View</a>
 <ul class="sectlevel2">
 <li><a href="#_whitebox_overall_system">5.1. Whitebox Overall System</a></li>
@@ -468,10 +472,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-runtime-view">6. Runtime View</a>
 <ul class="sectlevel2">
-<li><a href="#_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</a></li>
-<li><a href="#_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</a></li>
-<li><a href="#">6.3. &#8230;&#8203;</a></li>
-<li><a href="#_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</a></li>
+<li><a href="#_full_game">6.1. Full game</a></li>
+<li><a href="#_asking_for_a_hint">6.2. Asking for a hint</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -494,7 +496,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
 </ul>
 </li>
-<li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
+<li><a href="#section-risks-and-technical-debt">11. Risks and Technical Debt</a>
+<ul class="sectlevel2">
+<li><a href="#_risk_mitigation_table">11.1. Risk Mitigation Table</a></li>
+<li><a href="#_technical_debt">11.2. Technical Debt</a></li>
+</ul>
+</li>
 <li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
@@ -554,58 +561,36 @@ For documentation of your own system you use better the <em>plain</em> version.<
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<p>Describes the relevant requirements and the driving forces that software architects and development team must consider.
-These include</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>underlying business goals,</p>
-</li>
-<li>
-<p>essential features,</p>
-</li>
-<li>
-<p>essential functional requirements,</p>
-</li>
-<li>
-<p>quality goals for the architecture and</p>
-</li>
-<li>
-<p>relevant stakeholders and their expectations</p>
-</li>
-</ul>
+<p>Describes the relevant requirements and the driving forces that software architects and development team must consider.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_requirements_overview">1.1. Requirements Overview</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Short description of the functional requirements, driving forces, extract (or abstract)
-of requirements. Link to (hopefully existing) requirements documents
-(with version number and information where to find it).</p>
+<p><strong>YOVI</strong> is a gaming suite developed for <strong>Micrati</strong> based on "Game Y". The system allows users to play hexagonal board games against the computer and provides an interface for external bots.</p>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>From the point of view of the end users a system is created or modified to
-improve support of a business activity and/or improve the quality.</p>
+<p>Key functional requirements include:</p>
 </div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Short textual description, probably in tabular use-case format.
-If requirements documents exist this overview should refer to these documents.</p>
-</div>
-<div class="paragraph">
-<p>Keep these excerpts as short as possible. Balance readability of this document with potential redundancy w.r.t to requirements documents.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-1/">Introduction and Goals</a> in the arc42 documentation.</p>
-</div>
-</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Core Gameplay:</strong> Implementation of classic Game Y with variable board sizes.</p>
+</li>
+<li>
+<p><strong>AI Strategies:</strong> Support for multiple machine strategies and selectable difficulty levels.</p>
+</li>
+<li>
+<p><strong>User Management:</strong> Registration and match history tracking (win/loss stats).</p>
+</li>
+<li>
+<p><strong>External Access:</strong> A fully documented API for bot interaction using <strong>YEN notation</strong>.</p>
+</li>
+<li>
+<p><strong>Public Availability:</strong> The system must be deployed and accessible via the web.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -638,6 +623,50 @@ If you as an architect do not know how the quality of your work will be judged&#
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p>The following table presents the top five quality goals for the YOVI architecture, ordered by priority. These goals have been identified based on stakeholder expectations and the ISO 25010 quality model. They represent the most critical quality attributes that will guide architectural decisions throughout the project and serve as the primary criteria for evaluating the success of the system.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Priority</th>
+<th class="tableblock halign-left valign-top">Quality Goal</th>
+<th class="tableblock halign-left valign-top">Concrete Scenario</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Performance Efficiency</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Rust engine must respond to move validation and AI suggestions in under 200ms, ensuring a smooth gameplay experience even during peak usage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Compatibility (Interoperability)</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must allow external bots to connect via a well-documented JSON API (YEN notation), enabling third-party developers to create their own game clients.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Functional Suitability</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Rust engine must accurately implement all "Game Y" rules, and the web frontend must cover all user stories including registration, gameplay, and statistics.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Maintainability</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The architecture must keep Rust logic independent from the TypeScript layer, with clear ADRs and &gt;80% code coverage, allowing evaluators and future developers to understand and modify the system.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Transferability</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The complete system must be deployable with a single Docker command, ensuring evaluators can easily install and test the application on any modern environment.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_stakeholders">1.3. Stakeholders</h3>
@@ -678,29 +707,82 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p>This section provides an explicit overview of the stakeholders of the system. Stakeholders include all persons, roles, or organizations that should know the architecture, need to be convinced of it, have to work with the architecture or codebase, require the documentation for their work, or are involved in making decisions about the system and its development. We have identified the following stakeholders related to our project:</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 20%;">
-<col style="width: 40%;">
-<col style="width: 40%;">
+<col style="width: 12.5%;">
+<col style="width: 25%;">
+<col style="width: 12.5%;">
+<col style="width: 12.5%;">
+<col style="width: 37.5%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Role/Name</th>
-<th class="tableblock halign-left valign-top">Contact</th>
-<th class="tableblock halign-left valign-top">Expectations</th>
+<th class="tableblock halign-left valign-top">Category</th>
+<th class="tableblock halign-left valign-top">Stakeholder</th>
+<th class="tableblock halign-left valign-top">Impact</th>
+<th class="tableblock halign-left valign-top">Influence</th>
+<th class="tableblock halign-left valign-top">Key Interests &amp; Expectations</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Role-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Contact-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Expectation-1&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1. Primary Owners</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Micrati</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Critical</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Successful delivery of the YOVI suite based on "Game Y".</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Role-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Contact-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Expectation-2&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2. End Users</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Human Players</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Smooth UX, web-based matches, and accurate statistics.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bot Developers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Robust external API and clear technical documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3. Technical Team</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Project Team</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Critical</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Proper implementation of TypeScript and Rust subsystems.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Architects</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Structural integrity, ADR maintenance, and quality attributes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DevOps/SysAdmin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Seamless CI/CD, deployment, and system monitoring.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4. External</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Competing Teams</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interoperability and compatibility for optional matches.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5. Academic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Evaluators</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Critical</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Test coverage, documentation quality, and project management.</p></td>
 </tr>
 </tbody>
 </table>
@@ -714,124 +796,132 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Any requirement that constraints software architects in their freedom of design and implementation decisions or decision about the development process. These constraints sometimes go beyond individual systems and are valid for whole organizations and companies.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Architects should know exactly where they are free in their design decisions and where they must adhere to constraints.
-Constraints must always be dealt with; they may be negotiable, though.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Simple tables of constraints with explanations.
-If needed you can subdivide them into
-technical constraints, organizational and political constraints and
-conventions (e.g. programming or versioning guidelines, documentation or naming conventions)</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-2/">Architecture Constraints</a> in the arc42 documentation.</p>
+<p>Requirements that constrain the freedom of design and implementation.</p>
 </div>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Constraint</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Programming Languages</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Web application must be implemented in <strong>TypeScript</strong>; the logic/strategy module must be in <strong>Rust</strong>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Data Exchange</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Communication must use <strong>JSON</strong> messages following the <strong>YEN notation</strong> standard.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Interface Architecture</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Rust module must be exposed as a <strong>basic web service interface</strong> (stateless).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Project Management</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mandatory use of <strong>GitHub Issues</strong> for task tracking and <strong>ADRs</strong> for documenting architectural decisions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Infrastructure</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must be deployed to a <strong>public cloud provider</strong> using automated <strong>CI/CD</strong>.</p></td>
+</tr>
+</tbody>
+</table>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="section-context-and-scope">3. Context and Scope</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>Context and scope - as the name suggests - delimits your system (i.e. your scope) from all its communication partners
-(neighboring systems and users, i.e. the context of your system). It thereby specifies the external interfaces.</p>
-</div>
-<div class="paragraph">
-<p>If necessary, differentiate the business context (domain specific inputs and outputs) from the technical context (channels, protocols, hardware).</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>The domain interfaces and technical interfaces to communication partners are among your system&#8217;s most critical aspects. Make sure that you completely understand them.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Various options:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Context diagrams</p>
-</li>
-<li>
-<p>Lists of communication partners and their interfaces.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-3/">Context and Scope</a> in the arc42 documentation.</p>
+<img src="./images/03_1_business_context.png" alt="Business Context">
 </div>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Neighbor</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Human player who interacts with the <strong>YOVI</strong> web application. They can play matches of "Game Y", register in the system, and consult their win/loss statistics and rankings.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bot / External API</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External automated systems that interact with the application through a documented API. They can manage user data and play matches by sending board states in <strong>YEN notation</strong>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rust Module</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External module that provides a web service interface. It is responsible for verifying match victories and suggesting the next move using JSON messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence system used to store user registration information, match history, and performance metrics.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sect2">
-<h3 id="_business_context">3.1. Business Context</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
+<h3 id="_technical_context">3.1. Technical Context</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Interface</th>
+<th class="tableblock halign-left valign-top">Channel</th>
+<th class="tableblock halign-left valign-top">Description / Format</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User Interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web Browser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows human players to interact with the game, register, and view statistics.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bot / External API</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External API</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows automated systems to manage data and play matches using JSON (YEN Notation).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game Logic Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal communication with the Rust Module to verify match victories and request move suggestions using JSON (YEN Notation).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence Layer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database Connection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System used to store user registration information, match history, and performance metrics.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Specification of <strong>all</strong> communication partners (users, IT-systems, &#8230;&#8203;) with explanations of domain specific inputs and outputs or interfaces.
-Optionally you can add domain specific formats or communication protocols.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>All stakeholders should understand which data are exchanged with the environment of the system.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>All kinds of diagrams that show the system as a black box and specify the domain interfaces to communication partners.</p>
-</div>
-<div class="paragraph">
-<p>Alternatively (or additionally) you can use a table.
-The title of the table is the name of your system, the three columns contain the name of the communication partner, the inputs, and the outputs.</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>&lt;Diagram or Table&gt;</strong></p>
-</div>
-<div class="paragraph">
-<p><strong>&lt;optionally: Explanation of external domain interfaces&gt;</strong></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_technical_context">3.2. Technical Context</h3>
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>Technical interfaces (channels and transmission media) linking your system to its environment. In addition a mapping of domain specific input/output to the channels, i.e. an explanation which I/O uses which channel.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Many stakeholders make architectural decision based on the technical interfaces between the system and its context. Especially infrastructure or hardware designers decide these technical interfaces.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>E.g. UML deployment diagram describing channels to neighboring systems,
-together with a mapping table showing the relationships between channels and input/output.</p>
-</div>
-</div>
+<p>Technical Details
+YEN Notation: All game-related data exchange (size, turn, players, and layout) must strictly follow the JSON-based YEN notation.</p>
 </div>
 <div class="paragraph">
-<p><strong>&lt;Diagram or Table&gt;</strong></p>
+<p>Coordinate Systems: The system handles the coordinates using both barycentric coordinates (x, y, z) and linear indices.</p>
 </div>
 <div class="paragraph">
-<p><strong>&lt;optionally: Explanation of technical interfaces&gt;</strong></p>
-</div>
-<div class="paragraph">
-<p><strong>&lt;Mapping Input/Output to Channels&gt;</strong></p>
+<p>Deployment: The application is designed to be deployed (through Docker) and publicly accessible via the Web.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -844,44 +934,96 @@ together with a mapping table showing the relationships between channels and inp
 <div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
-<p>A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes</p>
+<p>A short summary and explanation of the fundamental decisions and solution strategies.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_strategic_decisions">4.1. Strategic Decisions</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Goal / Problem</th>
+<th class="tableblock halign-left valign-top">Decision</th>
+<th class="tableblock halign-left valign-top">Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Database Technology</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>SQL (PostgreSQL)</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A relational database ensures data integrity for users and matches. PostgreSQL offers flexibility and robustness for long-term storage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Backend Architecture</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Component-based &amp; Layered</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Organized into independent components with layers (entry-points, domain, data-access) to ensure maintainability and separation of concerns.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Game Logic Engine</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Rust</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High-performance engine to handle Game Y logic. It allows the implementation of complex AI strategies without sacrificing response time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Frontend Technology</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Web Application (React)</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The user interface is developed as a web application. The team prioritized Quality of Life (QoL) features such as Hints and Undo button, while discarding complex media features like video chat.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>AI Levels</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Selectable Difficulty</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system provides multiple difficulty levels. This satisfies the requirement of having more than one machine strategy (e.g., Random vs. Minimax).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>User Interaction</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Text-based Chat</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A lightweight text chat is implemented to enhance social interaction between players without the technical overhead of video/audio streaming.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Security</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Hashing &amp; Env Variables</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Encryption for passwords and environment variables for secrets to follow security best practices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Ranking System</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Winrate Metric</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Focuses on the win/loss ratio to provide a simple but competitive ranking for the leaderboard.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_organizational_development_strategy">4.2. Organizational &amp; Development Strategy</h3>
+<div class="paragraph">
+<p>Decisions regarding team coordination and workflow to ensure project quality:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>technology decisions</p>
+<p><strong>Task Distribution:</strong> Work is divided into fixed sub-groups of 2-3 people (Frontend, Backend, Rust/Docs) to ensure code reviews and knowledge sharing.</p>
 </li>
 <li>
-<p>decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern</p>
-</li>
+<p><strong>GitHub Workflow:</strong></p>
+<div class="ulist">
+<ul>
 <li>
-<p>decisions on how to achieve key quality goals</p>
-</li>
-<li>
-<p>relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.</p>
+<p>Pull Requests are reviewed by the sub-group (Frontend/Backend) NOT related to the topic itself, ensuring shared understanding of project upgrades among team members.</p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>These decisions form the cornerstones for your architecture. They are the foundation for many other detailed decisions or implementation rules.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Keep the explanations of such key decisions short.</p>
-</div>
-<div class="paragraph">
-<p>Motivate what was decided and why it was decided that way,
-based upon problem statement, quality goals and key constraints.
-Refer to details in the following sections.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-4/">Solution Strategy</a> in the arc42 documentation.</p>
-</div>
-</div>
+</li>
+<li>
+<p><strong>Documentation:</strong> Developed collaboratively and consolidated in specific sessions.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1138,100 +1280,27 @@ Refer to details in the following sections.</p>
 <div class="sect1">
 <h2 id="section-runtime-view">6. Runtime View</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>The runtime view describes concrete behavior and interactions of the system’s building blocks in form of scenarios from the following areas:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>important use cases or features: how do building blocks execute them?</p>
-</li>
-<li>
-<p>interactions at critical external interfaces: how do building blocks cooperate with users and neighboring systems?</p>
-</li>
-<li>
-<p>operation and administration: launch, start-up, stop</p>
-</li>
-<li>
-<p>error and exception scenarios</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Remark: The main criterion for the choice of possible scenarios (sequences, workflows) is their <strong>architectural relevance</strong>. It is <strong>not</strong> important to describe a large number of scenarios. You should rather document a representative selection.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>You should understand how (instances of) building blocks of your system perform their job and communicate at runtime.
-You will mainly capture scenarios in your documentation to communicate your architecture to stakeholders that are less willing or able to read and understand the static models (building block view, deployment view).</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>There are many notations for describing scenarios, e.g.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>numbered list of steps (in natural language)</p>
-</li>
-<li>
-<p>activity diagrams or flow charts</p>
-</li>
-<li>
-<p>sequence diagrams</p>
-</li>
-<li>
-<p>BPMN or EPCs (event process chains)</p>
-</li>
-<li>
-<p>state machines</p>
-</li>
-<li>
-<p>&#8230;&#8203;</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-6/">Runtime View</a> in the arc42 documentation.</p>
-</div>
-</div>
-</div>
 <div class="sect2">
-<h3 id="_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</h3>
-<div class="ulist">
-<ul>
-<li>
-<p><em>&lt;insert runtime diagram or textual description of the scenario&gt;</em></p>
-</li>
-<li>
-<p><em>&lt;insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.&gt;</em></p>
-</li>
-</ul>
-</div>
+<h3 id="_full_game">6.1. Full game</h3>
 <div class="paragraph">
-<p>It is possible to use a sequence diagram:</p>
+<p>This diagram represents a full game, from when the user logs to when the user ends the game</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="332" height="335">
+<img src="./images/Playing%20the%20game.png" alt="Playing the game" width="556" height="673">
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</h3>
-
+<h3 id="_asking_for_a_hint">6.2. Asking for a hint</h3>
+<div class="paragraph">
+<p>This diagram represents the user asking for a hint</p>
 </div>
-<div class="sect2">
-<h3 id="">6.3. &#8230;&#8203;</h3>
-
+<div class="imageblock">
+<div class="content">
+<img src="./images/Asking%20for%20Hint.png" alt="Asking for Hint" width="598" height="487">
 </div>
-<div class="sect2">
-<h3 id="_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</h3>
+</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1739,32 +1808,74 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 </div>
 </div>
 <div class="sect1">
-<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
+<h2 id="section-risks-and-technical-debt">11. Risks and Technical Debt</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>A list of identified technical risks or technical debts, ordered by priority</p>
+<div class="sect2">
+<h3 id="_risk_mitigation_table">11.1. Risk Mitigation Table</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Risk</th>
+<th class="tableblock halign-left valign-top">Proactive Measure</th>
+<th class="tableblock halign-left valign-top">Contingent Measure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Team Attrition</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maintain clean code and updated documentation so any member can take over.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redistribute tasks among remaining members; focus on MVP features.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Uneven Learning Curves</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Conduct internal "Pair Programming" sessions for difficult modules (Rust).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reassign tasks based on individual strengths and simplify complexity.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Rust Learning Curve</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use simpler AI strategies (e.g., Random Move) if logic becomes a bottleneck.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Integration Failures</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define a shared JSON Schema for YEN validation between TS and Rust.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hold emergency integration meetings to align data formats and parsers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Final Exam Pressure</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set internal deadlines 2 weeks before the official delivery date.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Shift focus to critical bug fixes and mandatory documentation only.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Deployment Failures</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure and test CI/CD pipelines (GitHub Actions) in the first month.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Perform manual deployments to alternative providers (e.g., Fly.io or Render).</p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.)</p>
-</div>
-<div class="paragraph">
-<p>This should be your motto for systematic detection and evaluation of risks and technical debts in the architecture, which will be needed by management stakeholders (e.g. project managers, product owners) as part of the overall risk analysis and measurement planning.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-11/">Risks and Technical Debt</a> in the arc42 documentation.</p>
-</div>
-</div>
+<div class="sect2">
+<h3 id="_technical_debt">11.2. Technical Debt</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>AI Complexity:</strong> Initial AI versions will use basic heuristics; advanced algorithms are considered debt for later sprints.</p>
+</li>
+<li>
+<p><strong>Test Coverage:</strong> Reaching 80% automated coverage is a pending goal while focusing on core features.</p>
+</li>
+<li>
+<p><strong>YEN Robustness:</strong> Deep validation for malformed JSON from external bots is yet to be fully implemented.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 <div class="sect1">
