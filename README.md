@@ -1,7 +1,6 @@
 # 🕹️ Welcome to Game Y!🕹️
 
-
-[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming;suite+dedicated+to+the+classic+Game+Y.+🚀)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
 ---
 
 <p align="center">
@@ -197,3 +196,9 @@ Each component has its own set of scripts defined in its `package.json`. Here ar
 - `cargo test`: Runs the unit tests.
 - `cargo run`: Runs the gamey application.
 - `cargo doc`: Generates documentation for the GameY engine application
+
+### Documentation
+
+- `npm run build`: Generates the documentation
+- `npm run deploy`: Deploys the documentation to GitHub Pages 
+
