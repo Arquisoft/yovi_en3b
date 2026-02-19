@@ -1,11 +1,52 @@
-# YOVI_en3b - Game Y at UniOvi
+# 🕹️ Welcome to Game Y!🕹️
 
-[![Release — Test, Build, Publish, Deploy](https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
 
-This project is a template with some basic functionality for the ASW labs.
+[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming;suite+dedicated+to+the+classic+Game+Y.+🚀)](https://git.io/typing-svg)
+---
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="Maintained">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+  <img src="https://img.shields.io/badge/Platform-Web-blue.svg" alt="Platform">
+  <br>
+  <a href="https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml">
+    <img src="https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml/badge.svg" alt="Release Status">
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=alert_status" alt="Quality Gate">
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=coverage" alt="Coverage">
+  </a>
+</p>
+
+---
+
+## 👋 Meet the Team
+
+We are a coordinated team working across different layers of the stack to deliver a seamless gaming experience:
+
+| Member | Role | Contact | 
+| :--- | :--- | :--- | 
+| **Elena Quintes** | Frontend| UO269665@uniovi.es | 
+| **Luis Sánchez** | Frontend| UO277488@uniovi.es | 
+| **Marcos José Sánchez**| Backend | UO300022@uniovi.es | 
+| **David Alonso** | Frontend | UO300569@uniovi.es | 
+| **Ceyda Tolunay** | Backend | UO318869@uniovi.es | 
+| **Lucas Uña García** | Backend | UO302165@uniovi.es | 
+
+---
+
+## ✨ Key Features
+
+* **🎮 Classic Game Y:** Fully functional hexagonal board game.
+* **🧠 Smart AI:** Multiple difficulty levels powered by our high-performance Rust engine.
+* **💬 Text Chat:** Integrated real-time text interaction for competitive matches.
+* **⏪ Player QoL:** Strategic **Hints** and **Undo** functionality to improve learning.
+* **📊 Rankings:** Competitive leaderboard based on specialized **Winrate Metrics**.
+* **🤖 Bot Friendly:** Documented API using **YEN notation** for external developers.
+
+---
 ## Project Structure
 
 The project is divided into three main components, each in its own directory:
