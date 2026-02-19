@@ -5,6 +5,5 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'lcov'],
     },
-    setupFiles: ['./vitest.setup.js'],
   },
 })
