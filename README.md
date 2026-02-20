@@ -1,9 +1,12 @@
-# 🕹️ Welcome to Game Y!🕹️
+# 🕹️ Welcome to Game Y! 🕹️
 
 [![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
 
-[![Arc42 Documentation](https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](https://arquisoft.github.io/yovi_en3b/)
----
+<p align="center">
+  <a href="https://arquisoft.github.io/yovi_en3b/">
+    <img src="https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Arc42 Documentation">
+  </a>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="Maintained">
@@ -59,7 +62,6 @@ We are a coordinated team working across different layers of the stack to delive
 
 ---
 ## 📁 Project Structure
-
 ```text
 yovi_en3b/
 ├── 📁 docs/          # Arc42 documentation & meeting minutes
@@ -68,6 +70,8 @@ yovi_en3b/
 ├── 📁 webapp/        # React + TypeScript frontend (User Interface)
 └── 🐳 docker-compose.yml  # System orchestration
 ```
+
+
 
 ## Basic Features
 
@@ -213,6 +217,7 @@ Each component has its own set of scripts defined in its `package.json`. Here ar
 
 - `npm run build`: Generates the documentation
 - `npm run deploy`: Deploys the documentation to GitHub Pages 
+
 
 ---
 ## 👥 Contributors
