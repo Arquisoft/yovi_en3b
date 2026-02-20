@@ -30,9 +30,8 @@
 [![TypeScript](https://img.shields.io/badge/typescript-%23007acc.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-
 
 ---
 
@@ -43,7 +42,7 @@ We are a coordinated team working across different layers of the stack to delive
 | Member | Role | Contact | 
 | :--- | :--- | :--- | 
 | **Elena Quintes** | Frontend| UO269665@uniovi.es | 
-| **Luis Sánchez** | Frontend| UO277488@uniovi.es | 
+| **Luis Sánchez de Posada** | Frontend| UO277488@uniovi.es | 
 | **Marcos José Sánchez**| Backend | UO300022@uniovi.es | 
 | **David Alonso** | Frontend | UO300569@uniovi.es | 
 | **Ceyda Tolunay** | Backend | UO318869@uniovi.es | 
