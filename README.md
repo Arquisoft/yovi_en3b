@@ -63,12 +63,10 @@ We are a coordinated team working across different layers of the stack to delive
 ```text
 yovi_en3b/
 ├── 📁 docs/          # Arc42 documentation & meeting minutes
-├── 📁 restapi/       # Node.js + Express backend
-│   ├── 📄 models/    # Data schemas (MongoDB)
-│   └── 📄 routes/    # API Endpoints
-├── 📁 webapp/        # React + TypeScript frontend
-│   └── 📄 src/       # Application components
-└── 🐳 docker-compose.yml
+├── 📁 gamey/         # Rust-based Game Engine (Logic & AI)
+├── 📁 restapi/       # Node.js + Express backend (Business Logic)
+├── 📁 webapp/        # React + TypeScript frontend (User Interface)
+└── 🐳 docker-compose.yml  # System orchestration
 ```
 
 ## Basic Features
