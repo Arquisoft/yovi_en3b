@@ -1,6 +1,8 @@
 # 🕹️ Welcome to Game Y!🕹️
 
 [![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
+
+[![Arc42 Documentation](https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](https://arquisoft.github.io/yovi_en3b/)
 ---
 
 <p align="center">
