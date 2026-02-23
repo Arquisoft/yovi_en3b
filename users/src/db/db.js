@@ -1,3 +1,4 @@
+console.log("!!! EL ARCHIVO DB.JS SE ESTÁ EJECUTANDO REALMENTE !!!");
 const {Pool} = require('pg');
 require('dotenv').config();
 
