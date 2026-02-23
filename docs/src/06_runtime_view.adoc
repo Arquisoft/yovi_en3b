@@ -12,19 +12,20 @@ This diagram the action of the user login
 @startuml
 actor User
 participant WebApp
-participant GameYEngine
+participant UsersService
 database Database
 
-User -> WebApp: Introduces credentials (user/password)
-WebApp -> GameYEngine: Auth Request
-GameYEngine -> Database: Searchs for the user and validates password hash
-Database --> GameYEngine: Returns the user data (or error)
+User -> WebApp: Enters credentials (username/password)
+WebApp -> UsersService: Auth Request
+UsersService -> Database: Search for user & validate password hash
+Database --> UsersService: Return user data (or error)
+
 alt valid credentials
-    GameYEngine --> WebApp: Login Ok
-    WebApp --> User: Redirects to the game panel
-else Invalid credentials
-    GameYEngine --> WebApp: Login failed
-    WebApp --> User: Shows "Incorrect user / password"
+    UsersService --> WebApp: Login Success
+    WebApp --> User: Redirect to Game Dashboard
+else invalid credentials
+    UsersService --> WebApp: Login Failed (401 Unauthorized)
+    WebApp --> User: Show "Invalid username or password"
 end
 @enduml
 ----
@@ -39,6 +40,7 @@ This diagram shows the execution of a game
 actor User
 participant WebApp
 participant GameYEngine
+participant UsersService
 database Database
 
 User -> WebApp: Selects board size, difficulty
@@ -58,8 +60,10 @@ loop
     WebApp --> User: Shows the play of the bot
 end
 
-WebApp -> GameYEngine: Asks to save the data of the game
-GameYEngine -> Database: Asks to save the data of the game
+WebApp -> UsersService: Asks to save the data of the game
+UsersService -> Database: Asks to save the data of the game
+Database --> UsersService: Confirms the data was saved
+UsersService --> WebApp: Confirms the data was saved
 @enduml
 ----
 
