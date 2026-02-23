@@ -3,38 +3,67 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-runtime-view]]
 == Runtime View
 
-=== Full game
+=== User Login
 
-This diagram represents a full game, from when the user logs to when the user ends the game
+This diagram the action of the user login
 
-[plantuml,"Playing the game",png]
+[plantuml,"Login",png]
 ----
 @startuml
 actor User
 participant WebApp
-participant RustModule
-database Db
+participant UsersService
+database Database
 
-User -> WebApp: Log in
-WebApp -> Db: Checks credentials
-Db --> WebApp: Returns data of the user
-User -> WebApp: Selects board size, difficulty...
-WebApp -> RustModule: Create board
-RustModule --> WebApp: Board created
+User -> WebApp: Enters credentials (username/password)
+WebApp -> UsersService: Auth Request
+UsersService -> Database: Search for user & validate password hash
+Database --> UsersService: Return user data (or error)
+
+alt valid credentials
+    UsersService --> WebApp: Login Success
+    WebApp --> User: Redirect to Game Dashboard
+else invalid credentials
+    UsersService --> WebApp: Login Failed (401 Unauthorized)
+    WebApp --> User: Show "Invalid username or password"
+end
+@enduml
+----
+
+=== User plays the game
+
+This diagram shows the execution of a game
+
+[plantuml,"Game",png]
+----
+@startuml
+actor User
+participant WebApp
+participant GameYEngine
+participant UsersService
+database Database
+
+User -> WebApp: Selects board size, difficulty
+User -> WebApp: Selects 'Play'
+WebApp -> GameYEngine: Requests the board
+GameYEngine --> WebApp: Returns the board
+
 loop
     User -> WebApp: Plays their turn
-    WebApp -> RustModule: Checks if there is a winner
-
-    break There is a winner  
-        RustModule --> WebApp: Returns result of the game
-        WebApp --> User: Shows result of the gmae
+    WebApp -> GameYEngine: Sends the board state & Checks if there is a winner
+    GameYEngine -> WebApp: Returns whether there is a winner
+    break There is a winner!
+        WebApp --> User: Shows result of the game
     end
-
-    WebApp -> RustModule: Asks the machine to play
-    RustModule --> WebApp: Returns machine's play
-    WebApp --> User: Shows what the machine has done
+    WebApp -> GameYEngine: Sends the board state & Asks the bot to play
+    GameYEngine --> WebApp: Returns the play of the bot 
+    WebApp --> User: Shows the play of the bot
 end
-WebApp -> Db: Save data of the game
+
+WebApp -> UsersService: Asks to save the data of the game
+UsersService -> Database: Asks to save the data of the game
+Database --> UsersService: Confirms the data was saved
+UsersService --> WebApp: Confirms the data was saved
 @enduml
 ----
 
@@ -47,20 +76,12 @@ This diagram represents the user asking for a hint
 @startuml
 actor User
 participant WebApp
-participant RustModule
-database Db
-
-User -> WebApp: Log in
-WebApp -> Db: Checks credentials
-Db --> WebApp: Returns data of the user
-User -> WebApp: Selects board size, difficulty...
-WebApp -> RustModule: Create board
-RustModule --> WebApp: Board created
+participant GameYEngine
 
 User -> WebApp: Asks for a hint
-WebApp -> RustModule: Requests the hint
-RustModule --> WebApp: Returns in YEN notation the movement hint
-WebApp --> User: Returns the hint graphically
+WebApp -> GameYEngine: Sends the board state & Asks for the move
+GameYEngine --> WebApp: Returns the hint
+WebApp --> User: Shows visually the hint
 
 @enduml
 ----
