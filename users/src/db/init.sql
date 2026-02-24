@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS matches (
     red_player_id UUID REFERENCES users(id), -- Null if you play against a BOT
     is_bot BOOLEAN DEFAULT false,
     bot_difficulty INT DEFAULT 0, -- 0 if you play against a real local player, 1=Easy, 2=Medium, 3=Hard
-    winner_id UUID REFERENCES users(id), -- 0 if the match hasn't ended yet, 1 if the bot wins the match, otherwise winners id
+    winner_id UUID REFERENCES users(id), -- Null if the match hasn't ended yet or if there is a tie
     status VARCHAR(20) DEFAULT 'in_progress', -- 'in_progress', 'finished', 'abandoned'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP
