@@ -7,6 +7,8 @@ const fs = require('node:fs');
 const YAML = require('js-yaml');
 const promBundle = require('express-prom-bundle');
 const userRoutes = require('./src/modules/user/entry-points/userRoutes');
+//
+const matchRoutes = require('./src/modules/match/entry-points/matchRoutes');
 
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
@@ -29,7 +31,8 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use('/users', userRoutes);
-
+//
+app.use('/matches', matchRoutes);
 
 if (require.main === module) {
   app.listen(port, () => {
