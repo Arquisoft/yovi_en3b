@@ -1,95 +1,200 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* App.css */
+
+/* 1. REGISTRO DE TU FUENTE PERSONALIZADA */
+@font-face {
+  font-family: 'Cubic';
+  /* Ajusta esta ruta si tu carpeta se llama distinto, ej: ./fonts/cubic.ttf */
+  src: url('./assets/fonts/cubic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 2. RESET Y FONDO FULL SCREEN (AZUL Y ROJO) */
+.App {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+.menu-container {
+  width: 100%;
+  max-width: 1200px;
+  height: 100vh;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 3. ICONOS ARRIBA A LA DERECHA */
+/* Contenedor de la barra superior */
+.header-icons {
+  display: flex;
+  justify-content: flex-end; /* Alineados a la derecha */
+  gap: 20px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+/* Estilo para los botones de iconos superiores */
+.icon-btn {
+  background: transparent; /* Sin fondo */
+  border: none;            /* Sin bordes */
+  color: #60a5fa;         /* Tu azul claro */
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #ffffff;         /* Cambia a blanco al pasar el ratón */
+  transform: scale(1.1);   /* Un pequeño efecto de aumento */
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
+}
+
+/* Asegúrate de que el título use tu fuente Cubic si ya la tienes cargada */
+.title-game {
+  font-family: 'Cubic', sans-serif;
+  /* ... resto de tu estilo ... */
+}
+
+/* 4. TÍTULO CON FUENTE CUBIC */
+.title-game {
+  font-family: 'Cubic', sans-serif; 
+  font-size: 8rem; 
+  text-align: center;
+  margin: 30px 0 50px 0;
+  color: #60a5fa; /* Azul brillante */
+  text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+/* 5. CUADRÍCULA DE BOTONES */
+.grid-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 420px); /* Botones anchos de escritorio */
+  gap: 25px;
+  justify-content: center;
+}
+
+.main-button {
+  background: rgba(15, 23, 42, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 45px;
+  border-radius: 25px;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.main-button:hover {
+  transform: translateY(-8px);
+  background: rgba(30, 41, 59, 0.9);
+  border-color: #60a5fa;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Colores específicos */
+.btn-blue {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  border: none;
+}
+
+.btn-red {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  border: none;
+  grid-column: 1 / span 2; /* El ranking ocupa toda la fila */
+}
+
+/* Estilos del Modal Emergente */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px); /* Desenfoque de fondo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative; 
+  background: rgba(15, 23, 42, 0.95);
+  padding: 60px 40px 40px 40px; 
+  border-radius: 30px;
+  border: 2px solid #60a5fa;
+  width: 90%;
+  max-width: 500px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.modal-title {
+  font-family: 'Cubic', sans-serif;
+  color: #60a5fa;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* Register Form Styles */
-.register-form {
-  display: flex;
-  flex-direction: column;
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 15px;
-  max-width: 300px;
-  margin: 50px auto;
+}
+
+.opt-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #333;
-}
-
-.form-input {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.form-input:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.submit-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  background-color: #03080e;
+  border-radius: 15px;
   color: white;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.submit-button:hover {
-  background-color: #0056b3;
+.opt-btn:hover {
+  background: #2563eb;
+  transform: translateX(10px);
+}
+
+
+.close-modal {
+  position: absolute; 
+  top: 20px;          
+  right: 25px;         
+  background: transparent;
+  border: none;
+  color: #60a5fa;     
+  font-size: 3.5rem;   
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Ajuste para el botón de ranking que ahora ocupa todo el ancho */
+.full-width {
+  grid-column: 1 / span 2;
 }
