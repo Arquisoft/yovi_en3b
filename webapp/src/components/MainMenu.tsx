@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { Languages, MessageSquare, Settings, User } from 'lucide-react'; // Importamos iconos
-import '../App.css'; 
+import '../App.css';
 import { ProfileOverlay } from '../features/profile/ProfileOverlay';
+import { useNavigate } from 'react-router-dom';
 
 const MainMenu: React.FC = () => {
   const [showPlayOptions, setShowPlayOptions] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleStartGame = (level: string) => {
+    setShowPlayOptions(false);
+    navigate('/game');
+  };
 
   return (
     <div className="App">
@@ -28,15 +36,15 @@ const MainMenu: React.FC = () => {
 
         <div className="grid-buttons">
           <button className="main-button btn-blue full-width" onClick={() => setShowPlayOptions(true)}>
-              PLAY
-          </button>
-          
-          <button className="main-button">
-              HOW TO PLAY
+            PLAY
           </button>
 
           <button className="main-button">
-              OVERALL RANKING
+            HOW TO PLAY
+          </button>
+
+          <button className="main-button">
+            OVERALL RANKING
           </button>
         </div>
 
@@ -47,9 +55,9 @@ const MainMenu: React.FC = () => {
               <button className="close-modal" onClick={() => setShowPlayOptions(false)}>&times;</button>
               <h2 className="modal-title">Select Level</h2>
               <div className="modal-grid">
-                <button className="opt-btn"> EASY</button>
-                <button className="opt-btn"> MEDIUM</button>
-                <button className="opt-btn"> HARD</button>
+                <button className="opt-btn" onClick={() => handleStartGame('easy')}> EASY</button>
+                <button className="opt-btn" onClick={() => handleStartGame('medium')}> MEDIUM</button>
+                <button className="opt-btn" onClick={() => handleStartGame('hard')}> HARD</button>
               </div>
             </div>
           </div>
