@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Languages, MessageSquare, Settings, User } from 'lucide-react'; // Importamos iconos
 import '../App.css'; 
+import { ProfileOverlay } from '../features/profile/ProfileOverlay';
 
 const MainMenu: React.FC = () => {
   const [showPlayOptions, setShowPlayOptions] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   return (
     <div className="App">
@@ -13,7 +15,13 @@ const MainMenu: React.FC = () => {
           <button className="icon-btn" title="Language"><Languages size={28} /></button>
           <button className="icon-btn" title="Chat"><MessageSquare size={28} /></button>
           <button className="icon-btn" title="Settings"><Settings size={28} /></button>
-          <button className="icon-btn" title="Profile"><User size={28} /></button>
+          <button
+            className="icon-btn"
+            title="Profile"
+            onClick={() => setProfileOpen(true)}
+          >
+            <User size={28} />
+          </button>
         </div>
 
         <h1 className="title-game">game y</h1>
@@ -46,6 +54,9 @@ const MainMenu: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* profile overlay controlled by avatar button */}
+        <ProfileOverlay open={profileOpen} onClose={() => setProfileOpen(false)} />
       </div>
     </div>
   );
