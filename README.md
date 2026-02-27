@@ -1,21 +1,76 @@
-# YOVI_en3b - Game Y at UniOvi
+# 🕹️ Welcome to Game Y! 🕹️
 
-[![Release — Test, Build, Publish, Deploy](https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml/badge.svg)](https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b)
+[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
 
-This project is a template with some basic functionality for the ASW labs.
+<p align="center">
+  <a href="https://arquisoft.github.io/yovi_en3b/">
+    <img src="https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Arc42 Documentation">
+  </a>
+</p>
 
-## Project Structure
+<p align="center">
+  <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="Maintained">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
+  <img src="https://img.shields.io/badge/Platform-Web-blue.svg" alt="Platform">
+  <br>
+  <a href="https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml">
+    <img src="https://github.com/arquisoft/yovi_en3b/actions/workflows/release-deploy.yml/badge.svg" alt="Release Status">
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=alert_status" alt="Quality Gate">
+  </a>
+  <a href="https://sonarcloud.io/summary/new_code?id=Arquisoft_yovi_en3b">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=Arquisoft_yovi_en3b&metric=coverage" alt="Coverage">
+  </a>
+</p>
 
-The project is divided into three main components, each in its own directory:
+### 🛠 Tech Stack
 
-- `webapp/`: A frontend application built with React, Vite, and TypeScript.
-- `users/`: A backend service for managing users, built with Node.js and Express.
-- `gamey/`: A Rust game engine and bot service.
-- `docs/`: Architecture documentation sources following Arc42 template
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007acc.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-Each component has its own `package.json` file with the necessary scripts to run and test the application.
+---
+
+## 👋 Meet the Team
+
+We are a coordinated team working across different layers of the stack to deliver a seamless gaming experience:
+
+| Member | Role | Contact | 
+| :--- | :--- | :--- | 
+| **Elena Quintes** | Frontend| UO269665@uniovi.es | 
+| **Luis Sánchez de Posada** | Frontend| UO277488@uniovi.es | 
+| **Marcos José Sánchez**| Backend | UO300022@uniovi.es | 
+| **David Alonso** | Frontend | UO300569@uniovi.es | 
+| **Ceyda Tolunay** | Backend | UO318869@uniovi.es | 
+| **Lucas Uña García** | Backend | UO302165@uniovi.es | 
+
+---
+
+## ✨ Key Features
+
+* **🎮 Classic Game Y:** Fully functional hexagonal board game.
+* **🧠 Smart AI:** Multiple difficulty levels powered by our high-performance Rust engine.
+* **💬 Text Chat:** Integrated real-time text interaction for competitive matches.
+* **⏪ Player QoL:** Strategic **Hints** and **Undo** functionality to improve learning.
+* **📊 Rankings:** Competitive leaderboard based on specialized **Winrate Metrics**.
+* **🤖 Bot Friendly:** Documented API using **YEN notation** for external developers.
+
+---
+## 📁 Project Structure
+```text
+yovi_en3b/
+├── 📁 docs/          # Arc42 documentation & meeting minutes
+├── 📁 gamey/         # Rust-based Game Engine (Logic & AI)
+├── 📁 restapi/       # Node.js + Express backend (Business Logic)
+├── 📁 webapp/        # React + TypeScript frontend (User Interface)
+└── 🐳 docker-compose.yml  # System orchestration
+```
+
+
 
 ## Basic Features
 
@@ -156,3 +211,21 @@ Each component has its own set of scripts defined in its `package.json`. Here ar
 - `cargo test`: Runs the unit tests.
 - `cargo run`: Runs the gamey application.
 - `cargo doc`: Generates documentation for the GameY engine application
+
+### Documentation
+
+- `npm run build`: Generates the documentation
+- `npm run deploy`: Deploys the documentation to GitHub Pages 
+
+
+---
+## 👥 Contributors
+
+We are **Group EN3B**, a team of students at the University of Oviedo.
+
+<a href="https://github.com/Arquisoft/yovi_en3b/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Arquisoft/yovi_en3b" />
+</a>
+
+---
+*Generated by [contrib.rocks](https://contrib.rocks)*
