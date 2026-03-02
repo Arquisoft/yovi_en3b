@@ -7,8 +7,7 @@ ifdef::arc42help[]
 [role="arc42help"]
 ****
 .Contents
-A short summary and explanation of the fundamental decisions and solution strategies...
-(Help text omitted for brevity)
+A short summary and explanation of the fundamental decisions and solution strategies.
 ****
 endif::arc42help[]
 
@@ -20,27 +19,35 @@ endif::arc42help[]
 
 | **Database Technology**
 | **SQL (PostgreSQL)**
-| The team selected a relational database to ensure data integrity and robustness. PostgreSQL was chosen specifically for being open-source and fulfilling our requirements. It also offers hybrid support (relational/non-relational) for future flexibility.
+| A relational database ensures data integrity for users and matches. PostgreSQL offers flexibility and robustness for long-term storage.
 
 | **Backend Architecture**
 | **Component-based & Layered**
-| To ensure maintainability and scalability, the backend is organized into independent components. Internally, each component is divided into three strict layers: **entry-points, domain, and data-access**.
+| Organized into independent components with layers (entry-points, domain, data-access) to ensure maintainability and separation of concerns.
 
 | **Game Logic Engine**
 | **Rust**
-| The core logic for the "Game Y" is isolated in a separate module developed in Rust to ensure performance and safety.
+| High-performance engine to handle Game Y logic. It allows the implementation of complex AI strategies without sacrificing response time.
 
-| **Frontend Strategy**
+| **Frontend Technology**
 | **Web Application (React)**
-| The user interface is developed as a web application. The team prioritized Quality of Life (QoL) features such as **Hints** and **Undo button**, while discarding complex media features like video chat.
+| The user interface is developed as a web application. The team prioritized Quality of Life (QoL) features such as Hints and Undo button, while discarding complex media features like video chat.
+
+| **AI Levels**
+| **Selectable Difficulty**
+| The system provides multiple difficulty levels. This satisfies the requirement of having more than one machine strategy (e.g., Random vs. Minimax).
+
+| **User Interaction**
+| **Text-based Chat**
+| A lightweight text chat is implemented to enhance social interaction between players without the technical overhead of video/audio streaming.
 
 | **Security**
-| **Hashing & Environment Variables**
-| User passwords will be encrypted using a hashing algorithm. Database credentials are managed via environment variables to prevent hardcoding sensitive data in the source code.
+| **Hashing & Env Variables**
+| Encryption for passwords and environment variables for secrets to follow security best practices.
 
 | **Ranking System**
 | **Winrate Metric**
-| The ranking functionality focuses specifically on the win/loss ratio (won matches against played) to simplify the data model and presentation layer.
+| Focuses on the win/loss ratio to provide a simple but competitive ranking for the leaderboard.
 |===
 
 === Organizational & Development Strategy
