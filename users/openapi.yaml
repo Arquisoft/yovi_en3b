@@ -21,7 +21,7 @@ paths:
                   type: string
                   example: "testuser"
       responses:
-        '200':
+        "200":
           description: User created successfully
           content:
             application/json:
@@ -30,6 +30,6 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Hello testuser! welcome to the course!"
-        '400':
+                    example: "Welcome testuser"
+        "400":
           description: Error creating user

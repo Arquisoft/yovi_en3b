@@ -19,7 +19,7 @@ const RegisterForm: React.FC = () => {
     setLoading(true);
     try {
       const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
-      const res = await fetch(`${API_URL}/createuser`, {
+      const res = await fetch(`${API_URL}/users/createuser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -40,6 +40,18 @@ const RegisterForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  async function testConection() {
+    try {
+          const API_URL = import.meta.env.VITE_GAMEY_URL ?? 'http://localhost:4000'
+          const res = await fetch(`${API_URL}`); 
+          console.log("✅ Conexión establecida con el servidor Rust");
+          console.log("Status recibido:", res.status);
+      } catch(error){
+        console.log(error);
+  }
+  };
+  testConection();
 
   return (
     <form onSubmit={handleSubmit} className="register-form">
