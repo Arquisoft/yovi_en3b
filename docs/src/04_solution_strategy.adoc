@@ -3,32 +3,58 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-solution-strategy]]
 == Solution Strategy
 
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
 .Contents
-A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes
-
-* technology decisions
-* decisions about the top-level decomposition of the system, e.g. usage of an architectural pattern or design pattern
-* decisions on how to achieve key quality goals
-* relevant organizational decisions, e.g. selecting a development process or delegating certain tasks to third parties.
-
-.Motivation
-These decisions form the cornerstones for your architecture. They are the foundation for many other detailed decisions or implementation rules.
-
-.Form
-Keep the explanations of such key decisions short.
-
-Motivate what was decided and why it was decided that way,
-based upon problem statement, quality goals and key constraints.
-Refer to details in the following sections.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentation.
-
+A short summary and explanation of the fundamental decisions and solution strategies.
 ****
 endif::arc42help[]
+
+=== Strategic Decisions
+
+[cols="1,1,2" options="header"]
+|===
+| Goal / Problem | Decision | Rationale
+
+| **Database Technology**
+| **SQL (PostgreSQL)**
+| A relational database ensures data integrity for users and matches. PostgreSQL offers flexibility and robustness for long-term storage.
+
+| **Backend Architecture**
+| **Component-based & Layered**
+| Organized into independent components with layers (entry-points, domain, data-access) to ensure maintainability and separation of concerns.
+
+| **Game Logic Engine**
+| **Rust**
+| High-performance engine to handle Game Y logic. It allows the implementation of complex AI strategies without sacrificing response time.
+
+| **Frontend Technology**
+| **Web Application (React)**
+| The user interface is developed as a web application. The team prioritized Quality of Life (QoL) features such as Hints and Undo button, while discarding complex media features like video chat.
+
+| **AI Levels**
+| **Selectable Difficulty**
+| The system provides multiple difficulty levels. This satisfies the requirement of having more than one machine strategy (e.g., Random vs. Minimax).
+
+| **User Interaction**
+| **Text-based Chat**
+| A lightweight text chat is implemented to enhance social interaction between players without the technical overhead of video/audio streaming.
+
+| **Security**
+| **Hashing & Env Variables**
+| Encryption for passwords and environment variables for secrets to follow security best practices.
+
+| **Ranking System**
+| **Winrate Metric**
+| Focuses on the win/loss ratio to provide a simple but competitive ranking for the leaderboard.
+|===
+
+=== Organizational & Development Strategy
+
+Decisions regarding team coordination and workflow to ensure project quality:
+
+* **Task Distribution:** Work is divided into fixed sub-groups of 2-3 people (Frontend, Backend, Rust/Docs) to ensure code reviews and knowledge sharing.
+* **GitHub Workflow:**
+** Pull Requests are reviewed by the sub-group (Frontend/Backend) NOT related to the topic itself, ensuring shared understanding of project upgrades among team members.
+* **Documentation:** Developed collaboratively and consolidated in specific sessions.
