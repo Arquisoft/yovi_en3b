@@ -17,3 +17,13 @@ CREATE TABLE IF NOT EXISTS matches (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP
 );
+
+-- Rankings table: stores aggregated stats per user
+CREATE TABLE IF NOT EXISTS rankings (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID UNIQUE NOT NULL REFERENCES users(id),
+    total_matches INT DEFAULT 0,
+    win_matches INT DEFAULT 0,
+    score INT DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
