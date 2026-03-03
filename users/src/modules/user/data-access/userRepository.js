@@ -1,5 +1,7 @@
 const db = require('../../../db/db.js');
 
+//Access the data base to create a new User with the params passed to the query
+// and returns some attributes to confirm the addition
 const createUser = async (userData) => {
     const query = `
         INSERT INTO users (username, email, password)

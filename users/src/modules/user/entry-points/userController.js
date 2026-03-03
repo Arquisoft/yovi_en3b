@@ -1,6 +1,8 @@
 const userService = require('../domain/userService');
 
 // POST /users/createuser
+//Here the service for creating a user is called. 
+// In case of a successful creation, a message is returned.
 const createUser = async (req, res) => {
     try {
         const result = await userService.createUser(req.body);
