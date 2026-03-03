@@ -203,6 +203,9 @@ git commit -m "feat: añadida funcionalidad de login"
 git push origin tu-rama
 ```
 
+**Nota:** El "Paso a paso" anterior describe el flujo cuando trabajas en tu rama personal con tus propias funcionalidades. Si vas a compartir la implementación o trabajar en una funcionalidad junto a otros compañeros (por ejemplo, una funcionalidad conjunta de front-end o back-end), crea una rama de colaboración (por ejemplo `feature/nombre`) y trabaja localmente en tu rama personal; luego sube (push) y abre una Pull Request hacia la rama de colaboración o hacia `develop` según corresponda para integrar el trabajo conjunto. En cualquier caso, todos deberíamos trabajar primero en nuestra propia rama personal y **no** directamente en `front-end` ni `back-end`: esas ramas son temporales dependientes de eliminación cuando termine su ciclo de implementación.
+
+
 ### ¿Qué implica cada paso?
 
 | Comando      | ¿Qué hace?                                                                 |
@@ -675,6 +678,9 @@ git commit -m "feat: added login functionality"
 # 8. Push the changes to the remote repository
 git push origin your-branch
 ```
+
+**Note:** The "Step by step" above describes the flow when you work in your personal branch on your own features. If you need to share the implementation or work on a feature together with colleagues (for example a joint front-end or back-end feature), create a collaborative branch (for example `feature/name`) and develop locally on your personal branch; then push and open a Pull Request to the collaborative branch or to `develop` as appropriate to integrate the shared work. In any case, everyone should work first on their own personal branch and **not** directly on `front-end` or `back-end`: those branches are temporary and may be deleted once their implementation cycle finishes.
+
 
 ### What does each step imply?
 
