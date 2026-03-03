@@ -22,7 +22,8 @@ describe('POST /users/createuser', () => {
             .send({ 
                 username: testName,
                 email: 'pablo@test.com', 
-                password: 'password123'
+                password: 'password123',
+                photo: "photo"
             })
             .set('Accept', 'application/json')
 
