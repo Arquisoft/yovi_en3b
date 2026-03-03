@@ -4,11 +4,11 @@ const db = require('../../../db/db.js');
 // and returns some attributes to confirm the addition
 const createUser = async (userData) => {
     const query = `
-        INSERT INTO users (username, email, password)
-        VALUES ($1, $2, $3)
-        RETURNING id, username, email, created_at; 
+        INSERT INTO users (username, email, password, photo)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id, username, email, photo, created_at; 
     `;
-    const values = [userData.username, userData.email, userData.password];
+    const values = [userData.username, userData.email, userData.password, userData.photo];
     const { rows } = await db.query(query, values);
     return rows[0];
 };

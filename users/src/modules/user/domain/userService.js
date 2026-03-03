@@ -30,6 +30,7 @@ const createUser = async (data) => {
         username: data.username,
         email: data.username, //data.email
         password: "", //securePassword
+        photo: "", 
     });
     
     return newUser;
