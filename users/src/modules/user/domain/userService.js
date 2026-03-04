@@ -1,6 +1,10 @@
 
 const userRepository = require('../data-access/userRepository');
 
+//Service of the creation of a user.
+//It checks that all the fields have been written, the email is not used yet for another user and the password fullfills the requirements.
+//Here the password is encrypted to be saved.
+
 const createUser = async (data) => {
     // 1. Check password constraints
     // if (!data.password || data.password.length < 6) {
@@ -26,6 +30,7 @@ const createUser = async (data) => {
         username: data.username,
         email: data.username, //data.email
         password: "", //securePassword
+        photo: "", 
     });
     
     return newUser;

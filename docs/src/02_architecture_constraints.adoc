@@ -3,27 +3,19 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-architecture-constraints]]
 == Architecture Constraints
 
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
-.Contents
-Any requirement that constraints software architects in their freedom of design and implementation decisions or decision about the development process. These constraints sometimes go beyond individual systems and are valid for whole organizations and companies.
-
-.Motivation
-Architects should know exactly where they are free in their design decisions and where they must adhere to constraints.
-Constraints must always be dealt with; they may be negotiable, though.
-
-.Form
-Simple tables of constraints with explanations.
-If needed you can subdivide them into
-technical constraints, organizational and political constraints and
-conventions (e.g. programming or versioning guidelines, documentation or naming conventions)
-
-
-.Further Information
-
-See https://docs.arc42.org/section-2/[Architecture Constraints] in the arc42 documentation.
-
+Requirements that constrain the freedom of design and implementation.
 ****
 endif::arc42help[]
+
+[cols="1,3" options="header"]
+|===
+|Constraint |Description
+|**Programming Languages** |The Web application must be implemented in **TypeScript**; the logic/strategy module must be in **Rust**.
+|**Data Exchange** |Communication must use **JSON** messages following the **YEN notation** standard.
+|**Interface Architecture** |The Rust module must be exposed as a **basic web service interface** (stateless).
+|**Project Management** |Mandatory use of **GitHub Issues** for task tracking and **ADRs** for documenting architectural decisions.
+|**Infrastructure** |The system must be deployed to a **public cloud provider** using automated **CI/CD**.
+|===

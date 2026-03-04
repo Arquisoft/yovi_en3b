@@ -3,65 +3,87 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-runtime-view]]
 == Runtime View
 
+=== User Login
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-The runtime view describes concrete behavior and interactions of the system’s building blocks in form of scenarios from the following areas:
+This diagram the action of the user login
 
-* important use cases or features: how do building blocks execute them?
-* interactions at critical external interfaces: how do building blocks cooperate with users and neighboring systems?
-* operation and administration: launch, start-up, stop
-* error and exception scenarios
-
-Remark: The main criterion for the choice of possible scenarios (sequences, workflows) is their *architectural relevance*. It is *not* important to describe a large number of scenarios. You should rather document a representative selection.
-
-.Motivation
-You should understand how (instances of) building blocks of your system perform their job and communicate at runtime.
-You will mainly capture scenarios in your documentation to communicate your architecture to stakeholders that are less willing or able to read and understand the static models (building block view, deployment view).
-
-.Form
-There are many notations for describing scenarios, e.g.
-
-* numbered list of steps (in natural language)
-* activity diagrams or flow charts
-* sequence diagrams
-* BPMN or EPCs (event process chains)
-* state machines
-* ...
-
-
-.Further Information
-
-See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
-
-****
-endif::arc42help[]
-
-=== <Runtime Scenario 1>
-
-
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
-
-It is possible to use a sequence diagram:
-
-[plantuml,"Sequence diagram",png]
+[plantuml,"Login",png]
 ----
-actor Alice
-actor Bob
-database Pod as "Bob's Pod"
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
-Alice  --> Pod: Store route
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+@startuml
+actor User
+participant WebApp
+participant UsersService
+database Database
+
+User -> WebApp: Enters credentials (username/password)
+WebApp -> UsersService: Auth Request
+UsersService -> Database: Search for user & validate password hash
+Database --> UsersService: Return user data (or error)
+
+alt valid credentials
+    UsersService --> WebApp: Login Success
+    WebApp --> User: Redirect to Game Dashboard
+else invalid credentials
+    UsersService --> WebApp: Login Failed (401 Unauthorized)
+    WebApp --> User: Show "Invalid username or password"
+end
+@enduml
 ----
 
-=== <Runtime Scenario 2>
+=== User plays the game
 
-=== ...
+This diagram shows the execution of a game
 
-=== <Runtime Scenario n>
+[plantuml,"Game",png]
+----
+@startuml
+actor User
+participant WebApp
+participant GameYEngine
+participant UsersService
+database Database
+
+User -> WebApp: Selects board size, difficulty
+User -> WebApp: Selects 'Play'
+WebApp -> GameYEngine: Requests the board
+GameYEngine --> WebApp: Returns the board
+
+loop
+    User -> WebApp: Plays their turn
+    WebApp -> GameYEngine: Sends the board state & Checks if there is a winner
+    GameYEngine -> WebApp: Returns whether there is a winner
+    break There is a winner!
+        WebApp --> User: Shows result of the game
+    end
+    WebApp -> GameYEngine: Sends the board state & Asks the bot to play
+    GameYEngine --> WebApp: Returns the play of the bot 
+    WebApp --> User: Shows the play of the bot
+end
+
+WebApp -> UsersService: Asks to save the data of the game
+UsersService -> Database: Asks to save the data of the game
+Database --> UsersService: Confirms the data was saved
+UsersService --> WebApp: Confirms the data was saved
+@enduml
+----
+
+=== Asking for a hint
+
+This diagram represents the user asking for a hint
+
+[plantuml,"Asking for Hint",png]
+----
+@startuml
+actor User
+participant WebApp
+participant GameYEngine
+
+User -> WebApp: Asks for a hint
+WebApp -> GameYEngine: Sends the board state & Asks for the move
+GameYEngine --> WebApp: Returns the hint
+WebApp --> User: Shows visually the hint
+
+@enduml
+----
+
+

@@ -60,18 +60,22 @@ For multiple environments or alternative deployments please copy and adapt this 
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+image::deployment_level1.png["Infrastructure Level 1 Overview"]
 
 Motivation::
 
-_<explanation in text form>_
+The system is designed as a distributed web application. A central server hosts all the application logic and data (backend, game engine, database), while users access the game via standard web browsers. This centralized structure ensures data consistency and simplifies updates.
 
 Quality and/or Performance Features::
 
-_<explanation in text form>_
+* **Scalability:** The server uses Docker, allowing easy scaling of resources if the number of players increases.
+* **Accessibility:** Users do not need to install any specific software; a web browser is sufficient.
+* **Availability:** The server is accessible 24/7 via the internet.
 
 Mapping of Building Blocks to Infrastructure::
-_<description of the mapping>_
+* **Client Device:** Runs the `Frontend Application` (React) inside the browser.
+* **External Bot Device:** Runs custom bot scripts developed by third parties.
+* **YOVI Server:** Runs the `Backend (Users Service)`, `Game Engine (Rust)`, and `Database`.
 
 
 === Infrastructure Level 2
@@ -85,16 +89,34 @@ Please copy the structure from level 1 for each selected element.
 ****
 endif::arc42help[]
 
-==== _<Infrastructure Element 1>_
+==== Docker Host (Server)
 
-_<diagram + explanation>_
+image::deployment_server.png["Docker Host Detail"]
 
-==== _<Infrastructure Element 2>_
+This diagram illustrates the internal structure of the Server. The entire system is containerized using Docker, which ensures consistency across development and production environments.
 
-_<diagram + explanation>_
+* **Docker Host:** The physical or virtual server running the Docker Engine.
+* **WebApp Container:** Hosts the React frontend application. It acts as the entry point for users and external bots. It forwards API requests to the backend services.
+* **Users Service Container:** A Node.js/Express application that handles user authentication and history management. It is not directly accessible from the outside; it only accepts requests from the WebApp.
+* **GameY Service Container:** The core game engine written in Rust. It processes game logic and validates moves. Like the Users Service, it is internal and accessed via the WebApp.
+* **Database Container:** A PostgreSQL instance used for persistent storage of user data and game history. It is strictly isolated and only accessible by the Users Service via TCP port 5432.
 
-...
+==== Client Device
 
-==== _<Infrastructure Element n>_
+image::deployment_client.png["User Device Detail"]
 
-_<diagram + explanation>_
+This diagram illustrates the client-side deployment.
+
+* **Client Device:** Represents the physical hardware (PC or Mobile) used by the player.
+* **Web Browser:** The execution environment (e.g., Chrome, Firefox) that renders the application.
+* **YOVI Web Client:** The React/TypeScript application artifact downloaded from the server and executed within the browser.
+
+==== External Bot Device
+
+image::deployment_bot.png["External Bot Device Detail"]
+
+This diagram illustrates the deployment of an external bot that interacts with the YOVI system. Unlike human players, bots do not use a web browser; instead, they run as standalone scripts or applications.
+
+* **External Bot Device:** Represents any machine (local computer or server) hosting a third-party bot.
+* **Bot Runtime:** The environment required to execute the bot logic (e.g., Python Interpreter, Java Virtual Machine, or Node.js Runtime).
+* **Bot Application:** The actual code developed by third parties (or the development team for testing). It communicates with the **YOVI System** exclusively via the HTTP/REST API (JSON) provided by the Web Application.
