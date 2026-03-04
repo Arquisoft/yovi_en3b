@@ -2,8 +2,7 @@ import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import MainMenu from './components/MainMenu'; // Importamos nueva pantalla
 import GameScreen from './components/GameScreen/GameScreen'; 
-import HistoryPage from './pages/HistoryPage'
-
+import HistoryPage from './components/HistoryPage/HistoryPage';
 function App() {
   return (
     <Routes>
