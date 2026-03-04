@@ -1,6 +1,7 @@
-/* App.css - Clean Merged Version */
+/* App.css */
 
 :root {
+  /* Here we define your neon colors and the background gradient */
   --bg-dark: #0f172a;
   --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
   --game-blue: #60a5fa;
@@ -9,28 +10,27 @@
   --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
 }
 
-/* 1. Reset and Fonts */
+body {
+  /* Here we reset the body margins and apply the main background */
+  margin: 0;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 1. FONT REGISTRATION */
 @font-face {
+  /* Here we register the custom 'Cubic' font for the title */
   font-family: 'Cubic';
   src: url('./assets/fonts/cubic.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-/* Importing Orbitron for modern UI text */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-body {
-  margin: 0;
-  background: var(--bg-gradient);
-  min-height: 100vh;
-  font-family: 'Orbitron', sans-serif; /* Default font */
-  color: white;
-  overflow-x: hidden;
-}
-
-/* 2. Main Layout Containers */
+/* 2. LAYOUT AND CONTAINERS */
 .App {
+  /* Here we center everything and ensure the background covers the full screen */
+  background: var(--bg-gradient);
   min-height: 100vh;
   width: 100vw;
   display: flex;
@@ -38,74 +38,101 @@ body {
 }
 
 .menu-container {
-  width: 100%;
+  /* Here we set up the main menu area with enough padding */
+width: 100%;
   max-width: 1200px;
   height: 100vh;
   padding: 30px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  justify-content: center;
 }
 
-/* 3. Titles and Typography */
+/* 3. HEADER ICONS */
+.header-icons {
+  /* Here we push the icons to the top right corner */
+  display: flex;
+  justify-content: flex-end; 
+  gap: 20px;
+  width: 100%;
+  padding: 40px 0; /* Increased top padding from 10px to 40px to push them down */
+  position: absolute; /* We make it absolute so it doesn't push the title "Game Y" */
+  top: 0;
+  right: 90px;
+  box-sizing: border-box;
+}
+
+.icon-btn {
+  /* Here we style the circular buttons for settings and profile */
+  background: transparent;
+  border: none;
+  color: var(--game-blue);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* 4. TITLE STYLE */
 .title-game {
-  font-family: 'Cubic', sans-serif; 
-  font-size: 8rem; 
+  /* Here we use the Cubic font and add a 100px margin to separate it from the buttons */
+  font-family: 'Cubic', sans-serif;
+  font-size: 8rem;
   text-align: center;
-  margin: 30px 0 50px 0;
+  margin: 30px 0 100px 0;
   color: var(--game-blue);
   text-shadow: var(--text-shadow);
-  letter-spacing: 6px;
   text-transform: uppercase;
 }
 
-.orbitron-text {
+/* 5. BUTTONS (ORBITRON FORCED) */
+.grid-buttons {
+  /* Here we create the 2-column layout for the main menu buttons */
+  display: grid;
+  grid-template-columns: repeat(2, 420px);
+  gap: 25px;
+  justify-content: center;
+}
+
+.main-button, .opt-btn, .boton-cerrar-fijo {
+  /* Here we force the Orbitron font on every button element */
   font-family: 'Orbitron', sans-serif !important;
 }
 
-/* 4. Global Button Styles (The ones you designed) */
 .main-button {
+  /* Here we style the large menu buttons with transparency and hover effects */
   background: rgba(15, 23, 42, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 25px;
-  border-radius: 20px;
+  padding: 45px;
+  border-radius: 25px;
   color: white;
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1.6rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
+  transition: 0.3s;
+  letter-spacing: 3px;
 }
 
-.main-button:hover:not(:disabled) {
-  transform: translateY(-5px);
+.main-button:hover {
+  /* Here we lift the button and glow the border on hover */
+  transform: translateY(-8px);
   border-color: var(--game-blue);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
 .btn-blue {
-  background: linear-gradient(to right, var(--game-blue-dark), #1d4ed8);
+  /* Here we apply the bright blue gradient to the PLAY button */
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
   border: none;
 }
 
-/* Disabled state for buttons */
-.main-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.5);
-}
-
-/* 5. Modal & Overlay Styles */
+/* 6. MODAL AND THE FIXED X */
 .modal-overlay {
+  /* Here we create the dark blurred background for the level selection */
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -114,11 +141,65 @@ body {
 }
 
 .modal-content {
+  /* Here we style the modal box and set it as a relative anchor for the X */
+  position: relative !important;
   background: rgba(15, 23, 42, 0.95);
-  padding: 40px;
+  padding: 60px 40px 40px 40px;
   border-radius: 30px;
   border: 2px solid var(--game-blue);
-  max-width: 500px;
   width: 90%;
-  position: relative;
+  max-width: 500px;
+}
+
+.boton-cerrar-fijo {
+  /* Here we anchor the X to the top right of the box so it doesn't move from there */
+  position: absolute !important;
+  top: 15px !important;
+  right: 20px !important;
+  background: none !important; /* Forces no background */
+  border: none !important; /* Forces no border */
+  box-shadow: none !important; /* Removes any shadow that might look like a box */
+  color: var(--game-blue) !important; /* Uses your neon blue */
+  font-size: 3rem !important;
+  cursor: pointer;
+  line-height: 1 !important;
+  padding: 0 !important; /* Removes padding that creates space around the X */
+  z-index: 1010;
+}
+
+.modal-title {
+  /* Here we style the "Select Level" title inside the modal */
+  font-family: 'Cubic', sans-serif;
+  color: var(--game-blue);
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.modal-grid {
+  /* Here we stack the level options vertically */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.opt-btn {
+  /* Here we style the Easy/Medium/Hard buttons */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  color: white;
+  transition: 0.3s;
+  letter-spacing: 3px;
+}
+
+.opt-btn:hover {
+  /* Here we highlight the selected level with a blue background */
+  background: #2563eb;
+  transform: translateX(10px);
+}
+
+.full-width {
+  /* Here we make the button span across both columns */
+  grid-column: 1 / span 2;
 }

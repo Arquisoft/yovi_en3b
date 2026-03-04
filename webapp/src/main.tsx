@@ -1,26 +1,21 @@
-<<<<<<< HEAD
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-import App from './App.tsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom'; // Required for the Routes in App.tsx to work
+import App from './App';
+import './index.css'; // Importing global base styles
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
-)
-=======
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+// Finding the root element in your index.html
+const rootElement = document.getElementById('root');
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
->>>>>>> origin/develop
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <BrowserRouter> {/* Wrapping the app in a Router for navigation */}
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+} else {
+  // Helpful error if the 'root' div is missing in index.html
+  console.error("Could not find root element.");
+}

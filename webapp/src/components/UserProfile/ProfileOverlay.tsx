@@ -23,9 +23,9 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content profile-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-modal" onClick={onClose}><X size={35} /></button>
+    <div className="modal-overlay">
+      <div className="modal-content profile-modal">
+        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
         
         <h2 className="modal-title">USER PROFILE</h2>
 
@@ -50,7 +50,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                     {isEditing ? <Check size={18} color="#60a5fa" /> : <Edit2 size={18} color="white" />}
                   </button>
                 </div>
-                {/* Mensaje de error condicional */}
+                {/* Conditional error message if username is not completed */}
                 {isNameEmpty && <p className="error-text">Username must be completed!</p>}
               </div>
 

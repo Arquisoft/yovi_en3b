@@ -12,9 +12,9 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="modal-overlay" onClick={onClose}> {/* Full screen background overlay */}
-      <div className="modal-content how-to-play-modal" onClick={(e) => e.stopPropagation()}> {/* Modal container */}
-        <button className="close-modal" onClick={onClose}><X size={35} /></button> {/* Close icon button */}
+    <div className="modal-overlay"> {/* Full screen background overlay */}
+      <div className="modal-content how-to-play-modal"> {/* Modal container */}
+        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button> {/* Close icon button */}
         
         <h2 className="modal-title cubic-text">HOW TO PLAY</h2> {/* Main title in Cubic font */}
 

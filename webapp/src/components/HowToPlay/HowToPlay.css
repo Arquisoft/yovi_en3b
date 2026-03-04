@@ -1,6 +1,16 @@
 .how-to-play-modal { 
+  position: relative !important; /* This is the anchor for the X button */
   width: min(500px, 95vw) !important; 
   padding: 40px !important; 
+  background: rgba(15, 23, 42, 0.95) !important; /* Matches the Select Level modal */
+  border: 2px solid var(--game-blue) !important; /* Matches the Select Level modal */
+  border-radius: 30px !important;
+}
+
+/* Force Orbitron on the understood button as well */
+.understood-btn {
+   font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 3px;
 }
 
 /* --- Global Font Rule for Instructions --- */
@@ -8,7 +18,7 @@
 .how-to-play-modal h3, 
 .how-to-play-modal p, 
 .how-to-play-modal .step-number,
-.how-to-play-modal .understood-btn {
+.how-to-play-modal {
   font-family: 'Orbitron', sans-serif !important;
   letter-spacing: 1px;
 }
