@@ -1,135 +1,139 @@
 /* App.css */
 
-/* 1. REGISTRO DE TU FUENTE PERSONALIZADA */
+:root {
+  /* Here we define your neon colors and the background gradient */
+  --bg-dark: #0f172a;
+  --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
+  --game-blue: #60a5fa;
+  --game-blue-dark: #2563eb;
+  --game-red: #ef4444;
+  --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+}
+
+body {
+  /* Here we reset the body margins and apply the main background */
+  margin: 0;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 1. FONT REGISTRATION */
 @font-face {
+  /* Here we register the custom 'Cubic' font for the title */
   font-family: 'Cubic';
-  /* Ajusta esta ruta si tu carpeta se llama distinto, ej: ./fonts/cubic.ttf */
   src: url('./assets/fonts/cubic.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-/* 2. RESET Y FONDO FULL SCREEN (AZUL Y ROJO) */
+/* 2. LAYOUT AND CONTAINERS */
 .App {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
+  /* Here we center everything and ensure the background covers the full screen */
+  background: var(--bg-gradient);
   min-height: 100vh;
   width: 100vw;
-  margin: 0;
-  padding: 0;
   display: flex;
   justify-content: center;
-  overflow-x: hidden; /* Evita scroll horizontal */
 }
 
 .menu-container {
-  width: 100%;
+  /* Here we set up the main menu area with enough padding */
+width: 100%;
   max-width: 1200px;
   height: 100vh;
   padding: 30px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  justify-content: center;
 }
 
-/* 3. ICONOS ARRIBA A LA DERECHA */
-/* Contenedor de la barra superior */
+/* 3. HEADER ICONS */
 .header-icons {
+  /* Here we push the icons to the top right corner */
   display: flex;
-  justify-content: flex-end; /* Alineados a la derecha */
+  justify-content: flex-end; 
   gap: 20px;
   width: 100%;
-  padding: 10px 0;
+  padding: 40px 0; /* Increased top padding from 10px to 40px to push them down */
+  position: absolute; /* We make it absolute so it doesn't push the title "Game Y" */
+  top: 0;
+  right: 90px;
+  box-sizing: border-box;
 }
 
-/* Estilo para los botones de iconos superiores */
 .icon-btn {
-  background: transparent; /* Sin fondo */
-  border: none;            /* Sin bordes */
-  color: #60a5fa;         /* Tu azul claro */
+  /* Here we style the circular buttons for settings and profile */
+  background: transparent;
+  border: none;
+  color: var(--game-blue);
   cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  transition: 0.3s;
 }
 
-.icon-btn:hover {
-  color: #ffffff;         /* Cambia a blanco al pasar el ratón */
-  transform: scale(1.1);   /* Un pequeño efecto de aumento */
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
-}
-
-/* Asegúrate de que el título use tu fuente Cubic si ya la tienes cargada */
+/* 4. TITLE STYLE */
 .title-game {
+  /* Here we use the Cubic font and add a 100px margin to separate it from the buttons */
   font-family: 'Cubic', sans-serif;
-  /* ... resto de tu estilo ... */
-}
-
-/* 4. TÍTULO CON FUENTE CUBIC */
-.title-game {
-  font-family: 'Cubic', sans-serif; 
-  font-size: 8rem; 
+  font-size: 8rem;
   text-align: center;
-  margin: 30px 0 50px 0;
-  color: #60a5fa; /* Azul brillante */
-  text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
-  letter-spacing: 6px;
+  margin: 30px 0 100px 0;
+  color: var(--game-blue);
+  text-shadow: var(--text-shadow);
   text-transform: uppercase;
 }
 
-/* 5. CUADRÍCULA DE BOTONES */
+/* 5. BUTTONS (ORBITRON FORCED) */
 .grid-buttons {
+  /* Here we create the 2-column layout for the main menu buttons */
   display: grid;
-  grid-template-columns: repeat(2, 420px); /* Botones anchos de escritorio */
+  grid-template-columns: repeat(2, 420px);
   gap: 25px;
   justify-content: center;
 }
 
+.main-button, .opt-btn, .boton-cerrar-fijo {
+  /* Here we force the Orbitron font on every button element */
+  font-family: 'Orbitron', sans-serif !important;
+}
+
 .main-button {
+  /* Here we style the large menu buttons with transparency and hover effects */
   background: rgba(15, 23, 42, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.1);
   padding: 45px;
   border-radius: 25px;
   color: white;
   font-size: 1.6rem;
-  font-weight: 800;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
+  transition: 0.3s;
+  letter-spacing: 3px;
 }
 
 .main-button:hover {
+  /* Here we lift the button and glow the border on hover */
   transform: translateY(-8px);
-  background: rgba(30, 41, 59, 0.9);
-  border-color: #60a5fa;
+  border-color: var(--game-blue);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
-/* Colores específicos */
 .btn-blue {
+  /* Here we apply the bright blue gradient to the PLAY button */
   background: linear-gradient(to right, #2563eb, #1d4ed8);
   border: none;
 }
 
-.btn-red {
-  background: linear-gradient(to right, #2563eb, #1d4ed8);
-  border: none;
-  grid-column: 1 / span 2; /* El ranking ocupa toda la fila */
-}
-
-/* Estilos del Modal Emergente */
+/* 6. MODAL AND THE FIXED X */
 .modal-overlay {
+  /* Here we create the dark blurred background for the level selection */
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px); /* Desenfoque de fondo */
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -137,64 +141,65 @@
 }
 
 .modal-content {
-  position: relative; 
+  /* Here we style the modal box and set it as a relative anchor for the X */
+  position: relative !important;
   background: rgba(15, 23, 42, 0.95);
-  padding: 60px 40px 40px 40px; 
+  padding: 60px 40px 40px 40px;
   border-radius: 30px;
-  border: 2px solid #60a5fa;
+  border: 2px solid var(--game-blue);
   width: 90%;
   max-width: 500px;
-  text-align: center;
+}
+
+.boton-cerrar-fijo {
+  /* Here we anchor the X to the top right of the box so it doesn't move from there */
+  position: absolute !important;
+  top: 15px !important;
+  right: 20px !important;
+  background: none !important; /* Forces no background */
+  border: none !important; /* Forces no border */
+  box-shadow: none !important; /* Removes any shadow that might look like a box */
+  color: var(--game-blue) !important; /* Uses your neon blue */
+  font-size: 3rem !important;
+  cursor: pointer;
+  line-height: 1 !important;
+  padding: 0 !important; /* Removes padding that creates space around the X */
+  z-index: 1010;
 }
 
 .modal-title {
+  /* Here we style the "Select Level" title inside the modal */
   font-family: 'Cubic', sans-serif;
-  color: #60a5fa;
+  color: var(--game-blue);
   font-size: 2.5rem;
   margin-bottom: 30px;
 }
 
 .modal-grid {
+  /* Here we stack the level options vertically */
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
 }
 
 .opt-btn {
+  /* Here we style the Easy/Medium/Hard buttons */
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px;
   border-radius: 15px;
   color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
   transition: 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  letter-spacing: 3px;
 }
 
 .opt-btn:hover {
+  /* Here we highlight the selected level with a blue background */
   background: #2563eb;
   transform: translateX(10px);
 }
 
-
-.close-modal {
-  position: absolute; 
-  top: 20px;          
-  right: 25px;         
-  background: transparent;
-  border: none;
-  color: #60a5fa;     
-  font-size: 3.5rem;   
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* Ajuste para el botón de ranking que ahora ocupa todo el ancho */
 .full-width {
+  /* Here we make the button span across both columns */
   grid-column: 1 / span 2;
 }
