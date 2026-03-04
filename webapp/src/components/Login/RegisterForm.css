@@ -1,0 +1,88 @@
+/* Container to center the card on the whole screen */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
+  position: fixed; /* Ensures it stays full screen */
+  top: 0;
+  left: 0;
+}
+
+/* The card where the login lives */
+.login-card {
+  background: rgba(15, 23, 42, 0.95);
+  padding: 60px 40px;
+  border-radius: 30px;
+  border: 2px solid #60a5fa;
+  box-shadow: 0 0 40px rgba(96, 165, 250, 0.2);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 10px;
+}
+
+/* Label styling with Orbitron */
+.input-group label {
+  color: #60a5fa;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* Input field styling with Orbitron */
+.input-group input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.2);
+}
+
+/* Play button centered and Orbitron */
+.play-btn {
+  width: 100% !important;
+  height: 60px !important;
+  margin-top: 15px !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 800;
+  letter-spacing: 3px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Error message styling */
+.error-text {
+  color: #ef4444;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 0.8rem;
+  margin: 0;
+  letter-spacing: 0.5px;
+}

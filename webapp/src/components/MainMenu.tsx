@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Languages, Settings, User } from 'lucide-react';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
-import HowToPlay from './HowToPlay/HowToPlay'; /* Import the instructional component */
+import HowToPlay from '../components/HowToPlay/HowToPlay';
 import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
 
 const MainMenu: React.FC = () => {
