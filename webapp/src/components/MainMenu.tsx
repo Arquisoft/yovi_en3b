@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Languages, MessageSquare, Settings, User } from 'lucide-react'; // Importamos iconos
+import { Languages, Settings, User } from 'lucide-react';
 import '../App.css';
-import { ProfileOverlay } from '../features/profile/ProfileOverlay';
 import { useNavigate } from 'react-router-dom';
+import HowToPlay from './HowToPlay/HowToPlay'; /* Import the instructional component */
+import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
 
 const MainMenu: React.FC = () => {
   const [showPlayOptions, setShowPlayOptions] = useState(false);
+  const [showHowTo, setShowHowTo] = useState(false); /* State to manage HowToPlay visibility */
   const [profileOpen, setProfileOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -19,9 +21,8 @@ const MainMenu: React.FC = () => {
     <div className="App">
       <div className="menu-container">
         <div className="header-icons">
-          {/* Iconos de librería estandarizados */}
           <button className="icon-btn" title="Language"><Languages size={28} /></button>
-          <button className="icon-btn" title="Chat"><MessageSquare size={28} /></button>
+          
           <button className="icon-btn" title="Settings"><Settings size={28} /></button>
           <button
             className="icon-btn"
@@ -39,7 +40,8 @@ const MainMenu: React.FC = () => {
             PLAY
           </button>
 
-          <button className="main-button">
+          {/* Trigger the HowToPlay modal by setting the state to true */}
+          <button className="main-button" onClick={() => setShowHowTo(true)}>
             HOW TO PLAY
           </button>
 
@@ -48,7 +50,7 @@ const MainMenu: React.FC = () => {
           </button>
         </div>
 
-        {/* MODAL DE OPCIONES DE JUEGO */}
+        {/* Game options modal */}
         {showPlayOptions && (
           <div className="modal-overlay" onClick={() => setShowPlayOptions(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -63,7 +65,10 @@ const MainMenu: React.FC = () => {
           </div>
         )}
 
-        {/* profile overlay controlled by avatar button */}
+        {/* Conditional rendering for the HowToPlay component based on state */}
+        {showHowTo && <HowToPlay onClose={() => setShowHowTo(false)} />}
+
+        {/* Profile overlay controlled by avatar button */}
         <ProfileOverlay open={profileOpen} onClose={() => setProfileOpen(false)} />
       </div>
     </div>

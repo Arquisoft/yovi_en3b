@@ -75,12 +75,6 @@ body {
   filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
 }
 
-/* Asegúrate de que el título use tu fuente Cubic si ya la tienes cargada */
-.title-game {
-  font-family: 'Cubic', sans-serif;
-  /* ... resto de tu estilo ... */
-}
-
 /* 4. TÍTULO CON FUENTE CUBIC */
 .title-game {
   font-family: 'Cubic', sans-serif; 
