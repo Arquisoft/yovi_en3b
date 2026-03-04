@@ -1,4 +1,4 @@
-/* App.css */
+/* App.css - Clean Merged Version */
 
 :root {
   --bg-dark: #0f172a;
@@ -9,31 +9,32 @@
   --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
 }
 
-body {
-  margin: 0;
-  background: var(--bg-gradient);
-  min-height: 100vh;
-}
-
-/* 1. REGISTRO DE TU FUENTE PERSONALIZADA */
+/* 1. Reset and Fonts */
 @font-face {
   font-family: 'Cubic';
-  /* Ajusta esta ruta si tu carpeta se llama distinto, ej: ./fonts/cubic.ttf */
   src: url('./assets/fonts/cubic.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-/* 2. RESET Y FONDO FULL SCREEN (AZUL Y ROJO) */
+/* Importing Orbitron for modern UI text */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  font-family: 'Orbitron', sans-serif; /* Default font */
+  color: white;
+  overflow-x: hidden;
+}
+
+/* 2. Main Layout Containers */
 .App {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
   min-height: 100vh;
   width: 100vw;
-  margin: 0;
-  padding: 0;
   display: flex;
   justify-content: center;
-  overflow-x: hidden; /* Evita scroll horizontal */
 }
 
 .menu-container {
@@ -46,99 +47,66 @@ body {
   box-sizing: border-box;
 }
 
-/* 3. ICONOS ARRIBA A LA DERECHA */
-/* Contenedor de la barra superior */
-.header-icons {
-  display: flex;
-  justify-content: flex-end; /* Alineados a la derecha */
-  gap: 20px;
-  width: 100%;
-  padding: 10px 0;
-}
-
-/* Estilo para los botones de iconos superiores */
-.icon-btn {
-  background: transparent; /* Sin fondo */
-  border: none;            /* Sin bordes */
-  color: #60a5fa;         /* Tu azul claro */
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.icon-btn:hover {
-  color: #ffffff;         /* Cambia a blanco al pasar el ratón */
-  transform: scale(1.1);   /* Un pequeño efecto de aumento */
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
-}
-
-/* 4. TÍTULO CON FUENTE CUBIC */
+/* 3. Titles and Typography */
 .title-game {
   font-family: 'Cubic', sans-serif; 
   font-size: 8rem; 
   text-align: center;
   margin: 30px 0 50px 0;
-  color: #60a5fa; /* Azul brillante */
-  text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+  color: var(--game-blue);
+  text-shadow: var(--text-shadow);
   letter-spacing: 6px;
   text-transform: uppercase;
 }
 
-/* 5. CUADRÍCULA DE BOTONES */
-.grid-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 420px); /* Botones anchos de escritorio */
-  gap: 25px;
-  justify-content: center;
+.orbitron-text {
+  font-family: 'Orbitron', sans-serif !important;
 }
 
+/* 4. Global Button Styles (The ones you designed) */
 .main-button {
   background: rgba(15, 23, 42, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 45px;
-  border-radius: 25px;
+  padding: 25px;
+  border-radius: 20px;
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
+  text-transform: uppercase;
 }
 
-.main-button:hover {
-  transform: translateY(-8px);
-  background: rgba(30, 41, 59, 0.9);
-  border-color: #60a5fa;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+.main-button:hover:not(:disabled) {
+  transform: translateY(-5px);
+  border-color: var(--game-blue);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Colores específicos */
 .btn-blue {
-  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  background: linear-gradient(to right, var(--game-blue-dark), #1d4ed8);
   border: none;
 }
 
-.btn-red {
-  background: linear-gradient(to right, #2563eb, #1d4ed8);
-  border: none;
-  grid-column: 1 / span 2; /* El ranking ocupa toda la fila */
+/* Disabled state for buttons */
+.main-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
-/* Estilos del Modal Emergente */
+/* 5. Modal & Overlay Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px); /* Desenfoque de fondo */
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -146,64 +114,11 @@ body {
 }
 
 .modal-content {
-  position: relative; 
   background: rgba(15, 23, 42, 0.95);
-  padding: 60px 40px 40px 40px; 
+  padding: 40px;
   border-radius: 30px;
-  border: 2px solid #60a5fa;
-  width: 90%;
+  border: 2px solid var(--game-blue);
   max-width: 500px;
-  text-align: center;
-}
-
-.modal-title {
-  font-family: 'Cubic', sans-serif;
-  color: #60a5fa;
-  font-size: 2.5rem;
-  margin-bottom: 30px;
-}
-
-.modal-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-.opt-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 15px;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.opt-btn:hover {
-  background: #2563eb;
-  transform: translateX(10px);
-}
-
-
-.close-modal {
-  position: absolute; 
-  top: 20px;          
-  right: 25px;         
-  background: transparent;
-  border: none;
-  color: #60a5fa;     
-  font-size: 3.5rem;   
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* Ajuste para el botón de ranking que ahora ocupa todo el ancho */
-.full-width {
-  grid-column: 1 / span 2;
+  width: 90%;
+  position: relative;
 }
