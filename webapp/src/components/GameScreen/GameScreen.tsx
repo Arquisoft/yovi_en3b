@@ -87,7 +87,7 @@ const GameScreen: React.FC = () => {
                             <div className="chat-user-info">
                                 <div className="avatar-circle">P2</div>
                                 <div className="user-details">
-                                    <span className="user-name">PLAYER 2</span>
+                                    <span className="user-name">PLAYER 2 </span>
                                     <span className="status-online">Online</span>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@ const GameScreen: React.FC = () => {
                         <p>If you leave now, the game will count as a <strong>loss</strong>.</p>
 
                         <div className="modal-buttons">
-                            <button className="btn-confirm-exit" onClick={() => navigate('/')}>
+                            <button className="btn-confirm-exit" onClick={() => navigate('/menu')}>
                                 YES, EXIT AND LOSE
                             </button>
                             <button className="btn-cancel" onClick={() => setShowExitConfirmation(false)}>

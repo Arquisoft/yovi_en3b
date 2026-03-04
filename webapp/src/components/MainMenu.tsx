@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Languages, Settings, User } from 'lucide-react';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
-import HowToPlay from './HowToPlay/HowToPlay'; /* Import the instructional component */
+import HowToPlay from '../components/HowToPlay/HowToPlay';
 import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
 
 const MainMenu: React.FC = () => {
@@ -50,11 +50,13 @@ const MainMenu: React.FC = () => {
           </button>
         </div>
 
-        {/* Game options modal */}
+    {/* Game options modal - Click outside disabled */}
         {showPlayOptions && (
-          <div className="modal-overlay" onClick={() => setShowPlayOptions(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <button className="close-modal" onClick={() => setShowPlayOptions(false)}>&times;</button>
+          <div className="modal-overlay"> 
+            {/* Here we removed the onClick from the overlay to prevent closing by mistake */}
+            <div className="modal-content">
+              {/* The only way to close is this X button */}
+              <button className="boton-cerrar-fijo" onClick={() => setShowPlayOptions(false)}>&times;</button>
               <h2 className="modal-title">Select Level</h2>
               <div className="modal-grid">
                 <button className="opt-btn" onClick={() => handleStartGame('easy')}> EASY</button>
