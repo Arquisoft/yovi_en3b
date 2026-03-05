@@ -1,22 +1,24 @@
-import './App.css'
-import RegisterForm from './RegisterForm';
-import reactLogo from './assets/react.svg'
+import './App.css'; // Importing global styles
+import { Routes, Route, Navigate } from 'react-router-dom'; // Importing routing components
+import MainMenu from './components/MainMenu'; // Your main menu component
+import GameScreen from './components/GameScreen/GameScreen'; // Your game screen component
+import RegisterForm from './components/Login/RegisterForm'; // Your colleague's login component
 
 function App() {
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+    <Routes>
+      {/* 1. Login/Register is now the entry point (Colleague's part) */}
+      <Route path="/" element={<RegisterForm />} /> 
 
-      <h2>Welcome to the Software Arquitecture 2025-2026 course</h2>
-      <RegisterForm />
-    </div>
+      {/* 2. Main Menu with all your buttons (Your part) */}
+      <Route path="/menu" element={<MainMenu />} /> 
+
+      {/* 3. The actual Game screen (Your part) */}
+      <Route path="/game" element={<GameScreen />} />
+
+      {/* 4. Redirect any unknown route to login */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 
