@@ -81,14 +81,13 @@ const RegisterForm: React.FC = () => {
 
           {/* New Sign Up link styled as a gray text link */}
           <div className="auth-footer">
-            <span className="orbitron-text">DON'T HAVE AN ACCOUNT? </span>
-            <button 
-              type="button" 
-              className="auth-link" 
-              onClick={() => navigate('/signup')} // Navigates to the new signup component
-            >
-              SIGN UP
-            </button>
+            <span className="orbitron-text" style={{ color: '#64748b' }}>DON'T HAVE AN ACCOUNT? </span>
+               <button 
+                   type="button" 
+                   className="auth-link" 
+                   onClick={() => navigate('/signup')} // Here we change the screen to signup
+              > SIGN UP
+               </button>
           </div>
         
         </form>
