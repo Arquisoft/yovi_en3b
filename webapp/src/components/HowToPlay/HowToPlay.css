@@ -24,15 +24,36 @@
 }
 
 /* Board styling remains consistent */
-.board-container { display: flex; justify-content: center; margin-bottom: 30px; }
-.triangle-frame { 
-  padding: 20px; border: 3px solid #ef4444; border-radius: 20px; 
-  background: rgba(0,0,0,0.4); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+.board-container { 
+  display: flex; 
+  justify-content: center; 
+  margin-bottom: 15px; /* Less space below the drawing */
 }
-.balls-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
-.ball { width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
-.ball.red { background: #ef4444; color: #ef4444; }
-.ball.blue { background: #60a5fa; color: #60a5fa; }
+
+.triangle-frame { 
+  padding: 15px 25px; /* Reduced vertical padding to make it smaller */
+  border: 2px solid #60a5fa; /* Thinner border for a cleaner look */
+  border-radius: 15px; 
+  background: rgba(0,0,0,0.4); 
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.2);
+}
+
+.balls-row { 
+  display: flex; 
+  justify-content: center; 
+  gap: 8px; /* Closer balls */
+  margin-bottom: 6px; /* Closer rows */
+}
+
+.ball { 
+  width: 14px; /* Smaller diameter for the pieces */
+  height: 14px; 
+  border-radius: 50%; 
+  filter: drop-shadow(0 0 5px currentColor); /* Subtle glow based on color */
+}
+
+.ball.red { background: #ef4444; color: #ef4444; } /* Red piece styling */
+.ball.blue { background: #60a5fa; color: #60a5fa; } /* Blue piece styling */
 
 /* Instruction Cards */
 .instructions-list { 
@@ -89,4 +110,28 @@
 .understood-btn:hover {
   transform: scale(1.02);
   filter: brightness(1.1);
+}
+.video-resource {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.video-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #60a5fa;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+
+.video-link-btn:hover {
+  filter: drop-shadow(0 0 5px #60a5fa);
+  transform: scale(1.02);
 }
