@@ -49,20 +49,30 @@ width: 100%;
   justify-content: center;
 }
 
-/* 3. HEADER ICONS */
+/* 3. HEADER ICONS 
 .header-icons {
-  /* Here we push the icons to the top right corner */
+  /* Here we push the icons to the top right corner 
   display: flex;
   justify-content: flex-end; 
   gap: 20px;
   width: 100%;
-  padding: 40px 0; /* Increased top padding from 10px to 40px to push them down */
-  position: absolute; /* We make it absolute so it doesn't push the title "Game Y" */
+  padding: 40px 0; /* Increased top padding from 10px to 40px to push them down 
+  position: absolute; /* We make it absolute so it doesn't push the title "Game Y" 
   top: 0;
   right: 90px;
   box-sizing: border-box;
+  
 }
+*/
 
+.header-icons {
+  position: absolute; 
+  top: 40px; 
+  right: 40px; 
+  display: flex;
+  gap: 20px;
+  z-index: 100;
+}
 .icon-btn {
   /* Here we style the circular buttons for settings and profile */
   background: transparent;
@@ -109,6 +119,13 @@ width: 100%;
   cursor: pointer;
   transition: 0.3s;
   letter-spacing: 3px;
+}
+
+.icon-btn:hover {
+  /* Neon glow effect when hovering over header icons */
+  color: #ffffff !important;
+  filter: drop-shadow(0 0 8px #60a5fa);
+  transform: scale(1.1);
 }
 
 .main-button:hover {
@@ -180,6 +197,14 @@ width: 100%;
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
+}
+
+.modal-text {
+  font-family: 'Orbitron', sans-serif !important;
+  color: #94a3b8 !important;
+  margin-bottom: 30px !important;
+  text-align: center !important;
+  font-size: 1rem !important;
 }
 
 .opt-btn {
