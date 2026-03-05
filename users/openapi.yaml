@@ -6,8 +6,57 @@ info:
 paths:
   /createuser:
     post:
+      tags: [Users]
       summary: Creates a new user
-      description: Creates a new user with the given username.
+      description: Creates a new user with the given nickname, username, email, password and photo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nickname
+                - username
+                - email
+                - password
+                - photo
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                nickname:
+                  type: string
+                  example: "testuser"
+                email:
+                  type: string
+                  example: "testuser@testuser"
+                photo:
+                  type: string
+                  example: "photo"
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Welcome testuser"
+        "400":
+          description: Error creating user (some fields missing or there exist another user with that critical information)
+        "500":
+          description: Database server error
+  /findUserByUsername:
+    post:
+      tags: [Users]
+      summary: Searches for a user
+      description: Searches for a user with that username and returns it
       requestBody:
         required: true
         content:
@@ -22,14 +71,27 @@ paths:
                   example: "testuser"
       responses:
         "200":
-          description: User created successfully
+          description: User found
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  username:
                     type: string
-                    example: "Welcome testuser"
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "testuser"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
         "400":
-          description: Error creating user
+          description: The username is required
+        "404":
+          description: It did not find a user with that username
+        "500":
+          description: Database server error
