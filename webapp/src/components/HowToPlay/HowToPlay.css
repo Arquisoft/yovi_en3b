@@ -1,0 +1,137 @@
+.how-to-play-modal { 
+  position: relative !important; /* This is the anchor for the X button */
+  width: min(500px, 95vw) !important; 
+  padding: 40px !important; 
+  background: rgba(15, 23, 42, 0.95) !important; /* Matches the Select Level modal */
+  border: 2px solid var(--game-blue) !important; /* Matches the Select Level modal */
+  border-radius: 30px !important;
+}
+
+/* Force Orbitron on the understood button as well */
+.understood-btn {
+   font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 3px;
+}
+
+/* --- Global Font Rule for Instructions --- */
+/* Force Orbitron on all text elements within the modal */
+.how-to-play-modal h3, 
+.how-to-play-modal p, 
+.how-to-play-modal .step-number,
+.how-to-play-modal {
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1px;
+}
+
+/* Board styling remains consistent */
+.board-container { 
+  display: flex; 
+  justify-content: center; 
+  margin-bottom: 15px; /* Less space below the drawing */
+}
+
+.triangle-frame { 
+  padding: 15px 25px; /* Reduced vertical padding to make it smaller */
+  border: 2px solid #60a5fa; /* Thinner border for a cleaner look */
+  border-radius: 15px; 
+  background: rgba(0,0,0,0.4); 
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.2);
+}
+
+.balls-row { 
+  display: flex; 
+  justify-content: center; 
+  gap: 8px; /* Closer balls */
+  margin-bottom: 6px; /* Closer rows */
+}
+
+.ball { 
+  width: 14px; /* Smaller diameter for the pieces */
+  height: 14px; 
+  border-radius: 50%; 
+  filter: drop-shadow(0 0 5px currentColor); /* Subtle glow based on color */
+}
+
+.ball.red { background: #ef4444; color: #ef4444; } /* Red piece styling */
+.ball.blue { background: #60a5fa; color: #60a5fa; } /* Blue piece styling */
+
+/* Instruction Cards */
+.instructions-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 15px; 
+  text-align: left;
+  margin-bottom: 25px; /* Added more space before the button */
+}
+
+.step-card { 
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  padding: 15px;
+  background: rgba(255,255,255,0.05); 
+  border-radius: 15px; 
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  position: relative;
+}
+
+.step-number { 
+  position: absolute; top: -10px; left: -10px; background: #ef4444; 
+  width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 0.8rem; font-weight: bold; color: white;
+}
+
+.step-icon { background: #2563eb; padding: 10px; border-radius: 50%; display: flex; color: white; }
+.step-text h3 { font-size: 0.95rem; color: #60a5fa; margin: 0; text-transform: uppercase; }
+.step-text p { font-size: 0.85rem; color: #94a3b8; margin: 5px 0 0 0; line-height: 1.4; }
+
+/* --- Adjusted Understood Button --- */
+.understood-btn {
+  /* Aligns with the width of the cards above */
+  width: 100% !important; 
+  /* Reduced height/padding for a sleeker look */
+  height: 48px !important; 
+  padding: 0 !important;
+  margin-top: 10px !important; /* Extra separation from the last card */
+  
+  /* Centering text */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  /* Font styling */
+  font-size: 1rem !important;
+  font-weight: 700;
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.understood-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+.video-resource {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.video-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #60a5fa;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+
+.video-link-btn:hover {
+  filter: drop-shadow(0 0 5px #60a5fa);
+  transform: scale(1.02);
+}

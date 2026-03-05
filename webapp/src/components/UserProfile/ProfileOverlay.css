@@ -1,0 +1,276 @@
+/* --- Unifying Fonts --- */
+/* Apply Orbitron to all texts inside the modal except the title */
+.profile-modal,
+.profile-modal label,
+.profile-modal input,
+.profile-modal .value,
+.profile-modal .loading-text,
+.profile-modal .error,
+.profile-modal .history-btn,
+.profile-modal .btn-group .main-button {
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1.7px;
+}
+
+/* Specific Cubic title style */
+.modal-title {
+  font-family: 'Cubic', sans-serif !important;
+  color: #60a5fa;
+  font-size: 2.5rem;
+  margin-bottom: 25px;
+}
+
+/* --- Modal Layout & Dimensions --- */
+.profile-modal {
+  width: min(480px, calc(100vw - 32px)) !important; /* Increased width to accommodate grid */
+  padding: 40px !important;
+  text-align: center;
+  max-height: 90vh; /* Prevent modal from being larger than screen */
+  overflow-y: auto; /* Allow scrolling inside modal if needed */
+}
+
+/* --- Avatar Bubble --- */
+.avatar-display-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.avatar-bubble {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(15, 20, 30, 0.6);
+  display: grid;
+  place-items: center;
+  font-size: 48px; /* Bigger emoji for main display */
+  border: 3px solid #60a5fa;
+  box-shadow: 0 0 25px rgba(96, 165, 250, 0.3);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* --- Profile Fields Layout --- */
+.profile-fields {
+  text-align: left;
+  margin-bottom: 20px; /* Base margin before buttons */
+}
+
+.profile-row {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  transition: border-color 0.2s ease;
+}
+
+.profile-row:focus-within {
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+.profile-row label {
+  display: block;
+  color: #60a5fa;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* --- Input & Value Styling --- */
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.profile-row input,
+.profile-row .value {
+  color: white;
+  font-size: 1.3rem;
+  background: transparent;
+  border: none;
+  width: 100%;
+  outline: none;
+}
+
+.profile-row input:disabled {
+  opacity: 1; /* Ensure text remains bright when disabled */
+  color: #e2e8f0;
+}
+
+/* --- Edit Button Bubble --- */
+.edit-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: rgba(96, 165, 250, 0.2);
+}
+
+/* --- Avatar Grid Layout --- */
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+  justify-items: center;
+}
+
+.avatar-opt {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.avatar-opt:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.avatar-opt.active {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.2);
+  transform: scale(1.1);
+}
+
+/* --- Buttons Section & Alignment --- */
+.profile-actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between History and the bottom group */
+  margin-top: 0px !important; /* Forces the section to be close to fields */
+}
+
+/* --- THE FIX: Vertical centering and removing huge margins --- */
+/* We apply this to History and Reset/Save buttons */
+.history-btn,
+.btn-group .main-button {
+  /* 1. Eliminate app-level margin */
+  margin: 0 !important;
+  
+  /* 2. Control total height exactly */
+  height: 55px !important;
+  
+  /* 3. Perfect vertical and horizontal centering using Flexbox */
+  display: flex !important;
+  align-items: center !important; /* Vertical center */
+  justify-content: center !important; /* Horizontal center */
+  
+  /* 4. Increase font size and remove excessive vertical padding */
+  font-size: 1.15rem !important; /* Slightly larger for presence */
+  padding: 0 20px !important; /* Remove top/bottom padding, keep only side padding */
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Bottom buttons row */
+.btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Overriding App.css full-width for the history button if needed */
+.history-btn {
+  width: 100%;
+}
+
+/* --- Status Texts --- */
+.loading-text,
+.muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #ef4444;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Estilo para el mensaje de error */
+.error-text {
+  font-size: 0.75rem;
+  margin-top: 8px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Estado visual para botones deshabilitados */
+.main-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Password section inside profile */
+.change-pass-trigger {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #94a3b8;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  transition: 0.3s;
+}
+
+.change-pass-trigger:hover {
+  color: var(--game-blue);
+  border-color: var(--game-blue);
+}
+
+.password-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.small-input {
+  background: rgba(0, 0, 0, 0.2) !important;
+  font-size: 0.75rem !important;
+  padding: 8px !important;
+}
+
+.pass-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.pass-actions button {
+  flex: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+}
+
+.confirm-pass { background: var(--game-blue); color: white; }
+.confirm-pass:disabled { opacity: 0.5; cursor: not-allowed; }
+.cancel-pass { background: transparent; color: #64748b; border: 1px solid #64748b !important; }
