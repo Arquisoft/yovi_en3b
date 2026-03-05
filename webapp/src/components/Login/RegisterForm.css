@@ -86,3 +86,28 @@
   margin: 0;
   letter-spacing: 0.5px;
 }
+
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #64748b; /* Gray color for the text */
+}
+
+.auth-link {
+  background: none !important; /* Removes button background */
+  border: none !important; /* Removes button border */
+  color: #94a3b8 !important; /* Slightly lighter gray */
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 5px;
+  transition: 0.3s;
+}
+
+.auth-link:hover {
+  color: #60a5fa !important; /* Turns neon blue on hover */
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+}
