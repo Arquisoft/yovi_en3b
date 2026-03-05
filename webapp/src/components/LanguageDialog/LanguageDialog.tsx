@@ -27,13 +27,13 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
             className={`opt-btn ${language === 'es' ? 'active' : ''}`}
             onClick={() => handleLanguageChange('es')}
           >
-            🇪🇸 {t.buttons.spanish}
+            {t.buttons.spanish}
           </button>
           <button
             className={`opt-btn ${language === 'en' ? 'active' : ''}`}
             onClick={() => handleLanguageChange('en')}
           >
-            🇬🇧 {t.buttons.english}
+            {t.buttons.english}
           </button>
         </div>
       </div>
