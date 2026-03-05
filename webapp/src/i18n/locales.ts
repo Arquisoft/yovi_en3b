@@ -22,6 +22,8 @@ export const translations = {
       logout: 'CERRAR SESIÓN',
       spanish: 'ESPAÑOL',
       english: 'INGLÉS',
+      yesExitAndLose: 'SÍ, SALIR Y PERDER',
+      backToGame: 'VOLVER AL JUEGO',
     },
     labels: {
       displayName: 'NOMBRE A MOSTRAR',
@@ -48,6 +50,8 @@ export const translations = {
       confirmTheDisplayNameFirst: 'Confirma el nombre a mostrar primero',
       openChat: 'Abrir chat',
       selectLanguage: 'Selecciona un idioma',
+      areYouSure: '¿Estás seguro?',
+      loseWarning: 'Si te vas ahora, el juego contará como una pérdida.',
     },
   },
   en: {
@@ -73,6 +77,8 @@ export const translations = {
       logout: 'LOGOUT',
       spanish: 'SPANISH',
       english: 'ENGLISH',
+      yesExitAndLose: 'YES, EXIT AND LOSE',
+      backToGame: 'BACK TO THE GAME',
     },
     labels: {
       displayName: 'DISPLAY NAME',
@@ -99,6 +105,8 @@ export const translations = {
       confirmTheDisplayNameFirst: 'Confirm the display name first',
       openChat: 'Open chat',
       selectLanguage: 'Select a language',
+      areYouSure: 'Are you sure?',
+      loseWarning: 'If you leave now, the game will count as a loss.',
     },
   },
 };

@@ -15,6 +15,8 @@ src/
 │   ├── MainMenu.tsx
 │   ├── GameScreen/
 │   │   └── GameScreen.tsx
+│   ├── LanguageDialog/
+│   │   └── LanguageDialog.tsx
 │   └── UserProfile/
 │       └── ProfileOverlay.tsx
 └── main.tsx            ← I18nProvider envuelve la app
@@ -70,6 +72,7 @@ Importa el hook `useI18n` y úsalo:
 
 import React from 'react';
 import { useI18n } from '../../i18n/useTranslation';
+import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import './MyNewComponent.css';
 
 interface MyNewComponentProps {
@@ -77,20 +80,24 @@ interface MyNewComponentProps {
 }
 
 const MyNewComponent: React.FC<MyNewComponentProps> = ({ onClose }) => {
-  const { t, language, setLanguage } = useI18n();
+  const { t } = useI18n();
+  const [showLanguageDialog, setShowLanguageDialog] = React.useState(false);
   
   return (
     <div className="my-component">
       <h1>{t.labels.myNewLabel}</h1>
       <p>{t.messages.myNewMessage}</p>
       
-      <button onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}>
+      <button onClick={() => setShowLanguageDialog(true)}>
         {t.buttons.myNewButton}
       </button>
       
       {onClose && (
-        <button onClick={onClose}>Cerrar</button>
+        <button onClick={onClose}>{t.buttons.cancel}</button>
       )}
+
+      {/* Usar LanguageDialog como en MainMenu y GameScreen */}
+      <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
     </div>
   );
 };
@@ -110,12 +117,13 @@ Esto garantiza que **no habrá errores de traducción** en tiempo de compilació
 ## 📋 Anatomía del Hook `useI18n()`
 
 ```typescript
-const { t, language, setLanguage } = useI18n();
+const { t, language } = useI18n();
 
 // t         → objeto con todas las traducciones del idioma actual
 // language  → idioma actual ('es' | 'en')
-// setLanguage → función para cambiar idioma
 ```
+
+> **Nota**: El cambio de idioma se realiza a través del componente `LanguageDialog`, que gestiona el cambio de forma centralizada.
 
 ---
 
@@ -144,25 +152,31 @@ const SettingsPanel: React.FC = () => {
 export default SettingsPanel;
 ```
 
-### Caso 2: Componente con Cambio de Idioma
+### Caso 2: Componente con Botón de Idioma (Abriendo LanguageDialog)
 
 ```typescript
-import React from 'react';
+import React, { useState } from 'react';
 import { Languages } from 'lucide-react';
 import { useI18n } from '../../i18n/useTranslation';
+import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 
 const LanguageSwitcher: React.FC = () => {
-  const { language, setLanguage, t } = useI18n();
+  const { t } = useI18n();
+  const [showLanguageDialog, setShowLanguageDialog] = useState(false);
 
   return (
-    <button 
-      className="language-btn"
-      title={t.labels.language}
-      onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
-    >
-      <Languages size={24} />
-      <span>{language.toUpperCase()}</span>
-    </button>
+    <>
+      <button 
+        className="language-btn"
+        title={t.buttons.language}
+        onClick={() => setShowLanguageDialog(true)}
+      >
+        <Languages size={24} />
+      </button>
+      
+      {/* LanguageDialog maneja el cambio de idioma */}
+      <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
+    </>
   );
 };
 
@@ -198,6 +212,85 @@ const UserFormModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <button onClick={handleSubmit}>{t.buttons.save}</button>
       <button onClick={onClose}>{t.buttons.exit}</button>
     </div>
+  );
+};
+
+export default UserFormModal;
+```
+
+### Caso 4: Modal de Confirmación (GameScreen)
+
+```typescript
+import React, { useState } from 'react';
+import { useI18n } from '../../i18n/useTranslation';
+
+const ExitConfirmationModal: React.FC<{ onConfirm: () => void; onCancel: () => void }> = ({ onConfirm, onCancel }) => {
+  const { t } = useI18n();
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h2>{t.messages.areYouSure}</h2>
+        <p>{t.messages.loseWarning}</p>
+        <div className="modal-buttons">
+          <button className="btn-confirm-exit" onClick={onConfirm}>
+            {t.buttons.yesExitAndLose}
+          </button>
+          <button className="btn-cancel" onClick={onCancel}>
+            {t.buttons.backToGame}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ExitConfirmationModal;
+```
+
+---
+
+## ✅ Checklist para Nuevos Componentes
+
+Cuando crees un nuevo componente, asegúrate de:
+
+- [ ] Agregar todas las claves de traducción en `src/i18n/locales.ts` (español e inglés)
+- [ ] Importar `useI18n` desde `'../../i18n/useTranslation'`
+- [ ] Usar `const { t, language } = useI18n();`
+- [ ] Reemplazar todos los strings hardcodeados con `t.categoria.clave`
+- [ ] Verificar que TypeScript sugiera las claves correctamente
+- [ ] Para cambiar idioma: usar `<LanguageDialog />` en lugar de `setLanguage()`
+- [ ] Probar que el cambio de idioma funciona correctamente
+
+## 🔄 Flujo de Traducción
+
+1. **Usuario abre la app** → Se carga idioma desde localStorage (o español por defecto)
+2. **Se renderiza componente** → Hook `useI18n()` obtiene traducciones del idioma actual
+3. **Usuario abre LanguageDialog** → Selecciona un nuevo idioma
+4. **Se re-renderizan componentes** → Todos reciben nuevas traducciones automáticamente
+
+## 📝 Claves de Traducción Disponibles
+
+### Buttons (`t.buttons.*`)
+- `play`, `howToPlay`, `undo`, `hint`, `confirm`, `exit`
+- `language`, `settings`, `profile`, `logout`
+- `easy`, `medium`, `hard`
+- `save`, `reset`, `cancel`, `changePassword`
+- `spanish`, `english`
+- `yesExitAndLose` (para modales de confirmación)
+- `backToGame` (para volver desde modales)
+
+### Labels (`t.labels.*`)
+- `displayName`, `selectLevel`, `userProfile`, `username`, `ranking`
+- `chooseAvatar`, `currentLevel`, `vs`, `player1`, `player2`
+- `boardGoesHere`
+- `security`, `currentPassword`, `newPassword`, `confirmNew`
+- `uniqueIdCannotBeChanged`
+
+### Messages (`t.messages.*`)
+- `loading`, `usernameMustBeCompleted`, `nameCannotBeEmpty`
+- `confirmTheDisplayNameFirst`, `openChat`, `selectLanguage`
+- `areYouSure`, `loseWarning` (para modales de confirmación)
   );
 };
 
