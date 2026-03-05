@@ -1,6 +1,6 @@
 import { render, screen,  waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import RegisterForm from '../RegisterForm'
+import RegisterForm from '../components/Login/RegisterForm'
 import { afterEach, describe, expect, test, vi } from 'vitest' 
 import '@testing-library/jest-dom'
 
