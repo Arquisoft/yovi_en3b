@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Importing routing
 import MainMenu from './components/MainMenu'; // Your main menu component
 import GameScreen from './components/GameScreen/GameScreen'; // Your game screen component
 import RegisterForm from './components/Login/RegisterForm'; // Your colleague's login component
+import SignUpForm from './components/SignUp/SignUpForm';
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
 
       {/* 4. Redirect any unknown route to login */}
       <Route path="*" element={<Navigate to="/" />} />
+
+      {/* 5. Sign Up route for new users */}          
+      <Route path="/signup" element={<SignUpForm />} />
     </Routes>
   );
 }

@@ -77,6 +77,19 @@ const RegisterForm: React.FC = () => {
           <button type="submit" className="main-button btn-blue play-btn" disabled={loading}>
             {loading ? 'LOADING...' : 'PLAY'} {/* Button label changes during request. */}
           </button>
+    
+
+          {/* New Sign Up link styled as a gray text link */}
+          <div className="auth-footer">
+            <span className="orbitron-text" style={{ color: '#64748b' }}>DON'T HAVE AN ACCOUNT? </span>
+               <button 
+                   type="button" 
+                   className="auth-link" 
+                   onClick={() => navigate('/signup')} // Here we change the screen to signup
+              > SIGN UP
+               </button>
+          </div>
+        
         </form>
       </div>
     </div>
