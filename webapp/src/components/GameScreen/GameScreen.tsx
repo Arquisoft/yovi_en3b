@@ -18,7 +18,7 @@ import { useI18n } from '../../i18n/useTranslation';
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
-    const { t, language } = useI18n();
+    const { t } = useI18n();
     const [currentPlayer, _setCurrentPlayer] = useState(1);
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
