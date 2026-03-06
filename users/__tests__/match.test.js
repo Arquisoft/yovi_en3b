@@ -11,7 +11,7 @@ describe('POST /matches/create', () => {
         vi.restoreAllMocks();
     });
 
-    it('Crea una partida contra un bot correctamente', async () => {
+    it('Creates a match against a bot successfully', async () => {
         const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
         
         vi.spyOn(db, 'query').mockResolvedValue({
@@ -20,7 +20,8 @@ describe('POST /matches/create', () => {
                 blue_player_id: fakeUserId, 
                 is_bot: true, 
                 bot_difficulty: 2,
-                status: 'in_progress'
+                status: 'in_progress',
+                current_state: null
             }]
         });
 
@@ -29,7 +30,8 @@ describe('POST /matches/create', () => {
             .send({ 
                 bluePlayerId: fakeUserId,
                 isBot: true,
-                botDifficulty: 2
+                botDifficulty: 2,
+                currentState: null
             })
             .set('Accept', 'application/json');
 
@@ -38,7 +40,7 @@ describe('POST /matches/create', () => {
         expect(res.body.match.is_bot).toBe(true);
     });
 
-    it('Falla si no le pasas la dificultad del bot', async () => {
+    it('Fails if bot difficulty is not provided', async () => {
         const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
 
         const res = await request(app)
@@ -50,5 +52,50 @@ describe('POST /matches/create', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.error).toMatch(/If you play against a BOT, you must select a difficulty./i);
+    });
+
+    it('Allows sending a non-null initial state', async () => {
+        const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
+        const initialState = '{"board":[]}';
+
+        vi.spyOn(db, 'query').mockResolvedValue({
+            rows: [{ 
+                id: '111e4567-e89b-12d3-a456-426614174111', 
+                blue_player_id: fakeUserId, 
+                is_bot: true, 
+                bot_difficulty: 1,
+                status: 'in_progress',
+                current_state: initialState
+            }]
+        });
+
+        const res = await request(app)
+            .post('/matches/create')
+            .send({ 
+                bluePlayerId: fakeUserId,
+                isBot: true,
+                botDifficulty: 1,
+                currentState: initialState
+            })
+            .set('Accept', 'application/json');
+
+        expect(res.status).toBe(201);
+        expect(res.body.match.current_state).toBe(initialState);
+    });
+
+    it('Rejects currentState that is not a string', async () => {
+        const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
+
+        const res = await request(app)
+            .post('/matches/create')
+            .send({ 
+                bluePlayerId: fakeUserId,
+                isBot: true,
+                botDifficulty: 1,
+                currentState: { board: [] }
+            });
+
+        expect(res.status).toBe(400);
+        expect(res.body.error).toMatch(/currentState must be a string/i);
     });
 });

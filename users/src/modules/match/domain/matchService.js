@@ -14,12 +14,18 @@ const createMatch = async (data) => {
         throw new Error("If you don't play against a BOT, you need a Red Player ID.");
     }
 
+    // currentState should be a string encoding of the board only (no turn information)
+    if (data.currentState !== undefined && data.currentState !== null && typeof data.currentState !== 'string') {
+        throw new Error("currentState must be a string representing the board state");
+    }
+
     // 2. Mandar a guardar
     const newMatch = await matchRepository.createMatch({
         bluePlayerId: data.bluePlayerId,
         redPlayerId: data.redPlayerId || null,
         isBot: data.isBot || false,
-        botDifficulty: data.botDifficulty || 0
+        botDifficulty: data.botDifficulty || 0,
+        currentState: data.currentState || null
     });
 
     return newMatch;
