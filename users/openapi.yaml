@@ -95,3 +95,50 @@ paths:
           description: It did not find a user with that username
         "500":
           description: Database server error
+  /loginUser:
+    post:
+      tags: [Users]
+      summary: Log in of a user
+      description: It compares the credentials passed to give access to the application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        "200":
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "testuser"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
+        "400":
+          description: Missing fields
+        "404":
+          description: Invalid username or password
+        "500":
+          description: Database server error
