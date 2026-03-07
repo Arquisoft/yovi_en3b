@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS matches (
     bot_difficulty INT DEFAULT 0, -- 0 if you play against a real local player, 1=Easy, 2=Medium, 3=Hard
     winner_id UUID REFERENCES users(id), -- Null if the match hasn't ended yet or if there is a tie
     status VARCHAR(20) DEFAULT 'in_progress', -- 'in_progress', 'finished', 'abandoned'
-    current_state TEXT, -- stores serialized board representation (string of piece positions)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP
 );
