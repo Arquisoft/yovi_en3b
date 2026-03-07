@@ -20,8 +20,7 @@ describe('POST /matches/create', () => {
                 blue_player_id: fakeUserId, 
                 is_bot: true, 
                 bot_difficulty: 2,
-                status: 'in_progress',
-                current_state: null
+                status: 'in_progress'
             }]
         });
 
@@ -30,8 +29,7 @@ describe('POST /matches/create', () => {
             .send({ 
                 bluePlayerId: fakeUserId,
                 isBot: true,
-                botDifficulty: 2,
-                currentState: null
+                botDifficulty: 2
             })
             .set('Accept', 'application/json');
 
@@ -54,48 +52,31 @@ describe('POST /matches/create', () => {
         expect(res.body.error).toMatch(/If you play against a BOT, you must select a difficulty./i);
     });
 
-    it('Allows sending a non-null initial state', async () => {
-        const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
-        const initialState = '{"board":[]}';
+    it('Creates a match with two real players', async () => {
+        const fakeBlueUserId = '123e4567-e89b-12d3-a456-426614174000';
+        const fakeRedUserId = '223e4567-e89b-12d3-a456-426614174001';
 
         vi.spyOn(db, 'query').mockResolvedValue({
             rows: [{ 
-                id: '111e4567-e89b-12d3-a456-426614174111', 
-                blue_player_id: fakeUserId, 
-                is_bot: true, 
-                bot_difficulty: 1,
-                status: 'in_progress',
-                current_state: initialState
+                id: '333e4567-e89b-12d3-a456-426614174333', 
+                blue_player_id: fakeBlueUserId,
+                red_player_id: fakeRedUserId,
+                is_bot: false, 
+                bot_difficulty: 0,
+                status: 'in_progress'
             }]
         });
 
         const res = await request(app)
             .post('/matches/create')
             .send({ 
-                bluePlayerId: fakeUserId,
-                isBot: true,
-                botDifficulty: 1,
-                currentState: initialState
+                bluePlayerId: fakeBlueUserId,
+                redPlayerId: fakeRedUserId,
+                isBot: false
             })
             .set('Accept', 'application/json');
 
         expect(res.status).toBe(201);
-        expect(res.body.match.current_state).toBe(initialState);
-    });
-
-    it('Rejects currentState that is not a string', async () => {
-        const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
-
-        const res = await request(app)
-            .post('/matches/create')
-            .send({ 
-                bluePlayerId: fakeUserId,
-                isBot: true,
-                botDifficulty: 1,
-                currentState: { board: [] }
-            });
-
-        expect(res.status).toBe(400);
-        expect(res.body.error).toMatch(/currentState must be a string/i);
+        expect(res.body.match.is_bot).toBe(false);
     });
 });

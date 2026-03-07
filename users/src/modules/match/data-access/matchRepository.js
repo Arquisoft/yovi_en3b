@@ -2,16 +2,15 @@ const db = require('../../../db/db.js');
 
 const createMatch = async (matchData) => {
     const query = `
-        INSERT INTO matches (blue_player_id, red_player_id, is_bot, bot_difficulty, status, current_state)
-        VALUES ($1, $2, $3, $4, 'in_progress', $5)
+        INSERT INTO matches (blue_player_id, red_player_id, is_bot, bot_difficulty, status)
+        VALUES ($1, $2, $3, $4, 'in_progress')
         RETURNING *; 
     `;
     const values = [
         matchData.bluePlayerId, 
         matchData.redPlayerId, 
         matchData.isBot, 
-        matchData.botDifficulty,
-        matchData.currentState || null
+        matchData.botDifficulty
     ];
     
     const { rows } = await db.query(query, values);
