@@ -48,6 +48,6 @@ export const generateBoard = (size: number) => {
  * @returns An object containing 'q' and 'r' (axial coordinates)
  * Mapping (q = y, r = x) ensures the top of the triangle is correctly aligned
  */
-export const barycentricToAxial = (x: number, y: number, z: number) => {
+export const barycentricToAxial = (x: number, y: number, _z: number) => {
   return { q: y, r: -x };
 };
