@@ -154,5 +154,10 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           command: |
             wget https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/master/docker-compose.yml -O docker-compose.yml
+
+            #To crete the schema of the db in the cloud. 
+            mkdir -p users/src/db
+            wget https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/master/users/src/db/init.sql -O ./users/src/db/init.sql
+
             docker compose down
             docker compose up -d --pull always
