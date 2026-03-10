@@ -29,18 +29,18 @@ const SignUpForm: React.FC = () => {
   const allValidationsPass = Object.values(passwordValidations).every(Boolean);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value }); // Updates specific field in state
   };
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevents default form submission behavior
     if (!allValidationsPass) return;
 
-    setLoading(true);
-    setError(null);
+    setLoading(true); // Sets loading state to true
+    setError(null); // Resets error state
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; // Fallback API URL
       const response = await fetch(`${API_URL}/users/createuser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ const SignUpForm: React.FC = () => {
       });
 
       if (response.ok) {
-        navigate('/'); 
+        navigate('/'); // Redirects to home on success
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Error creating account. Please try again.");
@@ -62,7 +62,7 @@ const SignUpForm: React.FC = () => {
     } catch (err) {
       setError("Cannot connect to the server. Please try again later.");
     } finally {
-      setLoading(false);
+      setLoading(false); // Sets loading state to false regardless of outcome
     }
   };
 
@@ -97,24 +97,46 @@ const SignUpForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">NICKNAME</label>
-            <input name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label htmlFor="nickname" className="orbitron-text">NICKNAME</label>
+            <input 
+              id="nickname"
+              name="nickname" 
+              type="text" 
+              className="orbitron-text" 
+              onChange={handleChange} 
+              required 
+            />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">USERNAME</label>
-            <input name="username" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label htmlFor="username" className="orbitron-text">USERNAME</label>
+            <input 
+              id="username"
+              name="username" 
+              type="text" 
+              className="orbitron-text" 
+              onChange={handleChange} 
+              required 
+            />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">EMAIL</label>
-            <input name="email" type="email" className="orbitron-text" onChange={handleChange} required />
+            <label htmlFor="email" className="orbitron-text">EMAIL</label>
+            <input 
+              id="email"
+              name="email" 
+              type="email" 
+              className="orbitron-text" 
+              onChange={handleChange} 
+              required 
+            />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">PASSWORD</label>
+            <label htmlFor="password" className="orbitron-text">PASSWORD</label>
             <div className="password-wrapper">
               <input 
+                id="password"
                 name="password" 
                 type={showPass ? "text" : "password"} 
                 className="orbitron-text" 
