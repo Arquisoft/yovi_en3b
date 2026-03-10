@@ -4,6 +4,7 @@ import MainMenu from './components/MainMenu'; // Your main menu component
 import GameScreen from './components/GameScreen/GameScreen'; // Your game screen component
 import RegisterForm from './components/Login/RegisterForm'; // Your colleague's login component
 import SignUpForm from './components/SignUp/SignUpForm';
+import HistoryPage from './components/HistoryPage/HistoryPage';
 
 function App() {
   return (
@@ -22,6 +23,10 @@ function App() {
 
       {/* 5. Sign Up route for new users */}          
       <Route path="/signup" element={<SignUpForm />} />
+      
+      {/* 6. History page route */}          
+      <Route path="/history" element={<HistoryPage />} />
+
     </Routes>
   );
 }
