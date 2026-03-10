@@ -4,16 +4,14 @@ import RegisterForm from '../components/Login/RegisterForm';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
-// 1. Create a mock function for navigate
+// 1. Mock navigate from react-router-dom
 const mockNavigate = vi.fn();
 
-// 2. Mock react-router-dom
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
 describe('RegisterForm', () => {
-  // Clear the mock navigator between tests
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -22,39 +20,67 @@ describe('RegisterForm', () => {
     vi.restoreAllMocks();
   });
 
-  test('shows validation error when username is empty', async () => {
+  test('shows validation error when fields are empty', async () => {
     render(<RegisterForm />);
     const user = userEvent.setup();
 
-    // 1. Do the action (do NOT put this inside waitFor)
-    await user.click(screen.getByRole('button', { name: /lets go!/i }));
+    // Find and click the PLAY button
+    await user.click(screen.getByRole('button', { name: /play/i }));
 
-    // 2. Assert the result (findByText automatically waits for the element to appear)
-    expect(await screen.findByText(/please enter a username/i)).toBeInTheDocument();
+    // Assert the specific error message from your component appears
+    expect(await screen.findByText('Please fill in all fields.')).toBeInTheDocument();
+    
+    // Ensure we did not try to navigate or fetch
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  test('submits username and displays response', async () => {
+  test('submits credentials, calls fetch, and navigates to /menu', async () => {
     const user = userEvent.setup();
 
-    // Mock fetch to resolve automatically
+    // Mock fetch to resolve successfully
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ message: 'Hello Pablo' }),
+      json: async () => ({}),
     } as Response);
 
     render(<RegisterForm />);
 
-    // 1. Do the actions first
-    await user.type(screen.getByLabelText(/whats your name\?/i), 'Pablo');
-    await user.click(screen.getByRole('button', { name: /lets go!/i }));
+    // Target the inputs using their placeholders
+    const usernameInput = screen.getByPlaceholderText('Enter your name');
+    const passwordInput = screen.getByPlaceholderText('••••••••');
 
-    // 2. Wait for the async state to update and assert
-    // (I uncommented your expectation here because it should work perfectly now!)
+    // Type in the credentials
+    await user.type(usernameInput, 'Pablo');
+    await user.type(passwordInput, 'SecurePass123');
+
+    // Click the PLAY button
+    await user.click(screen.getByRole('button', { name: /play/i }));
+
+    // 1. Wait for fetch to be called with the correct data
     await waitFor(() => {
-      expect(screen.getByText(/hello pablo/i)).toBeInTheDocument();
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/users/createuser'),
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'Pablo', password: 'SecurePass123' }),
+        })
+      );
     });
-    
-    // Optional: You can also assert that fetch was called correctly
-    // expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    // 2. Assert that the component navigated to the menu!
+    expect(mockNavigate).toHaveBeenCalledWith('/menu');
+  });
+
+  // BONUS TEST: Since you have a SIGN UP button, let's test that it navigates properly!
+  test('navigates to /signup when SIGN UP button is clicked', async () => {
+    render(<RegisterForm />);
+    const user = userEvent.setup();
+
+    // Click the "SIGN UP" button
+    await user.click(screen.getByRole('button', { name: /sign up/i }));
+
+    // Assert it navigated to the correct route
+    expect(mockNavigate).toHaveBeenCalledWith('/signup');
   });
 });
