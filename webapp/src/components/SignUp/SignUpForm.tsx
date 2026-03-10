@@ -7,7 +7,7 @@ const SignUpForm: React.FC = () => {
   const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
   
   const [formData, setFormData] = useState({
-    name: '',
+    nickname: '',
     username: '',
     email: '',
     password: '',
@@ -45,7 +45,7 @@ const SignUpForm: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
+          nickname: formData.nickname,
           username: formData.username,
           email: formData.email,
           password: formData.password,
@@ -97,8 +97,8 @@ const SignUpForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">NAME</label>
-            <input name="name" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text">NICKNAME</label>
+            <input name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
@@ -139,7 +139,7 @@ const SignUpForm: React.FC = () => {
           <button 
             type="submit" 
             className="main-button btn-blue save-btn-compact"
-            disabled={loading || !allValidationsPass || !formData.email || !formData.name || !formData.username}
+            disabled={loading || !allValidationsPass || !formData.email || !formData.nickname || !formData.username}
           >
             {loading ? 'CREATING...' : 'SAVE ACCOUNT'}
           </button>
