@@ -12,17 +12,68 @@ import {
     HelpCircle
 } from 'lucide-react';
 import './GameScreen.css';
-import { useNavigate } from 'react-router-dom';
+import { generateBoard, type Cell } from './gridUtils';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../../components/LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
+import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
+
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Size of the board
+    const size = location.state?.size || 3;
+
+    // Cells generated 
+    const cells = generateBoard(size);
+
+    // Offsets to center the board
+    // Not exact values, just try and error to try to center it
+    const offsetX = size * 4.75;
+    const offsetY = (size - 1) * 5;
+
+
     const { t } = useI18n();
-    const [currentPlayer, _setCurrentPlayer] = useState(1);
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
     const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+
+    // Saves who (player 1 or player 2) has occupied each cell -> Key: "x-y-z"
+    const [boardState, setBoardState] = useState<Record<string, number>>({});
+    // Tracks current turn
+    const [currentPlayer, _setCurrentPlayer] = useState(1);
+    // Temporarily stores what cell is selected before clicking confirm
+    const [pendingMove, setPendingMove] = useState<Cell | null>(null);
+
+    // Manages the clicks on the board
+    const handleClick = (cell: Cell) => {
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
+
+        // If it has already an owner, ignore it
+        if (boardState[key]) return;
+
+        // Mark it as "pending to confirm" 
+        setPendingMove(cell);
+    };
+
+    const handleConfirm = () => {
+        if (!pendingMove) return;
+
+        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
+
+        // Save the movement
+        setBoardState(prev => ({
+            ...prev,
+            [key]: currentPlayer
+        }));
+
+        // Clear the "pending to confirm" move
+        setPendingMove(null);
+        // Change to the other player
+        _setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+    };
 
     return (
         <div className="game-layout">
@@ -39,15 +90,56 @@ const GameScreen: React.FC = () => {
                 </header>
 
                 <main className="board-area">
-                    <div className="triangle-board">
-                        <div className="placeholder-text">{t.labels.boardGoesHere}</div>
+                    <div className="triangle-board" style={{ width: '100%', height: '100%' }}>
+                        <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
+                            <Layout
+                                size={{ x: 6, y: 6 }}
+                                flat={false}
+                                spacing={1.1}
+                                origin={{ x: offsetX, y: offsetY }}
+                            >
+                                {cells.map((cell) => {
+                                    // Generating unique key to identify each cell
+                                    const key = `${cell.x}-${cell.y}-${cell.z}`;
+                                    // Owner of the cell (if there is any)
+                                    const owner = boardState[key];
+                                    // Gets whether the cell is selected
+                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z;
+
+                                    return (
+                                        <Hexagon
+                                            key={key}
+                                            q={cell.q}
+                                            r={cell.r}
+                                            s={cell.s}
+                                            className={`hex-cell 
+                                                ${owner === 1 ? 'p1-selected' : ''} 
+                                                ${owner === 2 ? 'p2-selected' : ''}
+                                                ${isSelected ? 'pending-selection' : ''}`}
+                                            onClick={() => handleClick(cell)}
+
+                                        >
+                                            <text x="0" y="1" fontSize="2" textAnchor="middle" fill="#999">
+                                                {`${cell.x},${cell.y},${cell.z}`}
+                                            </text>
+                                        </Hexagon>
+                                    );
+                                })}
+                            </Layout>
+                        </HexGrid>
                     </div>
                 </main>
 
                 <footer className="game-footer">
                     <button className="game-action-btn"><Undo2 size={16} /> {t.buttons.undo}</button>
                     <button className="game-action-btn"><Lightbulb size={16} /> {t.buttons.hint}</button>
-                    <button className="game-action-btn btn-confirm-blue"><CheckCircle2 size={16} /> {t.buttons.confirm}</button>
+                    <button
+                        className="game-action-btn btn-confirm-blue"
+                        onClick={handleConfirm}
+                        disabled={!pendingMove} // Disabled if there is no pending move
+                    >
+                        <CheckCircle2 size={16} /> {t.buttons.confirm}
+                    </button>
                     <button className="game-action-btn" onClick={() => setShowExitConfirmation(true)}>
                         <LogOut size={16} /> {t.buttons.exit}
                     </button>
@@ -59,8 +151,8 @@ const GameScreen: React.FC = () => {
 
                 {/* Settings bar */}
                 <div className="global-settings-bar">
-                    <button 
-                        className="icon-btn" 
+                    <button
+                        className="icon-btn"
                         title={t.buttons.language}
                         onClick={() => setShowLanguageDialog(true)}
                     >

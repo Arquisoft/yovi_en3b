@@ -19,9 +19,9 @@ const MainMenu: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleStartGame = () => {
+  const handleStartGame = (size: number) => {
     setShowPlayOptions(false);
-    navigate('/game');
+    navigate('/game', { state: { size }});
   };
 
   /* Function to handle the final logout */
@@ -80,9 +80,9 @@ const MainMenu: React.FC = () => {
               <button className="boton-cerrar-fijo" onClick={() => setShowPlayOptions(false)}>&times;</button>
               <h2 className="modal-title">{t.labels.selectLevel}</h2>
               <div className="modal-grid">
-                <button className="opt-btn" onClick={() => handleStartGame()}>{t.buttons.easy}</button>
-                <button className="opt-btn" onClick={() => handleStartGame()}>{t.buttons.medium}</button>
-                <button className="opt-btn" onClick={() => handleStartGame()}>{t.buttons.hard}</button>
+                <button className="opt-btn" onClick={() => handleStartGame(3)}>{t.buttons.easy}</button>
+                <button className="opt-btn" onClick={() => handleStartGame(5)}>{t.buttons.medium}</button>
+                <button className="opt-btn" onClick={() => handleStartGame(7)}>{t.buttons.hard}</button>
               </div>
             </div>
           </div>
