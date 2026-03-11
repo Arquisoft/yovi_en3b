@@ -6,4 +6,4 @@ RUN npm ci --silent
 
 COPY . .
 EXPOSE 3000
-CMD ["node", "users-service.js"]
+CMD ["node", "index.js"]

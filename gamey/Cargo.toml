@@ -35,6 +35,9 @@ thiserror = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+dotenv = "0.15"
+uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
