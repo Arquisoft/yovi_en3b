@@ -44,4 +44,25 @@ describe('useUserProfile Hook', () => {
 
     await waitFor(() => expect(result.current.error).toBe("Failed to load"));
   });
+
+  it('sets unknown error when save fails with non-Error', async () => {
+    vi.spyOn(api, 'getMyProfile').mockResolvedValueOnce({
+      id: 'u1',
+      username: 'user',
+      displayName: 'Player One',
+      avatarId: 'avatar_01',
+    });
+    vi.spyOn(api, 'getMyRanking').mockResolvedValueOnce({ position: 1, totalPlayers: 10 });
+    vi.spyOn(api, 'updateMyProfile').mockRejectedValueOnce('boom');
+
+    const { result } = renderHook(() => useUserProfile(true));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.save();
+    });
+
+    expect(result.current.error).toBe('Unknown error');
+  });
 });

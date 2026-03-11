@@ -401,6 +401,24 @@ describe('GameScreen', () => {
         vi.clearAllMocks();
     });
 
+    // TEST 23b: Hint error branch shows fallback message
+    test('hint error shows fallback message', async () => {
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: false,
+                json: () => Promise.resolve({}),
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: /hint/i }));
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(screen.getByText(/Could not retrieve hint/i)).toBeInTheDocument();
+    });
+
     // TEST 23: Close hint should remove hint display
     test('hint can be closed', async () => {
         global.fetch = vi.fn(() =>
@@ -421,6 +439,10 @@ describe('GameScreen', () => {
 
         // Fetch was called
         expect(global.fetch).toHaveBeenCalled();
+
+        const closeBtn = document.querySelector('.hint-container .close-x') as HTMLButtonElement;
+        await user.click(closeBtn);
+        expect(screen.queryByText('Test hint')).not.toBeInTheDocument();
 
         vi.clearAllMocks();
     });
@@ -448,6 +470,47 @@ describe('GameScreen', () => {
         const difficultyCloseBtn = closeButtons.find(btn => btn.textContent?.trim() === 'Close') || closeButtons[1];
         await user.click(difficultyCloseBtn);
         expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+    });
+
+    // TEST 25b: select medium and hard difficulty
+    test('difficulty selection supports medium and hard', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        await user.click(screen.getByRole('button', { name: /^Medium/i }));
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        await user.click(screen.getByRole('button', { name: /^Hard/i }));
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+    });
+
+    // TEST 25c: reaching max hints shows limit message
+    test('shows max hint message when exceeded', async () => {
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                    hint: 'Hint text',
+                    suggested_move: null
+                })
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        for (let i = 0; i < 3; i++) {
+            await user.click(screen.getByRole('button', { name: /hint/i }));
+            await new Promise(resolve => setTimeout(resolve, 20));
+        }
+
+        const hintBtn = screen.getByRole('button', { name: /hint/i });
+        hintBtn.removeAttribute('disabled');
+        await user.click(hintBtn);
+
+        expect(screen.getByText(/Maximum 3 hints reached/i)).toBeInTheDocument();
     });
 
     // TEST 26: Cell selection should be temporary until confirmed

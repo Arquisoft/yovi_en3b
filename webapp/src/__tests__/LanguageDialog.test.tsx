@@ -45,4 +45,13 @@ describe('LanguageDialog', () => {
     if (overlay) fireEvent.click(overlay);
     expect(mockOnClose).toHaveBeenCalled();
   });
+
+  test('clicking inside modal content does not close', () => {
+    const { container } = render(<LanguageDialog open={true} onClose={mockOnClose} />);
+    const content = container.querySelector('.modal-content');
+    expect(content).toBeDefined();
+
+    if (content) fireEvent.click(content);
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
 });

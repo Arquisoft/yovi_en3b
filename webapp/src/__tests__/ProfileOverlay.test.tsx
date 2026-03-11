@@ -6,6 +6,12 @@ import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 
 const mockOnClose = vi.fn();
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return { ...actual, useNavigate: () => mockNavigate };
+});
 
 // Complete dictionary for the component to avoid undefined errors
 vi.mock('../i18n/useTranslation', () => ({
@@ -228,6 +234,16 @@ test('7. Handles keyboard navigation in name input', async () => {
         await userEvent.click(overlay);
 
         expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    test('13b. History button navigates when not editing', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        const historyBtn = screen.getByText(/History/i);
+        await userEvent.click(historyBtn);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/history');
     });
 
     test('14. Does not render when open is false', () => {
