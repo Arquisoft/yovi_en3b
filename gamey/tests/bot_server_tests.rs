@@ -314,8 +314,8 @@ async fn test_randombot_available_on_startup() {
 async fn test_randombot_returns_valid_coordinates() {
     let app = test_app();
 
-    // Test with a larger board to have more available cells
-    let yen = YEN::new(4, 0, vec!['B', 'R'], "../../...../.....".to_string());
+    // Test with a board (size 3 has more cells than size 2)
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
 
     let response = app
         .oneshot(
@@ -335,7 +335,7 @@ async fn test_randombot_returns_valid_coordinates() {
     let move_response: MoveResponse = serde_json::from_slice(&body).unwrap();
 
     // Verify the move has valid coordinates
-    assert!(move_response.coords.x() < 4 || move_response.coords.y() < 4 || move_response.coords.z() < 4);
+    assert!(move_response.coords.x() < 3 || move_response.coords.y() < 3 || move_response.coords.z() < 3);
 }
 
 // ============================================================================
