@@ -27,22 +27,21 @@ const RegisterForm: React.FC = () => {
         body: JSON.stringify({ username, password }) // Sending credentials to server.
       });
 
-      // --- CAMBIO AQUÍ: Entramos siempre ---
-       const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      // Guardar el token (si tu backend lo devuelve)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('username', username);
-      navigate('/menu');
-    } else {
-      // Si el servidor responde con error (ej. usuario no encontrado)
-      setError(data.message || 'Error en el login. Verifica tus datos.');
-    }
+      if (res.ok) {
+        // Guardar el token (si tu backend lo devuelve)
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', username);
+        navigate('/menu');
+      } else {
+        // Si el servidor responde con error (ej. usuario no encontrado)
+        setError(data.message || 'Error in the login. Please check your credentials.');
+      }
     } catch (err) {
-      // Si no hay conexión (Docker apagado), también entramos
-      console.error("Connection failed, forcing entry."); // Debug error.
-      navigate('/menu'); // Bypassing connection error.
+      // Si el backend no responde (Docker apagado o red fallida)
+      setError('Cannot connect to the server. Please try again later.');
+      console.error("Connection error:", err);
     } finally {
       setLoading(false); // Ends the loading state.
     }
@@ -55,8 +54,10 @@ const RegisterForm: React.FC = () => {
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
-            <label className="orbitron-text">USERNAME</label>
+            <label className="orbitron-text" htmlFor="login-username">USERNAME</label>
             <input
+              id="login-username"
+              name="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)} // Updates username state.
@@ -66,8 +67,10 @@ const RegisterForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">PASSWORD</label>
+            <label className="orbitron-text" htmlFor="login-password">PASSWORD</label>
             <input
+              id="login-password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)} // Updates password state.
