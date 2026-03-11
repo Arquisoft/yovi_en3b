@@ -50,9 +50,11 @@ const GameScreen: React.FC = () => {
     // Saves who (player 1 or player 2) has occupied each cell -> Key: "x-y-z"
     const [boardState, setBoardState] = useState<Record<string, number>>({});
     // Tracks current turn
-    const [currentPlayer, _setCurrentPlayer] = useState(1);
+    const [currentPlayer, setCurrentPlayer] = useState(1);
     // Temporarily stores what cell is selected before clicking confirm
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
+    // Track bot move cooldown (3 seconds)
+    const [botCooldown, setBotCooldown] = useState(false);
 
     // Manages the clicks on the board
     const handleClick = (cell: Cell) => {
@@ -81,8 +83,36 @@ const GameScreen: React.FC = () => {
         // Clear hint when a move is confirmed
         setHint(null);
         setSuggestedMove(null);
+        
         // Change to the other player
-        _setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+        const nextPlayer = currentPlayer === 1 ? 2 : 1;
+        setCurrentPlayer(nextPlayer);
+        
+        // If next player is player 2 (bot), start cooldown and make bot move
+        if (nextPlayer === 2) {
+            setBotCooldown(true);
+            setTimeout(() => {
+                // Make bot move logic here - pick a random available cell
+                const availableCells = cells.filter(cell => {
+                    const cellKey = `${cell.x}-${cell.y}-${cell.z}`;
+                    return !boardState[cellKey] && cellKey !== key;
+                });
+                
+                if (availableCells.length > 0) {
+                    const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+                    const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
+                    
+                    setBoardState(prev => ({
+                        ...prev,
+                        [botKey]: 2
+                    }));
+                    
+                    // Switch back to player 1
+                    setCurrentPlayer(1);
+                }
+                setBotCooldown(false);
+            }, 3000); // 3 second cooldown
+        }
     };
 
     const handleGetHint = async () => {
@@ -198,7 +228,8 @@ const GameScreen: React.FC = () => {
                     <button
                         className="game-action-btn btn-confirm-blue"
                         onClick={handleConfirm}
-                        disabled={!pendingMove} // Disabled if there is no pending move
+                        disabled={!pendingMove || botCooldown}
+                        title={botCooldown ? "Waiting for bot move..." : ""}
                     >
                         <CheckCircle2 size={16} /> {t.buttons.confirm}
                     </button>
