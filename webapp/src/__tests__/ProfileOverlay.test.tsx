@@ -196,4 +196,80 @@ test('7. Handles keyboard navigation in name input', async () => {
         expect(consoleSpy).toHaveBeenCalledWith("Changing password to:", "b");
         expect(screen.queryByPlaceholderText(/Current/i)).not.toBeInTheDocument();
     });
+
+    test('11. Handles modal close when not editing', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        const closeBtn = document.querySelector('.close-modal') as HTMLButtonElement;
+        await userEvent.click(closeBtn);
+
+        expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    test('12. Modal overlay click does not close when editing', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        const editBtn = document.querySelector('.edit-btn') as HTMLButtonElement;
+        await userEvent.click(editBtn);
+
+        const overlay = document.querySelector('.modal-overlay') as HTMLElement;
+        await userEvent.click(overlay);
+
+        expect(mockOnClose).not.toHaveBeenCalled();
+    });
+
+    test('13. Modal overlay click closes when not editing', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        const overlay = document.querySelector('.modal-overlay') as HTMLElement;
+        await userEvent.click(overlay);
+
+        expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    test('14. Does not render when open is false', () => {
+        const { container } = render(<MemoryRouter><ProfileOverlay open={false} onClose={mockOnClose} /></MemoryRouter>);
+        
+        expect(container.querySelector('.modal-overlay')).not.toBeInTheDocument();
+    });
+
+    test('15. Password change button is disabled when in edit mode', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        const editBtn = document.querySelector('.edit-btn') as HTMLButtonElement;
+        await userEvent.click(editBtn);
+
+        const changePassBtn = screen.getByText(/Change Password/i) as HTMLButtonElement;
+        expect(changePassBtn).toBeDisabled();
+    });
+
+    test('16. Password validation - only current password filled', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        await userEvent.click(screen.getByText(/Change Password/i));
+
+        const currentInput = screen.getByPlaceholderText(/Current/i);
+        await userEvent.type(currentInput, 'old');
+
+        const confirmBtn = screen.getByText(/Confirm/i, { selector: '.confirm-pass' }) as HTMLButtonElement;
+        expect(confirmBtn).toBeDisabled();
+    });
+
+    test('17. Password validation - only new password filled', async () => {
+        render(<MemoryRouter><ProfileOverlay open={true} onClose={mockOnClose} /></MemoryRouter>);
+        await waitForElementToBeRemoved(() => screen.queryByText(/Loading.../i));
+
+        await userEvent.click(screen.getByText(/Change Password/i));
+
+        const newInput = screen.getByPlaceholderText(/New/i);
+        await userEvent.type(newInput, 'new');
+
+        const confirmBtn = screen.getByText(/Confirm/i, { selector: '.confirm-pass' }) as HTMLButtonElement;
+        expect(confirmBtn).toBeDisabled();
+    });
 });

@@ -25,10 +25,10 @@ const createUser = async (data) => {
         throw new Error("The username already exists");
     }
 
-    
-
-    // 3. Encript password (future modifications)
-    data.password = "123"
+    // 3. Encrypt password
+    if(!data.password){
+        throw new Error("Missing fields");
+    }
     const hash = await bcrypt.hash(data.password, 10); 
 
     // 4. Call the repo to save
