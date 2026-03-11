@@ -26,5 +26,3 @@ const createMatch = async (data) => {
 };
 
 module.exports = { createMatch };
-
-module.exports = { createMatch };
