@@ -11,7 +11,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-/// Difficulty levels for the LLM bot.
+/// Difficulty levels for the LLM Anthropic bot.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DifficultyLevel {
     /// Easy mode: 20% chance of random moves
