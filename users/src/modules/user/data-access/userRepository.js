@@ -14,7 +14,14 @@ const findUserByUsername = async (username) => {
     const result = await db.query(queries.findUserByUsername, [username]);
     return result.rows[0];
 }
+
+//Searches a user with the email indicated in the parameter
+const findUserByEmail = async (email) => {
+    const result = await db.query(queries.findUserByEmail, [email]);
+    return result.rows[0];
+}
 module.exports = {
     createUser,
-    findUserByUsername
+    findUserByUsername,
+    findUserByEmail
 };

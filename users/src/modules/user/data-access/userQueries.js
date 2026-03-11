@@ -9,6 +9,11 @@ module.exports = {
     SELECT username, nickname, photo, email, password
     FROM users 
     WHERE username = $1; 
+  `,
+  findUserByEmail: `
+    SELECT username, nickname, photo, email, password
+    FROM users 
+    WHERE email = $1; 
   `
   
 };

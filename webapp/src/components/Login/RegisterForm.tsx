@@ -21,20 +21,24 @@ const RegisterForm: React.FC = () => {
     setLoading(true); // Starts the loading state.
     try {
       const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; // Backend endpoint.
-      const res = await fetch(`${API_URL}/users/createuser`, {
+      const res = await fetch(`${API_URL}/users/loginUser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }) // Sending credentials to server.
       });
 
       // --- CAMBIO AQUÍ: Entramos siempre ---
-      if (res.ok) {
-        navigate('/menu'); // Success case: Navigate to menu.
-      } else {
-        // Si el servidor da error (ej. 400), forzamos la entrada igualmente
-        console.warn("Server returned an error, but bypassing for design testing."); // Debug warning.
-        navigate('/menu'); // Bypassing server error.
-      }
+       const data = await res.json();
+
+    if (res.ok) {
+      // Guardar el token (si tu backend lo devuelve)
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', username);
+      navigate('/menu');
+    } else {
+      // Si el servidor responde con error (ej. usuario no encontrado)
+      setError(data.message || 'Error en el login. Verifica tus datos.');
+    }
     } catch (err) {
       // Si no hay conexión (Docker apagado), también entramos
       console.error("Connection failed, forcing entry."); // Debug error.
