@@ -14,7 +14,7 @@ const createMatch = async (data) => {
         throw new Error("If you don't play against a BOT, you need a Red Player ID.");
     }
 
-    // 2. Mandar a guardar
+    // 2. Create and save
     const newMatch = await matchRepository.createMatch({
         bluePlayerId: data.bluePlayerId,
         redPlayerId: data.redPlayerId || null,
