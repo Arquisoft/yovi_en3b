@@ -33,6 +33,11 @@ loop
     WebApp -> RustModule: Asks the machine to play
     RustModule --> WebApp: Returns machine's play
     WebApp --> User: Shows what the machine has done
+
+    opt User clicks "Save Game"
+        WebApp -> Db: Upsert current state into game_saves
+        Db --> WebApp: Confirm save
+    end
 end
 WebApp -> Db: Save data of the game
 @enduml
