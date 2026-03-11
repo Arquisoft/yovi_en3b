@@ -117,7 +117,7 @@ const GameScreen: React.FC = () => {
 
     const handleGetHint = async () => {
         if (hintsUsed >= maxHints) {
-            setHint(`Maximum ${maxHints} hints reached for this game!`);
+            setHint(`Maximum ${maxHints} hints reached`);
             return;
         }
 
@@ -297,6 +297,11 @@ const GameScreen: React.FC = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                )}
+                {hintsUsed >= maxHints && (
+                    <div className="hint-limit-message">
+                        Maximum {maxHints} hints reached
                     </div>
                 )}
 

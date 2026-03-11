@@ -83,6 +83,17 @@ describe('MainMenu Component', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 5 } });
     });
 
+    test('3b. Navigates to game with easy and hard sizes', () => {
+        render(<MemoryRouter><MainMenu /></MemoryRouter>);
+        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
+        fireEvent.click(screen.getByText(/EASY/i));
+        expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 3 } });
+
+        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
+        fireEvent.click(screen.getByText(/HARD/i));
+        expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 7 } });
+    });
+
     test('4. Opens HowToPlay modal', () => {
         render(<MemoryRouter><MainMenu /></MemoryRouter>);
         fireEvent.click(screen.getByRole('button', { name: /HOW TO PLAY/i }));
@@ -97,6 +108,13 @@ describe('MainMenu Component', () => {
         
         fireEvent.click(screen.getByText(/YES, LOGOUT/i));
         expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+
+    test('5b. Logout cancel closes the modal', () => {
+        render(<MemoryRouter><MainMenu /></MemoryRouter>);
+        fireEvent.click(screen.getByTitle(/Logout/i));
+        fireEvent.click(screen.getByText(/CANCEL/i));
+        expect(screen.queryByText(/Are you sure you want to log out/i)).toBeNull();
     });
 
     test('6. Opens Language and Profile overlays', async () => {
