@@ -1,0 +1,6 @@
+PORT=3000
+DB_USER=usuario_admin
+DB_PASSWORD=secreto_seguro
+DB_NAME=mi_base_de_datos
+DB_HOST=localhost
+DB_PORT=5432

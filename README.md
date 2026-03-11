@@ -63,10 +63,11 @@ We are a coordinated team working across different layers of the stack to delive
 ## 📁 Project Structure
 ```text
 yovi_en3b/
-├── 📁 docs/          # Arc42 documentation & meeting minutes
-├── 📁 gamey/         # Rust-based Game Engine (Logic & AI)
-├── 📁 restapi/       # Node.js + Express backend (Business Logic)
-├── 📁 webapp/        # React + TypeScript frontend (User Interface)
+├── 📁 docs/                  # Arc42 documentation & meeting minutes
+├── 📁 gamey/                 # Rust-based Game Engine (Logic & AI)
+├── 📁 restapi/               # Node.js + Express backend (Business Logic)
+├── 📁 webapp/                # React + TypeScript frontend (User Interface)
+├── 📁 utils-development/     # Folder only for development notes or instructions
 └── 🐳 docker-compose.yml  # System orchestration
 ```
 

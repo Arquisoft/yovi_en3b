@@ -15,7 +15,7 @@ const createUser = async (req, res) => {
         res.status(201).json({message});
     } catch (error) {
         console.log(error);
-        if (error.message === "Missing fields" || error.message.includes("already exists")) {
+        if (error.message === "Missing fields" || error.message.includes("already exists")||error.message.includes("password")) {
             return res.status(400).json({ error: error.message });
         }
         return res.status(500).json({ error: "Internal server error"});
