@@ -30,7 +30,7 @@ use std::sync::Arc;
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
-pub use hint::HintResponse;
+pub use hint::{HintResponse, generate_strategic_hint};
 
 use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
 

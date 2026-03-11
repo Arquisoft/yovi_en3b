@@ -117,7 +117,7 @@ pub async fn get_hint(
 }
 
 /// Generate a strategic hint based on the board state
-fn generate_strategic_hint(board: &GameY, difficulty: &str) -> String {
+pub fn generate_strategic_hint(board: &GameY, difficulty: &str) -> String {
     let available = board.available_cells().len();
     let total_cells = (board.board_size() * (board.board_size() + 1)) / 2;
     let cells_filled = total_cells.saturating_sub(available as u32);
@@ -158,6 +158,20 @@ mod tests {
         };
         assert_eq!(response.api_version, "v1");
         assert_eq!(response.difficulty, "medium");
+        assert_eq!(response.hint, "Test hint");
+        assert!(response.suggested_move.is_some());
+    }
+
+    #[test]
+    fn test_hint_response_without_move() {
+        let response = HintResponse {
+            api_version: "v1".to_string(),
+            hint: "No moves available".to_string(),
+            suggested_move: None,
+            difficulty: "easy".to_string(),
+        };
+        assert_eq!(response.api_version, "v1");
+        assert!(response.suggested_move.is_none());
     }
 
     #[test]
@@ -171,5 +185,133 @@ mod tests {
         assert_eq!(suggested_move.x, 1);
         assert_eq!(suggested_move.y, 0);
         assert_eq!(suggested_move.z, 0);
+    }
+
+    #[test]
+    fn test_suggested_move_equality() {
+        let move1 = SuggestedMove { x: 1, y: 2, z: 3 };
+        let move2 = SuggestedMove { x: 1, y: 2, z: 3 };
+        assert_eq!(move1, move2);
+    }
+
+    #[test]
+    fn test_suggested_move_inequality() {
+        let move1 = SuggestedMove { x: 1, y: 2, z: 3 };
+        let move2 = SuggestedMove { x: 1, y: 2, z: 4 };
+        assert_ne!(move1, move2);
+    }
+
+    #[test]
+    fn test_hint_params_with_difficulty() {
+        let json = serde_json::json!({
+            "api_version": "v1",
+            "difficulty": "hard"
+        });
+        let params: HintParams = serde_json::from_value(json).unwrap();
+        assert_eq!(params.api_version, "v1");
+        assert_eq!(params.difficulty, Some("hard".to_string()));
+    }
+
+    #[test]
+    fn test_hint_params_without_difficulty() {
+        let json = serde_json::json!({
+            "api_version": "v1"
+        });
+        let params: HintParams = serde_json::from_value(json).unwrap();
+        assert_eq!(params.api_version, "v1");
+        assert!(params.difficulty.is_none());
+    }
+
+    #[test]
+    fn test_strategic_hint_easy_board_empty() {
+        use crate::{GameY, YEN};
+        
+        let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create GameY");
+        
+        let hint = generate_strategic_hint(&board, "easy");
+        
+        assert!(hint.contains("central") || hint.contains("filled"));
+        assert!(hint.len() > 10);
+    }
+
+    #[test]
+    fn test_strategic_hint_medium_board_partial() {
+        use crate::{GameY, YEN};
+        
+        let yen = YEN::new(3, 2, vec!['B', 'R'], "B/R./.B.".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create GameY");
+        
+        let hint = generate_strategic_hint(&board, "medium");
+        
+        assert!(hint.contains("connecting") || hint.contains("filled"));
+        assert!(hint.len() > 10);
+    }
+
+    #[test]
+    fn test_strategic_hint_hard_board_advanced() {
+        use crate::{GameY, YEN};
+        
+        let yen = YEN::new(3, 4, vec!['B', 'R'], "B/RB/.BR".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create GameY");
+        
+        let hint = generate_strategic_hint(&board, "hard");
+        
+        assert!(hint.contains("Critical") || hint.contains("filled"));
+        assert!(hint.len() > 10);
+    }
+
+    #[test]
+    fn test_strategic_hint_invalid_difficulty_fallback() {
+        use crate::{GameY, YEN};
+        
+        let yen = YEN::new(2, 0, vec!['B', 'R'], "../..".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create GameY");
+        
+        let hint = generate_strategic_hint(&board, "unknown");
+        
+        assert!(hint.contains("consider") || hint.contains("carefully"));
+    }
+
+    #[test]
+    fn test_strategic_hint_all_difficulties() {
+        use crate::{GameY, YEN};
+        
+        let yen = YEN::new(3, 1, vec!['B', 'R'], "B/../...".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create GameY");
+        
+        let easy_hint = generate_strategic_hint(&board, "easy");
+        let med_hint = generate_strategic_hint(&board, "medium");
+        let hard_hint = generate_strategic_hint(&board, "hard");
+        
+        // All should be different
+        assert_ne!(easy_hint, med_hint);
+        assert_ne!(med_hint, hard_hint);
+        
+        // All should have content
+        assert!(!easy_hint.is_empty());
+        assert!(!med_hint.is_empty());
+        assert!(!hard_hint.is_empty());
+    }
+
+    #[test]
+    fn test_strategic_hint_different_board_sizes() {
+        use crate::{GameY, YEN};
+        
+        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "../..".to_string()))
+            .expect("Failed to create GameY");
+        let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
+            .expect("Failed to create GameY");
+        let board4 = GameY::try_from(YEN::new(4, 0, vec!['B', 'R'], "./../../../....".to_string()))
+            .expect("Failed to create GameY");
+        
+        let hint2 = generate_strategic_hint(&board2, "medium");
+        let hint3 = generate_strategic_hint(&board3, "medium");
+        let hint4 = generate_strategic_hint(&board4, "medium");
+        
+        // Hints should reflect different board sizes
+        assert!(hint2.contains("3") || hint2.contains("filled"));
+        assert!(hint3.contains("6") || hint3.contains("filled"));
+        assert!(hint4.contains("10") || hint4.contains("filled"));
     }
 }

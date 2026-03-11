@@ -395,3 +395,225 @@ async fn test_get_on_choose_endpoint_returns_method_not_allowed() {
 
     assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
 }
+
+// ============================================================================
+// Hint endpoint tests
+// ============================================================================
+
+#[tokio::test]
+async fn test_hint_endpoint_with_valid_request() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 1, vec!['B', 'R'], "B/../...".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let hint_response: gamey::bot_server::HintResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize hint response");
+
+    assert_eq!(hint_response.api_version, "v1");
+    assert!(hint_response.hint.len() > 0);
+    assert!(hint_response.suggested_move.is_some());
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_default_difficulty() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let hint_response: gamey::bot_server::HintResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize");
+
+    // Default difficulty should be medium
+    assert_eq!(hint_response.difficulty, "medium");
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_with_full_board() {
+    let app = test_app();
+
+    // Create a mostly full board (only 1 cell available)
+    let yen = YEN::new(3, 5, vec!['B', 'R'], "B/RB/.BR".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let hint_response: gamey::bot_server::HintResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize");
+
+    assert!(hint_response.suggested_move.is_some());
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_with_invalid_yen_format() {
+    let app = test_app();
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from("{ invalid json }"))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert!(response.status().is_client_error());
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_with_invalid_api_version() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v2/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let error_response: ErrorResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize");
+
+    assert!(error_response.message.contains("Unsupported API version"));
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_multiple_requests() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 1, vec!['B', 'R'], "B/../...".to_string());
+
+    // Make multiple requests to verify consistency
+    for _ in 0..3 {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/v1/ybot/hint")
+                    .header("content-type", "application/json")
+                    .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                    .expect("Failed to build request"),
+            )
+            .await
+            .expect("Failed to execute request");
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+        let _hint_response: gamey::bot_server::HintResponse =
+            serde_json::from_slice(&body).expect("Failed to deserialize");
+    }
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_large_board() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 2, vec!['B', 'R'], "B/R./.B.".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let hint_response: gamey::bot_server::HintResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize");
+
+    assert!(hint_response.suggested_move.is_some());
+    let suggested = hint_response.suggested_move.unwrap();
+    assert!(suggested.x <= 3 && suggested.y <= 3 && suggested.z <= 3);
+}
+
+#[tokio::test]
+async fn test_hint_endpoint_with_medium_difficulty() {
+    let app = test_app();
+
+    let yen = YEN::new(3, 1, vec!['B', 'R'], "B/../...".to_string());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/v1/ybot/hint")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
+                .expect("Failed to build request"),
+        )
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
+    let hint_response: gamey::bot_server::HintResponse =
+        serde_json::from_slice(&body).expect("Failed to deserialize");
+
+    assert_eq!(hint_response.difficulty, "medium");
+    assert!(hint_response.hint.len() > 0);
+    assert!(hint_response.suggested_move.is_some());
+}

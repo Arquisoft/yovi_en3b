@@ -35,33 +35,33 @@ impl DifficultyLevel {
 
 /// Request structure for Anthropic API
 #[derive(Debug, Serialize)]
-struct AnthropicRequest {
-    model: String,
-    max_tokens: u32,
-    messages: Vec<AnthropicMessage>,
+pub struct AnthropicRequest {
+    pub model: String,
+    pub max_tokens: u32,
+    pub messages: Vec<AnthropicMessage>,
 }
 
 #[derive(Debug, Serialize)]
-struct AnthropicMessage {
-    role: String,
-    content: String,
+pub struct AnthropicMessage {
+    pub role: String,
+    pub content: String,
 }
 
 /// Response structure from Anthropic API
 #[derive(Debug, Deserialize)]
-struct AnthropicResponse {
-    content: Vec<AnthropicContent>,
+pub struct AnthropicResponse {
+    pub content: Vec<AnthropicContent>,
 }
 
 #[derive(Debug, Deserialize)]
-struct AnthropicContent {
-    text: String,
+pub struct AnthropicContent {
+    pub text: String,
 }
 
 /// Anthropic Claude API client for move decisions and hints
 pub struct AnthropicClient {
-    api_key: String,
-    client: reqwest::Client,
+    pub api_key: String,
+    pub client: reqwest::Client,
 }
 
 impl AnthropicClient {
@@ -272,6 +272,93 @@ mod tests {
     }
 
     #[test]
+    fn test_difficulty_level_clone_and_copy() {
+        let easy = DifficultyLevel::Easy;
+        let medium = DifficultyLevel::Medium;
+        let hard = DifficultyLevel::Hard;
+
+        // Test Copy trait
+        let easy_copy = easy;
+        assert_eq!(easy, easy_copy);
+
+        // Test Clone trait
+        let medium_clone = medium.clone();
+        assert_eq!(medium, medium_clone);
+
+        let hard_clone = hard.clone();
+        assert_eq!(hard, hard_clone);
+    }
+
+    #[test]
+    fn test_difficulty_level_debug_impl() {
+        let easy_debug = format!("{:?}", DifficultyLevel::Easy);
+        let medium_debug = format!("{:?}", DifficultyLevel::Medium);
+        let hard_debug = format!("{:?}", DifficultyLevel::Hard);
+
+        assert!(easy_debug.contains("Easy"));
+        assert!(medium_debug.contains("Medium"));
+        assert!(hard_debug.contains("Hard"));
+    }
+
+    #[test]
+    fn test_difficulty_level_partial_eq() {
+        assert_eq!(DifficultyLevel::Easy, DifficultyLevel::Easy);
+        assert_eq!(DifficultyLevel::Medium, DifficultyLevel::Medium);
+        assert_eq!(DifficultyLevel::Hard, DifficultyLevel::Hard);
+
+        assert_ne!(DifficultyLevel::Easy, DifficultyLevel::Medium);
+        assert_ne!(DifficultyLevel::Easy, DifficultyLevel::Hard);
+        assert_ne!(DifficultyLevel::Medium, DifficultyLevel::Hard);
+    }
+
+    #[test]
+    fn test_anthropic_client_creation() {
+        let client = AnthropicClient::new("test_api_key".to_string());
+        assert_eq!(client.api_key, "test_api_key");
+    }
+
+    #[test]
+    fn test_anthropic_client_with_empty_key() {
+        let client = AnthropicClient::new("".to_string());
+        assert_eq!(client.api_key, "");
+    }
+
+    #[test]
+    fn test_anthropic_client_with_long_key() {
+        let long_key = "k".repeat(10000);
+        let client = AnthropicClient::new(long_key.clone());
+        assert_eq!(client.api_key, long_key);
+    }
+
+    #[test]
+    fn test_anthropic_request_creation() {
+        let request = AnthropicRequest {
+            model: "claude-3-5-sonnet-20241022".to_string(),
+            max_tokens: 100,
+            messages: vec![AnthropicMessage {
+                role: "user".to_string(),
+                content: "test".to_string(),
+            }],
+        };
+
+        assert_eq!(request.model, "claude-3-5-sonnet-20241022");
+        assert_eq!(request.max_tokens, 100);
+        assert_eq!(request.messages.len(), 1);
+        assert_eq!(request.messages[0].role, "user");
+    }
+
+    #[test]
+    fn test_anthropic_message_structure() {
+        let message = AnthropicMessage {
+            role: "assistant".to_string(),
+            content: "Hello, I'm Claude".to_string(),
+        };
+
+        assert_eq!(message.role, "assistant");
+        assert_eq!(message.content, "Hello, I'm Claude");
+    }
+
+    #[test]
     fn test_llm_bot_creation() {
         let bot = LLMBot::new(
             "test_bot".to_string(),
@@ -280,5 +367,115 @@ mod tests {
         );
         assert_eq!(bot.name(), "test_bot");
         assert_eq!(bot.difficulty(), DifficultyLevel::Easy);
+    }
+
+    #[test]
+    fn test_llm_bot_creation_all_difficulties() {
+        let bot_easy = LLMBot::new(
+            "easy".to_string(),
+            DifficultyLevel::Easy,
+            "key".to_string(),
+        );
+        let bot_medium = LLMBot::new(
+            "medium".to_string(),
+            DifficultyLevel::Medium,
+            "key".to_string(),
+        );
+        let bot_hard = LLMBot::new(
+            "hard".to_string(),
+            DifficultyLevel::Hard,
+            "key".to_string(),
+        );
+
+        assert_eq!(bot_easy.difficulty(), DifficultyLevel::Easy);
+        assert_eq!(bot_medium.difficulty(), DifficultyLevel::Medium);
+        assert_eq!(bot_hard.difficulty(), DifficultyLevel::Hard);
+    }
+
+    #[test]
+    fn test_llm_bot_name_getter() {
+        let names = vec!["bot1", "bot2", "my_custom_bot", ""];
+        for name in names {
+            let bot = LLMBot::new(name.to_string(), DifficultyLevel::Medium, "key".to_string());
+            assert_eq!(bot.name(), name);
+        }
+    }
+
+    #[test]
+    fn test_llm_bot_difficulty_getter() {
+        let difficulties = vec![
+            DifficultyLevel::Easy,
+            DifficultyLevel::Medium,
+            DifficultyLevel::Hard,
+        ];
+        for difficulty in difficulties {
+            let bot = LLMBot::new("bot".to_string(), difficulty, "key".to_string());
+            assert_eq!(bot.difficulty(), difficulty);
+        }
+    }
+
+    #[test]
+    fn test_llm_bot_implements_ybot_trait() {
+        let bot: Box<dyn YBot> = Box::new(LLMBot::new(
+            "trait_bot".to_string(),
+            DifficultyLevel::Medium,
+            "key".to_string(),
+        ));
+
+        assert_eq!(bot.name(), "trait_bot");
+        // Can call choose_move through trait
+        assert!(bot.name().len() > 0);
+    }
+
+    #[test]
+    fn test_multiple_llm_bots_independent() {
+        let bot1 = LLMBot::new(
+            "bot1".to_string(),
+            DifficultyLevel::Easy,
+            "key1".to_string(),
+        );
+        let bot2 = LLMBot::new(
+            "bot2".to_string(),
+            DifficultyLevel::Hard,
+            "key2".to_string(),
+        );
+
+        // Verify they are independent
+        assert_ne!(bot1.name(), bot2.name());
+        assert_ne!(bot1.difficulty(), bot2.difficulty());
+    }
+
+    #[test]
+    fn test_format_board_state() {
+        let client = AnthropicClient::new("key".to_string());
+        
+        use crate::{GameY, YEN};
+        let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+        let board = GameY::try_from(yen).expect("Failed to create board");
+        
+        let board_state = client.format_board_state(&board);
+        
+        assert!(board_state.contains("Total cells"));
+        assert!(board_state.contains("Available cells"));
+    }
+
+    #[test]
+    fn test_format_board_state_different_sizes() {
+        let client = AnthropicClient::new("key".to_string());
+        
+        use crate::{GameY, YEN};
+        
+        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "../..".to_string()))
+            .expect("Failed to create board");
+        let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
+            .expect("Failed to create board");
+        
+        let state2 = client.format_board_state(&board2);
+        let state3 = client.format_board_state(&board3);
+        
+        // Different board sizes should produce different states
+        assert_ne!(state2, state3);
+        assert!(state2.len() > 0);
+        assert!(state3.len() > 0);
     }
 }

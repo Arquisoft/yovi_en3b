@@ -16,4 +16,4 @@ pub mod llm_bot;
 pub use random::*;
 pub use ybot::*;
 pub use ybot_registry::*;
-pub use llm_bot::*;
+pub use llm_bot::{*, LLMBot, DifficultyLevel, AnthropicClient};
