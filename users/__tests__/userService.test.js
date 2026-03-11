@@ -20,6 +20,7 @@ describe('POST /users/createuser', () => {
         
         vi.spyOn(db, 'query')
             .mockResolvedValueOnce({ rows: [] }) 
+            .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
                 rows: [{username: testName, nickname: testName, email: 'pablo@test.com', password: 'password123', photo: "photo"}]
             });
@@ -45,8 +46,71 @@ describe('POST /users/createuser', () => {
         const res = await request(app)
             .post('/users/createuser')
             .send({ 
+                nickname: testName,
                 email: 'pablo@test.com', 
-                password: 'password123'
+                password: 'password123',
+                photo: 'photo'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("Missing fields") 
+    })
+    // EMAIL IS MISSING
+    it('returns 400 if the email is missing', async () => {
+        const res = await request(app)
+            .post('/users/createuser')
+            .send({ 
+                nickname: testName,
+                username: testName,
+                password: 'password123',
+                photo: 'photo'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("Missing fields") 
+    })
+     // PASSWORD IS MISSING
+    it('returns 400 if the password is missing', async () => {
+        const res = await request(app)
+            .post('/users/createuser')
+            .send({ 
+                nickname: testName,
+                username: testName,
+                email: 'pablo@test.com', 
+                photo: 'photo'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("Missing fields") 
+    })
+     // SHORT PASSWORD
+    it('returns 400 if the password is too short', async () => {
+        const res = await request(app)
+            .post('/users/createuser')
+            .send({ 
+                nickname: testName,
+                username: testName,
+                email: 'pablo@test.com', 
+                password: 'pas',
+                photo: 'photo'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("The password must have at least 8 characters") 
+    })
+    // NICKNAME IS MISSING
+    it('returns 400 if the nickname is missing', async () => {
+        const res = await request(app)
+            .post('/users/createuser')
+            .send({ 
+                password: 'password123',
+                username: testName,
+                email: 'pablo@test.com', 
+                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -72,6 +136,28 @@ describe('POST /users/createuser', () => {
 
         expect(res.status).toBe(400)
         expect(res.body.error).toBe("The username already exists")
+    })
+    // EMAIL ALREADY EXISTS
+    it('returns 400 if there already exists a user with that email', async () => {
+
+        
+        vi.spyOn(db, 'query')
+            .mockResolvedValueOnce({ rows: [] })
+            .mockResolvedValueOnce({
+                rows: [{ email: 'pablo@test.com' }]
+            });
+
+        const res = await request(app)
+            .post('/users/createuser')
+            .send({ username: testName,
+                nickname: testName,
+                email: 'pablo@test.com', 
+                password: 'password123',
+                photo: "photo" })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("The email already exists")
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {

@@ -6,26 +6,26 @@ const userRepository = require('../data-access/userRepository');
 //Here the password is encrypted to be saved.
 
 const createUser = async (data) => {
-    //1. Check password constraints
-    if (!data.password || data.password.length < 8) {
-        throw new Error("The password must have at least 8 characters");
-    }
-
+    
     if (!data.username || !data.email || !data.password || !data.nickname) {
         throw new Error("Missing fields");
     }
+    //1. Check password constraints
+    if (data.password.length < 8) {
+        throw new Error("The password must have at least 8 characters");
+    }
 
-    // if(!data.username){
-    //     throw new Error ("Missing fields");
-    // }
-
-    // 2. Check non-repeted username
-    const existingUser = await userRepository.findUserByUsername(data.username);
-    if (existingUser) {
+    // 2.1 Check non-repeted username
+    const existingUsername = await userRepository.findUserByUsername(data.username);
+    if (existingUsername) {
         throw new Error("The username already exists");
     }
 
-    
+    // 2.2 Check non-repeted email
+    const existingEmail = await userRepository.findUserByEmail(data.email);
+    if (existingEmail) {
+        throw new Error("The email already exists");
+    }
 
     // 3. Encript password (future modifications)
     // data.password = "123"
@@ -57,6 +57,8 @@ const findUserByUsername = async (data) => {
     }
     return user;
 }
+
+
 
 //Checks whether a user can login (if it has an account)
 const loginUser = async (data) => {
