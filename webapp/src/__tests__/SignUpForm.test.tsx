@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import SignUpForm from '../components/SignUp/SignUpForm';
@@ -145,15 +146,15 @@ describe('SignUpForm Component', () => {
         
         // Select rocket avatar
         fireEvent.click(rocketAvatar);
-        expect(rocketAvatar).toHaveClass('active');
+        expect((rocketAvatar as HTMLElement).classList.contains('active')).toBe(true);
         
         // Select different avatar to deselect rocket
         const pizzaAvatar = screen.getAllByRole('button').filter(btn => btn.textContent === "🎮")[0];
         fireEvent.click(pizzaAvatar);
         
         // Check that pizza is now active
-        expect(pizzaAvatar).toHaveClass('active');
-        expect(rocketAvatar).not.toHaveClass('active');
+        expect((pizzaAvatar as HTMLElement).classList.contains('active')).toBe(true);
+        expect((rocketAvatar as HTMLElement).classList.contains('active')).toBe(false);
     });
 
     test('10. Updates all form fields on change', () => {

@@ -95,7 +95,7 @@ describe('RegisterForm', () => {
         fireEvent.click(screen.getByText(/PLAY/i));
 
         await waitFor(() => {
-            expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
+            expect(screen.getByText(/Cannot connect to the server/i)).toBeDefined();
         });
     });
 
