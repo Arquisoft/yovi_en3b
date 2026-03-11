@@ -119,9 +119,9 @@ const GameScreen: React.FC = () => {
                                             onClick={() => handleClick(cell)}
 
                                         >
-                                            <text x="0" y="1" fontSize="2" textAnchor="middle" fill="#999">
+                                            {/* <text x="0" y="1" fontSize="2" textAnchor="middle" fill="#999">
                                                 {`${cell.x},${cell.y},${cell.z}`}
-                                            </text>
+                                            </text> */}
                                         </Hexagon>
                                     );
                                 })}

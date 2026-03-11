@@ -21,7 +21,7 @@ describe('POST /users/createuser', () => {
         vi.spyOn(db, 'query')
             .mockResolvedValueOnce({ rows: [] }) 
             .mockResolvedValueOnce({
-                rows: [{username: testName, email: 'pablo@test.com' }]
+                rows: [{username: testName, nickname: testName, email: 'pablo@test.com', password: 'password123', photo: "photo"}]
             });
 
         const res = await request(app)
@@ -63,7 +63,11 @@ describe('POST /users/createuser', () => {
 
         const res = await request(app)
             .post('/users/createuser')
-            .send({ username: testName })
+            .send({ username: testName,
+                nickname: testName,
+                email: 'pablo@test.com', 
+                password: 'password123',
+                photo: "photo" })
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(400)
