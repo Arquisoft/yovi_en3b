@@ -200,6 +200,7 @@ impl AnthropicClient {
 pub struct LLMBot {
     name: String,
     difficulty: DifficultyLevel,
+    #[allow(dead_code)]
     llm_client: Arc<AnthropicClient>,
 }
 
