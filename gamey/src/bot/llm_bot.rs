@@ -465,7 +465,7 @@ mod tests {
         
         use crate::{GameY, YEN};
         
-        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "../..".to_string()))
+        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "./..".to_string()))
             .expect("Failed to create board");
         let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
             .expect("Failed to create board");

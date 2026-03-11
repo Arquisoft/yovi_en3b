@@ -265,7 +265,7 @@ mod tests {
     fn test_strategic_hint_invalid_difficulty_fallback() {
         use crate::{GameY, YEN};
         
-        let yen = YEN::new(2, 0, vec!['B', 'R'], "../..".to_string());
+        let yen = YEN::new(2, 0, vec!['B', 'R'], "./..".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
         
         let hint = generate_strategic_hint(&board, "unknown");
@@ -277,7 +277,7 @@ mod tests {
     fn test_strategic_hint_all_difficulties() {
         use crate::{GameY, YEN};
         
-        let yen = YEN::new(3, 1, vec!['B', 'R'], "B/../...".to_string());
+        let yen = YEN::new(3, 1, vec!['B', 'R'], "B/BR/.R.".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
         
         let easy_hint = generate_strategic_hint(&board, "easy");
@@ -298,12 +298,11 @@ mod tests {
     fn test_strategic_hint_different_board_sizes() {
         use crate::{GameY, YEN};
         
-        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "../..".to_string()))
+        let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "./..".to_string()))
             .expect("Failed to create GameY");
         let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
             .expect("Failed to create GameY");
-        let board4 = GameY::try_from(YEN::new(4, 0, vec!['B', 'R'], "./../../../....".to_string()))
-            .expect("Failed to create GameY");
+        let board4 = GameY::try_from(YEN::new(4, 0, vec!['B', 'R'], ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....")).expect("Failed to create GameY");
         
         let hint2 = generate_strategic_hint(&board2, "medium");
         let hint3 = generate_strategic_hint(&board3, "medium");
