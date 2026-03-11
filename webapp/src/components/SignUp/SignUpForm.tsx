@@ -33,14 +33,14 @@ const SignUpForm: React.FC = () => {
   };
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevents default form submission behavior
+    e.preventDefault();
     if (!allValidationsPass) return;
 
-    setLoading(true); // Sets loading state to true
-    setError(null); // Resets error state
+    setLoading(true);
+    setError(null);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; // Fallback API URL
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
       const response = await fetch(`${API_URL}/users/createuser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ const SignUpForm: React.FC = () => {
       });
 
       if (response.ok) {
-        navigate('/'); // Redirects to home on success
+        navigate('/'); 
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Error creating account. Please try again.");
@@ -62,7 +62,7 @@ const SignUpForm: React.FC = () => {
     } catch (err) {
       setError("Cannot connect to the server. Please try again later.");
     } finally {
-      setLoading(false); // Sets loading state to false regardless of outcome
+      setLoading(false);
     }
   };
 
@@ -97,39 +97,18 @@ const SignUpForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label htmlFor="nickname" className="orbitron-text">NICKNAME</label>
-            <input 
-              id="nickname"
-              name="nickname" 
-              type="text" 
-              className="orbitron-text" 
-              onChange={handleChange} 
-              required 
-            />
+            <label className="orbitron-text">NICKNAME</label>
+            <input name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label htmlFor="username" className="orbitron-text">USERNAME</label>
-            <input 
-              id="username"
-              name="username" 
-              type="text" 
-              className="orbitron-text" 
-              onChange={handleChange} 
-              required 
-            />
+            <label className="orbitron-text">USERNAME</label>
+            <input name="username" type="text" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label htmlFor="email" className="orbitron-text">EMAIL</label>
-            <input 
-              id="email"
-              name="email" 
-              type="email" 
-              className="orbitron-text" 
-              onChange={handleChange} 
-              required 
-            />
+            <label className="orbitron-text">EMAIL</label>
+            <input name="email" type="email" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">

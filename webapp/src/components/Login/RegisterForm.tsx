@@ -20,16 +20,17 @@ const RegisterForm: React.FC = () => {
 
     setLoading(true); // Starts the loading state.
     try {
-    const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-    
-    // Llamada al endpoint de login
-    const res = await fetch(`${API_URL}/users/loginUser`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
 
-    const data = await res.json();
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; // Backend endpoint.
+      const res = await fetch(`${API_URL}/users/loginUser`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }) // Sending credentials to server.
+      });
+
+      // --- CAMBIO AQUÍ: Entramos siempre ---
+       const data = await res.json();
+
 
     if (res.ok) {
       // Guardar el token (si tu backend lo devuelve)
@@ -38,7 +39,14 @@ const RegisterForm: React.FC = () => {
       navigate('/menu');
     } else {
       // Si el servidor responde con error (ej. usuario no encontrado)
-      setError(data.message || 'Error in the login. Please check your credentials.');
+      setError(data.message || 'Error en el login. Verifica tus datos.');
+    }
+    } catch (err) {
+      // Si no hay conexión (Docker apagado), también entramos
+      console.error("Connection failed, forcing entry."); // Debug error.
+      navigate('/menu'); // Bypassing connection error.
+    } finally {
+      setLoading(false); // Ends the loading state.
     }
   } catch (err) {
     // Si el backend no responde (Docker apagado o red fallida)
