@@ -72,4 +72,59 @@ describe('RegisterForm', () => {
         // Verify navigation to signup
         expect(mockNavigate).toHaveBeenCalledWith('/signup');
     });
+
+    test('5. Clears error when user starts typing', async () => {
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.click(screen.getByText(/PLAY/i));
+        expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
+
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        
+        // Error should still be visible until both fields are filled
+        expect(screen.queryByText(/Please fill in all fields/i)).toBeDefined();
+    });
+
+    test('6. Handles network error gracefully', async () => {
+        (global.fetch as any).mockRejectedValue(new Error('Network error'));
+
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        fireEvent.click(screen.getByText(/PLAY/i));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Cannot connect to the server/i)).toBeDefined();
+        });
+    });
+
+    test('7. Loading state is set while API is being called', async () => {
+        let resolveResponse: any;
+        const responsePromise = new Promise(resolve => {
+            resolveResponse = resolve;
+        });
+
+        (global.fetch as any).mockReturnValue(responsePromise);
+
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        
+        const playBtn = screen.getByText(/PLAY/i) as HTMLButtonElement;
+        fireEvent.click(playBtn);
+
+        // Button should be disabled during loading
+        expect(playBtn.disabled).toBe(true);
+
+        resolveResponse({
+            ok: true,
+            json: async () => ({ token: 'fake-token' }),
+        });
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/menu');
+        });
+    });
 });

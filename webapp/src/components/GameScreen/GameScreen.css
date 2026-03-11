@@ -395,3 +395,149 @@
     stroke-width: 2;
     opacity: 0.7;
 }
+
+.hex-cell.suggested-move {
+  fill: #fbbf24;
+  stroke: #f59e0b;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
+}
+
+/*
+================================================
+||              HINT CONTAINER                ||
+================================================
+*/
+
+.hint-container {
+  flex: 0 0 auto;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 15px;
+  padding: 15px;
+  margin-bottom: 15px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hint-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #86efac;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.hint-header .close-x {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #86efac;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.hint-header .close-x:hover {
+  color: #ef4444;
+}
+
+.hint-content {
+  color: #d1fae5;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.suggested-move-info {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+/*
+================================================
+||           DIFFICULTY DIALOG               ||
+================================================
+*/
+
+.difficulty-modal {
+  max-width: 450px;
+}
+
+.difficulty-modal h2 {
+  margin-bottom: 10px;
+}
+
+.difficulty-modal p {
+  color: #94a3b8;
+  margin-bottom: 25px;
+  font-size: 0.9rem;
+}
+
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.difficulty-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.difficulty-btn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(30, 41, 59, 1);
+}
+
+.difficulty-btn.active {
+  background: #2563eb;
+  border-color: #3b82f6;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+}
+
+.difficulty-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.difficulty-desc {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.difficulty-btn.active .difficulty-desc {
+  color: #bfdbfe;
+}
+
+/*
+================================================
+||             MODAL ICON                    ||
+================================================
+*/
+
+.modal-icon {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

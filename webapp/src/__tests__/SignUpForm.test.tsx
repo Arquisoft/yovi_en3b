@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import SignUpForm from '../components/SignUp/SignUpForm';
@@ -122,5 +123,56 @@ describe('SignUpForm Component', () => {
 
         const errorMsg = await screen.findByText(/Cannot connect to the server/i);
         expect(errorMsg).toBeDefined(); // Catch block error should be visible
+    });
+
+    test('8. Disables submit button when password is invalid', () => {
+        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'John' } });
+        fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'jdoe' } });
+        fireEvent.change(screen.getByLabelText(/EMAIL/i), { target: { name: 'email', value: 'john@test.com' } });
+        
+        // Password missing uppercase
+        fireEvent.change(screen.getByLabelText(/PASSWORD/i), { target: { name: 'password', value: 'short123!' } });
+
+        const submitBtn = screen.getByText(/SAVE ACCOUNT/i) as HTMLButtonElement;
+        expect(submitBtn.disabled).toBe(true);
+    });
+
+    test('9. Resets avatar selection correctly', () => {
+        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        
+        const rocketAvatar = screen.getAllByRole('button').filter(btn => btn.textContent === "🚀")[0];
+        
+        // Select rocket avatar
+        fireEvent.click(rocketAvatar);
+        expect((rocketAvatar as HTMLElement).classList.contains('active')).toBe(true);
+        
+        // Select different avatar to deselect rocket
+        const pizzaAvatar = screen.getAllByRole('button').filter(btn => btn.textContent === "🎮")[0];
+        fireEvent.click(pizzaAvatar);
+        
+        // Check that pizza is now active
+        expect((pizzaAvatar as HTMLElement).classList.contains('active')).toBe(true);
+        expect((rocketAvatar as HTMLElement).classList.contains('active')).toBe(false);
+    });
+
+    test('10. Updates all form fields on change', () => {
+        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        
+        const nicknameInput = screen.getByLabelText(/NICKNAME/i) as HTMLInputElement;
+        const usernameInput = screen.getByLabelText(/USERNAME/i) as HTMLInputElement;
+        const emailInput = screen.getByLabelText(/EMAIL/i) as HTMLInputElement;
+        const passwordInput = screen.getByLabelText(/PASSWORD/i) as HTMLInputElement;
+
+        fireEvent.change(nicknameInput, { target: { name: 'nickname', value: 'TestNick' } });
+        fireEvent.change(usernameInput, { target: { name: 'username', value: 'testuser' } });
+        fireEvent.change(emailInput, { target: { name: 'email', value: 'test@email.com' } });
+        fireEvent.change(passwordInput, { target: { name: 'password', value: 'TestPass123!' } });
+
+        expect((nicknameInput).value).toBe('TestNick');
+        expect((usernameInput).value).toBe('testuser');
+        expect((emailInput).value).toBe('test@email.com');
+        expect((passwordInput).value).toBe('TestPass123!');
     });
 });
