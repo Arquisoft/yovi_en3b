@@ -1,4 +1,4 @@
-use gamey::bot::llm_bot::{DifficultyLevel, LLMBot};
+use gamey::bot::llm_bot::{DifficultyLevel, LLMBot, AnthropicClient, AnthropicRequest, AnthropicMessage};
 use gamey::{GameY, YBot, YEN};
 
 // ============================================================================
@@ -322,4 +322,195 @@ fn test_multiple_bots_same_difficulty() {
 
     assert_eq!(bot1.difficulty(), bot2.difficulty());
     assert_ne!(bot1.name(), bot2.name());
+}
+
+// ============================================================================
+// Board state formatting tests
+// ============================================================================
+
+
+// ============================================================================
+// LLMBot move selection - Random vs Strategic
+// ============================================================================
+
+#[test]
+fn test_llm_bot_chooses_from_available_cells() {
+    let bot = LLMBot::new(
+        "test_bot".to_string(),
+        DifficultyLevel::Medium,
+        "test_key".to_string(),
+    );
+
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+    let game_y = GameY::try_from(yen).expect("Failed to create GameY");
+
+    // Try multiple times to ensure moves are from available cells
+    for _ in 0..10 {
+        let coords = bot.choose_move(&game_y).expect("Bot should return a move");
+        let index = coords.to_index(3);
+        assert!(game_y.available_cells().contains(&index), "Move should be from available cells");
+    }
+}
+
+#[test]
+fn test_llm_bot_different_difficulties_behavior() {
+    let easy_bot = LLMBot::new(
+        "easy".to_string(),
+        DifficultyLevel::Easy,
+        "key".to_string(),
+    );
+    let medium_bot = LLMBot::new(
+        "medium".to_string(),
+        DifficultyLevel::Medium,
+        "key".to_string(),
+    );
+    let hard_bot = LLMBot::new(
+        "hard".to_string(),
+        DifficultyLevel::Hard,
+        "key".to_string(),
+    );
+
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+    let game_y = GameY::try_from(yen).expect("Failed to create GameY");
+
+    // All should make moves
+    assert!(easy_bot.choose_move(&game_y).is_some());
+    assert!(medium_bot.choose_move(&game_y).is_some());
+    assert!(hard_bot.choose_move(&game_y).is_some());
+}
+
+// ============================================================================
+// Edge cases and special scenarios
+// ============================================================================
+
+#[test]
+fn test_llm_bot_consistency_multiple_calls() {
+    let bot = LLMBot::new(
+        "consistent_bot".to_string(),
+        DifficultyLevel::Medium,
+        "key".to_string(),
+    );
+
+    let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
+    let game_y = GameY::try_from(yen).expect("Failed to create GameY");
+
+    // Multiple calls should always return a move
+    for _ in 0..20 {
+        assert!(bot.choose_move(&game_y).is_some(), "Bot should consistently return moves");
+    }
+}
+
+#[test]
+fn test_anthropic_request_serialization() {
+    let request = AnthropicRequest {
+        model: "claude-3-5-sonnet-20241022".to_string(),
+        max_tokens: 100,
+        messages: vec![
+            AnthropicMessage {
+                role: "user".to_string(),
+                content: "test message".to_string(),
+            }
+        ],
+    };
+
+    let json = serde_json::to_string(&request).expect("Should serialize");
+    assert!(json.contains("claude-3-5-sonnet-20241022"));
+    assert!(json.contains("100"));
+}
+
+#[test]
+fn test_difficulty_level_serialization() {
+    let easy = DifficultyLevel::Easy;
+    let medium = DifficultyLevel::Medium;
+    let hard = DifficultyLevel::Hard;
+
+    let easy_json = serde_json::to_string(&easy).expect("Should serialize");
+    let medium_json = serde_json::to_string(&medium).expect("Should serialize");
+    let hard_json = serde_json::to_string(&hard).expect("Should serialize");
+
+    assert!(easy_json.contains("Easy"));
+    assert!(medium_json.contains("Medium"));
+    assert!(hard_json.contains("Hard"));
+}
+
+#[test]
+fn test_llm_bot_difficulty_getter() {
+    let bot = LLMBot::new(
+        "test".to_string(),
+        DifficultyLevel::Hard,
+        "key".to_string(),
+    );
+
+    assert_eq!(bot.difficulty(), DifficultyLevel::Hard);
+}
+
+#[test]
+fn test_llm_bot_name_getter() {
+    let bot = LLMBot::new(
+        "my_custom_bot_name".to_string(),
+        DifficultyLevel::Easy,
+        "key".to_string(),
+    );
+
+    assert_eq!(bot.name(), "my_custom_bot_name");
+}
+
+// ============================================================================
+// LLMBot with various board states
+// ============================================================================
+
+#[test]
+fn test_llm_bot_with_mostly_filled_board() {
+    let bot = LLMBot::new(
+        "test_bot".to_string(),
+        DifficultyLevel::Medium,
+        "key".to_string(),
+    );
+
+    // Board with only 1 empty cell (size 2 has 3 cells total: 1+2)
+    let yen = YEN::new(2, 0, vec!['B', 'R'], "B/R.".to_string());
+    let game_y = GameY::try_from(yen).expect("Failed to create GameY");
+
+    let move_result = bot.choose_move(&game_y);
+    assert!(move_result.is_some());
+}
+
+#[test]
+fn test_llm_bot_move_valid_within_board() {
+    let bot = LLMBot::new(
+        "validator".to_string(),
+        DifficultyLevel::Easy,
+        "key".to_string(),
+    );
+
+    let yen = YEN::new(4, 0, vec!['B', 'R'], ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....");
+    let game_y = GameY::try_from(yen).expect("Failed to create GameY");
+
+    for _ in 0..10 {
+        if let Some(coords) = bot.choose_move(&game_y) {
+            assert!(coords.x() < 4 || coords.y() < 4 || coords.z() < 4);
+        }
+    }
+}
+
+#[test]
+fn test_anthropic_client_new() {
+    let client = AnthropicClient::new("my_key_12345".to_string());
+    assert_eq!(client.api_key, "my_key_12345");
+}
+
+// ============================================================================
+// Probability-based behavior tests
+// ============================================================================
+
+#[test]
+fn test_difficulty_random_probability_values() {
+    let easy_prob = DifficultyLevel::Easy.random_move_probability();
+    let medium_prob = DifficultyLevel::Medium.random_move_probability();
+    let hard_prob = DifficultyLevel::Hard.random_move_probability();
+
+    assert!(easy_prob > medium_prob);
+    assert!(medium_prob > hard_prob);
+    assert!(hard_prob >= 0.0);
+    assert!(easy_prob <= 100.0);
 }
