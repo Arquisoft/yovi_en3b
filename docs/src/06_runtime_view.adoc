@@ -55,9 +55,15 @@ loop
     break There is a winner!
         WebApp --> User: Shows result of the game
     end
+
     WebApp -> GameYEngine: Sends the board state & Asks the bot to play
     GameYEngine --> WebApp: Returns the play of the bot 
     WebApp --> User: Shows the play of the bot
+
+    opt User clicks "Save Game"
+        WebApp -> Db: Upsert current state into game_saves
+        Db --> WebApp: Confirm save
+    end
 end
 
 WebApp -> UsersService: Asks to save the data of the game
