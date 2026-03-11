@@ -228,6 +228,12 @@ impl LLMBot {
         let probability = self.difficulty.random_move_probability();
         let mut rng = rand::rng();
         let random_value: f32 = rng.random::<f32>() * 100.0;
+        self.should_make_random_move_with_value(random_value)
+    }
+
+    /// Decide whether to make a random move given a sampled value (0-100)
+    fn should_make_random_move_with_value(&self, random_value: f32) -> bool {
+        let probability = self.difficulty.random_move_probability();
         random_value < probability
     }
 }
@@ -238,13 +244,24 @@ impl YBot for LLMBot {
     }
 
     fn choose_move(&self, board: &GameY) -> Option<Coordinates> {
+        let random_value: f32 = rand::rng().random::<f32>() * 100.0;
+        self.choose_move_with_random_value(board, random_value)
+    }
+}
+
+impl LLMBot {
+    fn choose_move_with_random_value(
+        &self,
+        board: &GameY,
+        random_value: f32,
+    ) -> Option<Coordinates> {
         // Synchronous fallback: just make a random move with difficulty applied
         let available_cells = board.available_cells();
         if available_cells.is_empty() {
             return None;
         }
 
-        if self.should_make_random_move() {
+        if self.should_make_random_move_with_value(random_value) {
             let mut rng = rand::rng();
             let cell = available_cells.choose(&mut rng)?;
             let coordinates = Coordinates::from_index(*cell, board.board_size());
@@ -425,6 +442,63 @@ mod tests {
         assert_eq!(bot.name(), "trait_bot");
         // Can call choose_move through trait
         assert!(bot.name().len() > 0);
+    }
+
+    #[test]
+    fn test_should_make_random_move_with_value() {
+        let bot = LLMBot::new(
+            "bot".to_string(),
+            DifficultyLevel::Easy,
+            "key".to_string(),
+        );
+
+        // Easy has 20% probability
+        assert!(bot.should_make_random_move_with_value(0.0));
+        assert!(bot.should_make_random_move_with_value(19.9));
+        assert!(!bot.should_make_random_move_with_value(20.0));
+        assert!(!bot.should_make_random_move_with_value(100.0));
+    }
+
+    #[test]
+    fn test_choose_move_with_empty_board_returns_none() {
+        use crate::{GameY, YEN};
+
+        let board = GameY::try_from(YEN::new(1, 0, vec!['B', 'R'], "B".to_string()))
+            .expect("Failed to create board");
+        let bot = LLMBot::new("bot".to_string(), DifficultyLevel::Medium, "key".to_string());
+
+        assert!(bot.choose_move(&board).is_none());
+    }
+
+    #[test]
+    fn test_choose_move_single_cell_board_is_deterministic() {
+        use crate::{GameY, YEN};
+
+        let board = GameY::try_from(YEN::new(1, 0, vec!['B', 'R'], ".".to_string()))
+            .expect("Failed to create board");
+        let bot = LLMBot::new("bot".to_string(), DifficultyLevel::Hard, "key".to_string());
+
+        let chosen = bot.choose_move(&board).expect("Expected a move");
+        assert_eq!(chosen, Coordinates::new(0, 0, 0));
+    }
+
+    #[test]
+    fn test_choose_move_with_random_value_branches() {
+        use crate::{GameY, YEN};
+
+        let board = GameY::try_from(YEN::new(1, 0, vec!['B', 'R'], ".".to_string()))
+            .expect("Failed to create board");
+        let bot = LLMBot::new("bot".to_string(), DifficultyLevel::Easy, "key".to_string());
+
+        let chosen_random = bot
+            .choose_move_with_random_value(&board, 0.0)
+            .expect("Expected a move for random branch");
+        let chosen_default = bot
+            .choose_move_with_random_value(&board, 100.0)
+            .expect("Expected a move for default branch");
+
+        assert_eq!(chosen_random, Coordinates::new(0, 0, 0));
+        assert_eq!(chosen_default, Coordinates::new(0, 0, 0));
     }
 
     #[test]
