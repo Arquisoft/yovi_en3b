@@ -18,6 +18,7 @@ import { LanguageDialog } from '../../components/LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 
+type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -39,6 +40,12 @@ const GameScreen: React.FC = () => {
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
     const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+    const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
+    const [difficulty, setDifficulty] = useState<DifficultyLevel>('medium');
+    const [hint, setHint] = useState<string | null>(null);
+    const [suggestedMove, setSuggestedMove] = useState<{ x: number; y: number; z: number } | null>(null);
+    const [hintsUsed, setHintsUsed] = useState(0);
+    const [maxHints] = useState(3);
 
     // Saves who (player 1 or player 2) has occupied each cell -> Key: "x-y-z"
     const [boardState, setBoardState] = useState<Record<string, number>>({});
@@ -71,8 +78,53 @@ const GameScreen: React.FC = () => {
 
         // Clear the "pending to confirm" move
         setPendingMove(null);
+        // Clear hint when a move is confirmed
+        setHint(null);
+        setSuggestedMove(null);
         // Change to the other player
         _setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+    };
+
+    const handleGetHint = async () => {
+        if (hintsUsed >= maxHints) {
+            setHint(`Maximum ${maxHints} hints reached for this game!`);
+            return;
+        }
+
+        try {
+            // Format current board state for the API
+            const gameState = {
+                board: {
+                    size: size,
+                    state: boardState
+                }
+            };
+
+            const response = await fetch(`http://localhost:4000/v1/ybot/hint?difficulty=${difficulty}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gameState),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get hint');
+            }
+
+            const data = await response.json();
+            setHint(data.hint);
+            setSuggestedMove(data.suggested_move);
+            setHintsUsed(hintsUsed + 1);
+        } catch (error) {
+            console.error('Error getting hint:', error);
+            setHint('Could not retrieve hint. Try again later.');
+        }
+    };
+
+    const selectDifficulty = (level: DifficultyLevel) => {
+        setDifficulty(level);
+        setShowDifficultyDialog(false);
     };
 
     return (
@@ -105,6 +157,8 @@ const GameScreen: React.FC = () => {
                                     const owner = boardState[key];
                                     // Gets whether the cell is selected
                                     const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z;
+                                    // Gets whether this is the suggested move
+                                    const isSuggested = suggestedMove?.x === cell.x && suggestedMove?.y === cell.y && suggestedMove?.z === cell.z;
 
                                     return (
                                         <Hexagon
@@ -115,7 +169,8 @@ const GameScreen: React.FC = () => {
                                             className={`hex-cell 
                                                 ${owner === 1 ? 'p1-selected' : ''} 
                                                 ${owner === 2 ? 'p2-selected' : ''}
-                                                ${isSelected ? 'pending-selection' : ''}`}
+                                                ${isSelected ? 'pending-selection' : ''}
+                                                ${isSuggested && !owner ? 'suggested-move' : ''}`}
                                             onClick={() => handleClick(cell)}
 
                                         >
@@ -132,7 +187,14 @@ const GameScreen: React.FC = () => {
 
                 <footer className="game-footer">
                     <button className="game-action-btn"><Undo2 size={16} /> {t.buttons.undo}</button>
-                    <button className="game-action-btn"><Lightbulb size={16} /> {t.buttons.hint}</button>
+                    <button 
+                        className="game-action-btn"
+                        onClick={handleGetHint}
+                        disabled={hintsUsed >= maxHints}
+                        title={`Hints: ${hintsUsed}/${maxHints}`}
+                    >
+                        <Lightbulb size={16} /> {t.buttons.hint} ({hintsUsed}/{maxHints})
+                    </button>
                     <button
                         className="game-action-btn btn-confirm-blue"
                         onClick={handleConfirm}
@@ -159,6 +221,14 @@ const GameScreen: React.FC = () => {
                         <Languages size={28} />
                     </button>
 
+                    <button 
+                        className="icon-btn-global" 
+                        title="Difficulty"
+                        onClick={() => setShowDifficultyDialog(true)}
+                    >
+                        <Settings size={20} />
+                    </button>
+
                     <button className="icon-btn-global" title={t.buttons.howToPlay}>
                         <HelpCircle size={20} />
                     </button>
@@ -170,14 +240,34 @@ const GameScreen: React.FC = () => {
                     >
                         <MessageSquare size={20} />
                     </button>
-
-                    <button className="icon-btn-global" title={t.buttons.settings}>
-                        <Settings size={20} />
-                    </button>
                 </div>
 
-
-
+                {/* Hint Display */}
+                {hint && (
+                    <div className="hint-container">
+                        <div className="hint-header">
+                            <Lightbulb size={18} />
+                            <span>Hint (Level: {difficulty.toUpperCase()})</span>
+                            <button 
+                                className="close-x" 
+                                onClick={() => { 
+                                    setHint(null); 
+                                    setSuggestedMove(null); 
+                                }}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="hint-content">
+                            <p>{hint}</p>
+                            {suggestedMove && (
+                                <div className="suggested-move-info">
+                                    Suggested: ({suggestedMove.x}, {suggestedMove.y}, {suggestedMove.z})
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Chat */}
                 {isChatOpen && (
@@ -211,6 +301,46 @@ const GameScreen: React.FC = () => {
                     </div>
                 )}
             </aside>
+
+            {/* DIFFICULTY SELECTION DIALOG */}
+            {showDifficultyDialog && (
+                <div className="modal-overlay">
+                    <div className="modal-content difficulty-modal">
+                        <h2>Difficulty Level</h2>
+                        <p>Choose difficulty for AI hints and strategies</p>
+                        
+                        <div className="difficulty-options">
+                            <button 
+                                className={`difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
+                                onClick={() => selectDifficulty('easy')}
+                            >
+                                <div className="difficulty-name">Easy</div>
+                                <div className="difficulty-desc">20% random moves</div>
+                            </button>
+                            
+                            <button 
+                                className={`difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
+                                onClick={() => selectDifficulty('medium')}
+                            >
+                                <div className="difficulty-name">Medium</div>
+                                <div className="difficulty-desc">10% random moves</div>
+                            </button>
+                            
+                            <button 
+                                className={`difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
+                                onClick={() => selectDifficulty('hard')}
+                            >
+                                <div className="difficulty-name">Hard</div>
+                                <div className="difficulty-desc">3% random moves</div>
+                            </button>
+                        </div>
+
+                        <button className="btn-cancel" onClick={() => setShowDifficultyDialog(false)}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* EXIT CONFIRMATION WINDOW */}
             {showExitConfirmation && (

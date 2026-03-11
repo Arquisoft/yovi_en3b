@@ -6,6 +6,7 @@
 //! # Endpoints
 //! - `GET /status` - Health check endpoint
 //! - `POST /{api_version}/ybot/choose/{bot_id}` - Request a move from a bot
+//! - `POST /{api_version}/ybot/hint` - Get a strategic hint with difficulty consideration
 //!
 //! # Example
 //! ```no_run
@@ -23,11 +24,13 @@ pub mod choose;
 pub mod error;
 pub mod state;
 pub mod version;
+pub mod hint;
 use axum::response::IntoResponse;
 use std::sync::Arc;
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
+pub use hint::HintResponse;
 
 use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
 
@@ -40,6 +43,10 @@ pub fn create_router(state: AppState) -> axum::Router {
         .route(
             "/{api_version}/ybot/choose/{bot_id}",
             axum::routing::post(choose::choose),
+        )
+        .route(
+            "/{api_version}/ybot/hint",
+            axum::routing::post(hint::get_hint),
         )
         .with_state(state)
 }
