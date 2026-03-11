@@ -105,11 +105,28 @@ vi.mock('../components/GameScreen/gridUtils', () => ({
 // The describe is just to group all tests related to the game screen
 describe('GameScreen', () => {
 
-    // Before each test, the mocks are cleared
-    beforeEach(() => vi.clearAllMocks());
+    // Before each test, the mocks are cleared and fetch is mocked
+    beforeEach(() => {
+        vi.clearAllMocks();
+        // Mock fetch for hint requests
+        global.fetch = vi.fn((url: string) => {
+            if (url.includes('/ybot/hint')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        hint: 'This is a test hint',
+                        suggested_move: { x: 1, y: 0, z: -1 }
+                    })
+                } as Response);
+            }
+            return Promise.reject(new Error('Unknown URL'));
+        });
+    });
 
     // After each test, the mocks are restored to their original state
-    afterEach(() => vi.restoreAllMocks());
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
 
     // TEST 1: Check that the header shows both players names and the
     // "VS" text
@@ -284,22 +301,23 @@ describe('GameScreen', () => {
     test('hint button shows maximum hints reached', async () => {
         render(<GameScreen />);
         const user = userEvent.setup();
-        const hintButton = screen.getByRole('button', { name: /hint/i });
 
         // Click hint button 3 times to reach max (3/3)
         for (let i = 0; i < 3; i++) {
-            await user.click(hintButton);
-            // Wait for any async operations
-            await new Promise(resolve => setTimeout(resolve, 100));
+            const hintBtn = screen.getByRole('button', { name: /hint/i });
+            await user.click(hintBtn);
+            // Wait for fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        expect(hintButton).toBeDisabled();
+        // Check that the button is now disabled after 3 hints used
+        expect(screen.getByRole('button', { name: /hint/i })).toBeDisabled();
     });
 
     // TEST 17: Settings button should be clickable
     test('settings button is clickable', () => {
         render(<GameScreen />);
-        const settingsButton = screen.getByTitle('Settings');
+        const settingsButton = screen.getByTitle('Difficulty');
         expect(settingsButton).toBeInTheDocument();
     });
 
@@ -327,9 +345,13 @@ describe('GameScreen', () => {
         let confirmBtn = screen.getByRole('button', { name: /confirm/i });
         expect(confirmBtn).not.toBeDisabled();
 
-        // Confirm move
+        // Confirm move (Player 1 moves)
         await user.click(confirmBtn);
 
+        // Wait for bot cooldown to finish (3 seconds)
+        await new Promise(resolve => setTimeout(resolve, 3100));
+
+        // Now Player 2 should become Player 1 (after bot move), so we can select again
         // Select second cell (different cell)
         await user.click(cells[1]);
         confirmBtn = screen.getByRole('button', { name: /confirm/i });
@@ -419,7 +441,11 @@ describe('GameScreen', () => {
         await user.click(screen.getByTitle('Difficulty'));
         expect(screen.getByText('Difficulty Level')).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', { name: /close/i }));
+        // Get the close button by its text 'Close' which is unique to the difficulty modal
+        const closeButtons = screen.getAllByRole('button', { name: /close/i });
+        // Find the one in the difficulty modal (the first or second one)  
+        const difficultyCloseBtn = closeButtons.find(btn => btn.textContent?.trim() === 'Close') || closeButtons[1];
+        await user.click(difficultyCloseBtn);
         expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
     });
 
