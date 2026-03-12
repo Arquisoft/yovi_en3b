@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
+import { describe, expect, test, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nProvider } from '../i18n/Provider';
 import { I18nContext } from '../i18n/useTranslation';

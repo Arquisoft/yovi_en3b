@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 const renderMock = vi.fn();
