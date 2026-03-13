@@ -1,7 +1,6 @@
-/* App.css */
+/* --- App.css UNIFICADO --- */
 
 :root {
-  /* Here we define your neon colors and the background gradient */
   --bg-dark: #0f172a;
   --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
   --game-blue: #60a5fa;
@@ -11,25 +10,20 @@
 }
 
 body {
-  /* Here we reset the body margins and apply the main background */
   margin: 0;
   background: var(--bg-gradient);
   min-height: 100vh;
   font-family: 'Orbitron', sans-serif;
 }
 
-/* 1. FONT REGISTRATION */
 @font-face {
-  /* Here we register the custom 'Cubic' font for the title */
   font-family: 'Cubic';
   src: url('./assets/fonts/cubic.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-/* 2. LAYOUT AND CONTAINERS */
 .App {
-  /* Here we center everything and ensure the background covers the full screen */
   background: var(--bg-gradient);
   min-height: 100vh;
   width: 100vw;
@@ -38,8 +32,7 @@ body {
 }
 
 .menu-container {
-  /* Here we set up the main menu area with enough padding */
-width: 100%;
+  width: 100%;
   max-width: 1200px;
   height: 100vh;
   padding: 30px;
@@ -49,22 +42,6 @@ width: 100%;
   justify-content: center;
 }
 
-/* 3. HEADER ICONS 
-.header-icons {
-  /* Here we push the icons to the top right corner 
-  display: flex;
-  justify-content: flex-end; 
-  gap: 20px;
-  width: 100%;
-  padding: 40px 0; /* Increased top padding from 10px to 40px to push them down 
-  position: absolute; /* We make it absolute so it doesn't push the title "Game Y" 
-  top: 0;
-  right: 90px;
-  box-sizing: border-box;
-  
-}
-*/
-
 .header-icons {
   position: absolute; 
   top: 40px; 
@@ -73,8 +50,8 @@ width: 100%;
   gap: 20px;
   z-index: 100;
 }
+
 .icon-btn {
-  /* Here we style the circular buttons for settings and profile */
   background: transparent;
   border: none;
   color: var(--game-blue);
@@ -82,9 +59,13 @@ width: 100%;
   transition: 0.3s;
 }
 
-/* 4. TITLE STYLE */
+.icon-btn:hover {
+  color: #ffffff !important;
+  filter: drop-shadow(0 0 8px #60a5fa);
+  transform: scale(1.1);
+}
+
 .title-game {
-  /* Here we use the Cubic font and add a 100px margin to separate it from the buttons */
   font-family: 'Cubic', sans-serif;
   font-size: 8rem;
   text-align: center;
@@ -94,22 +75,19 @@ width: 100%;
   text-transform: uppercase;
 }
 
-/* 5. BUTTONS (ORBITRON FORCED) */
 .grid-buttons {
-  /* Here we create the 2-column layout for the main menu buttons */
   display: grid;
   grid-template-columns: repeat(2, 420px);
   gap: 25px;
   justify-content: center;
 }
 
-.main-button, .opt-btn, .boton-cerrar-fijo {
-  /* Here we force the Orbitron font on every button element */
+/* UNIFICACIÓN DE FUENTES EN BOTONES */
+.main-button, .opt-btn, .boton-cerrar-fijo, .btn-play-now {
   font-family: 'Orbitron', sans-serif !important;
 }
 
 .main-button {
-  /* Here we style the large menu buttons with transparency and hover effects */
   background: rgba(15, 23, 42, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.1);
   padding: 45px;
@@ -121,34 +99,22 @@ width: 100%;
   letter-spacing: 3px;
 }
 
-.icon-btn:hover {
-  /* Neon glow effect when hovering over header icons */
-  color: #ffffff !important;
-  filter: drop-shadow(0 0 8px #60a5fa);
-  transform: scale(1.1);
-}
-
 .main-button:hover {
-  /* Here we lift the button and glow the border on hover */
   transform: translateY(-8px);
   border-color: var(--game-blue);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
 .btn-blue {
-  /* Here we apply the bright blue gradient to the PLAY button */
   background: linear-gradient(to right, #2563eb, #1d4ed8);
   border: none;
 }
 
-/* 6. MODAL AND THE FIXED X */
+/* MODALES (BASE UNIFICADA) */
 .modal-overlay {
-  /* Here we create the dark blurred background for the level selection */
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   display: flex;
@@ -158,7 +124,6 @@ width: 100%;
 }
 
 .modal-content {
-  /* Here we style the modal box and set it as a relative anchor for the X */
   position: relative !important;
   background: rgba(15, 23, 42, 0.95);
   padding: 60px 40px 40px 40px;
@@ -168,47 +133,32 @@ width: 100%;
   max-width: 500px;
 }
 
+/* CLASE ESPECIAL PARA EL MODAL DE PREVIEW (MÁS ANCHO) */
+.preview-modal-wide {
+  max-width: 900px !important;
+}
+
 .boton-cerrar-fijo {
-  /* Here we anchor the X to the top right of the box so it doesn't move from there */
   position: absolute !important;
   top: 15px !important;
   right: 20px !important;
-  background: none !important; /* Forces no background */
-  border: none !important; /* Forces no border */
-  box-shadow: none !important; /* Removes any shadow that might look like a box */
-  color: var(--game-blue) !important; /* Uses your neon blue */
+  background: none !important;
+  border: none !important;
+  color: var(--game-blue) !important;
   font-size: 3rem !important;
   cursor: pointer;
   line-height: 1 !important;
-  padding: 0 !important; /* Removes padding that creates space around the X */
   z-index: 1010;
 }
 
 .modal-title {
-  /* Here we style the "Select Level" title inside the modal */
   font-family: 'Cubic', sans-serif;
   color: var(--game-blue);
   font-size: 2.5rem;
   margin-bottom: 30px;
 }
 
-.modal-grid {
-  /* Here we stack the level options vertically */
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-.modal-text {
-  font-family: 'Orbitron', sans-serif !important;
-  color: #94a3b8 !important;
-  margin-bottom: 30px !important;
-  text-align: center !important;
-  font-size: 1rem !important;
-}
-
 .opt-btn {
-  /* Here we style the Easy/Medium/Hard buttons */
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px;
@@ -219,12 +169,100 @@ width: 100%;
 }
 
 .opt-btn:hover {
-  /* Here we highlight the selected level with a blue background */
   background: #2563eb;
   transform: translateX(10px);
 }
 
-.full-width {
-  /* Here we make the button span across both columns */
-  grid-column: 1 / span 2;
+.full-width { grid-column: 1 / span 2; }
+
+/* NUEVAS CLASES DE PREVIEW (SIN DUPLICAR ESTILOS BASE) */
+.preview-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  padding: 20px;
+}
+
+.preview-left-board {
+  flex: 1.2;
+  background: rgba(255, 255, 255, 0.1); /* Estilo adaptado al fondo oscuro */
+  border-radius: 20px;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--game-blue);
+}
+
+.preview-right-settings {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+}
+
+.bots-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.bot-avatar {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 3px solid var(--game-blue);
+}
+
+.bot-orange { background-color: #ffd8a8; }
+.bot-teal { background-color: #96f2d7; }
+
+.setting-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-box {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.size-number-input {
+  width: 60px;
+  background: transparent;
+  color: var(--game-blue);
+  border: none;
+  border-bottom: 2px solid var(--game-blue);
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.difficulty-slider {
+  accent-color: var(--game-blue);
+  cursor: pointer;
+}
+
+.btn-play-now {
+  background-color: var(--game-blue-dark) !important;
+  color: white !important;
+  margin-top: auto;
+  padding: 20px !important;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: 0.3s;
+}
+
+.btn-play-now:hover {
+  background-color: white !important;
+  color: var(--game-blue-dark) !important;
+  transform: scale(1.02);
 }

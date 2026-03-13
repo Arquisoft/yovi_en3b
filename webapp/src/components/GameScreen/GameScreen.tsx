@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import {
     Languages,
     Settings,
@@ -9,17 +9,36 @@ import {
     LogOut,
     MoreVertical,
     MessageSquare,
-    HelpCircle
+    HelpCircle,
+    Clock // Added Clock icon
 } from 'lucide-react';
 import './GameScreen.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Added useLocation
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // Hook to get data from navigation state
 
+    // 1. EXTRAER SETTINGS (o valores por defecto si entras directo)
+    const settings = location.state || { size: 10, difficulty: 'medium', time: 100 };
+    
     const [currentPlayer, setCurrentPlayer] = useState(1);
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+    
+    // 2. ESTADO PARA EL CRONÓMETRO
+    const [timeLeft, setTimeLeft] = useState<number | null>(settings.time);
+
+    // 3. LÓGICA DEL CRONÓMETRO (Solo si hay tiempo límite)
+    useEffect(() => {
+        if (timeLeft === null || timeLeft <= 0) return;
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer); // Cleanup on unmount
+    }, [timeLeft]);
 
     return (
         <div className="game-layout">
@@ -29,7 +48,19 @@ const GameScreen: React.FC = () => {
                     <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}>
                         PLAYER 1
                     </div>
-                    <span className="vs-text">vs.</span>
+
+                    {/* MOSTRAR EL RELOJ AQUÍ (Si hay tiempo) */}
+                    <div className="game-timer-display">
+                        {timeLeft !== null ? (
+                            <div className={`timer-box ${timeLeft < 10 ? 'critical' : ''}`}>
+                                <Clock size={20} />
+                                <span>{timeLeft}s</span>
+                            </div>
+                        ) : (
+                            <span className="vs-text">vs.</span>
+                        )}
+                    </div>
+
                     <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}>
                         PLAYER 2
                     </div>
@@ -37,7 +68,10 @@ const GameScreen: React.FC = () => {
 
                 <main className="board-area">
                     <div className="triangle-board">
-                        <div className="placeholder-text">Board goes here</div>
+                        {/* 4. EL TABLERO AHORA SABE SU TAMAÑO */}
+                        <div className="placeholder-text">
+                            Triangular Board: {settings.size} x {settings.size}
+                        </div>
                     </div>
                 </main>
 
@@ -53,17 +87,14 @@ const GameScreen: React.FC = () => {
 
             {/* CHAT & SETTINGS BAR */}
             <aside className="game-sidebar">
-
                 {/* Settings bar */}
                 <div className="global-settings-bar">
                     <button className="icon-btn-global" title="Language">
                         <Languages size={20} />
                     </button>
-
                     <button className="icon-btn-global" title="How to play">
                         <HelpCircle size={20} />
                     </button>
-
                     <button
                         className={`icon-btn-global ${isChatOpen ? 'active-link' : ''}`}
                         onClick={() => setIsChatOpen(!isChatOpen)}
@@ -71,14 +102,10 @@ const GameScreen: React.FC = () => {
                     >
                         <MessageSquare size={20} />
                     </button>
-
                     <button className="icon-btn-global" title="Settings">
                         <Settings size={20} />
                     </button>
                 </div>
-
-
-
 
                 {/* Chat */}
                 {isChatOpen && (
@@ -102,7 +129,7 @@ const GameScreen: React.FC = () => {
                         <div className="chat-messages">
                             <div className="message received">Good luck!</div>
                             <div className="message sent">Thanks! You too.</div>
-                            <div className="message received">This is a tough game.</div>
+                            <div className="message received">Difficulty: {settings.difficulty}</div>
                         </div>
 
                         <div className="chat-input-wrapper">
@@ -122,7 +149,6 @@ const GameScreen: React.FC = () => {
                         </div>
                         <h2>Are you sure?</h2>
                         <p>If you leave now, the game will count as a <strong>loss</strong>.</p>
-
                         <div className="modal-buttons">
                             <button className="btn-confirm-exit" onClick={() => navigate('/menu')}>
                                 YES, EXIT AND LOSE

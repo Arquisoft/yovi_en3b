@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Edit2, Check, Lock } from "lucide-react"; // Added Lock icon
+import React, { useEffect, useState, useRef } from "react"; // Added useRef
+import { Edit2, Check, Lock, X } from "lucide-react"; // Added X icon
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "./useUserProfile";
 import "./ProfileOverlay.css";
@@ -11,6 +11,7 @@ const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null); // Defined inputRef
   
   // States for password change logic
   const [showPassFields, setShowPassFields] = useState(false);
@@ -27,6 +28,13 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
     }
   }, [open]);
 
+  // Defined handleConfirmName
+  const handleConfirmName = () => {
+    if (!isNameEmpty) {
+      setIsEditing(false);
+    }
+  };
+
   const handlePasswordChange = () => {
     // Here you would call your API to update the password
     console.log("Changing password to:", passData.next);
@@ -42,9 +50,10 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
         {/* Prevent closing while editing */}
         <button
-          className="close-modal"
+          className="boton-cerrar-fijo"
           onClick={isEditing ? undefined : onClose}
           disabled={isEditing}
+          style={{ opacity: isEditing ? 0.5 : 1 }}
         >
           <X size={35} />
         </button>
@@ -147,44 +156,35 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                 )}
               </div>
 
-                <div className="profile-row readonly">
-                  <label>USERNAME</label>
-                  <span className="value orbitron-text">{profile.username}</span>
-                </div>
+              <div className="profile-row readonly">
+                <label>RANKING</label>
+                <span className="value orbitron-text">
+                  {ranking ? `${ranking.position} / ${ranking.totalPlayers}` : "—"}
+                </span>
+              </div>
 
-                <div className="profile-row readonly">
-                  <label>RANKING</label>
-                  <span className="value orbitron-text">
-                    {ranking ? `${ranking.position} / ${ranking.totalPlayers}` : "—"}
-                  </span>
-                </div>
-
-                <div className="profile-row">
-                  <label>CHOOSE AVATAR</label>
-                  <div className="avatar-grid">
-                    {AVATARS.map((emoji, i) => {
-                      const id = `avatar_0${i + 1}`;
-                      return (
-                        <button
-                          key={id}
-                          className={`avatar-opt ${draftAvatarId === id ? "active" : ""}`}
-                          onClick={() => setDraftAvatarId(id)}
-                          disabled={isEditing}
-                          tabIndex={isEditing ? -1 : 0}
-                        >
-                          {emoji}
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div className="profile-row">
+                <label>CHOOSE AVATAR</label>
+                <div className="avatar-grid">
+                  {AVATARS.map((emoji, i) => {
+                    const id = `avatar_0${i + 1}`;
+                    return (
+                      <button
+                        key={id}
+                        className={`avatar-opt ${draftAvatarId === id ? "active" : ""}`}
+                        onClick={() => setDraftAvatarId(id)}
+                        disabled={isEditing}
+                        tabIndex={isEditing ? -1 : 0}
+                      >
+                        {emoji}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div
-              className="profile-actions-section"
-              style={{ position: "relative" }}
-            >
+            <div className="profile-actions-section" style={{ position: "relative" }}>
               {isEditing && (
                 <div
                   style={{
