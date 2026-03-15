@@ -22,13 +22,13 @@
 
 /* --- Modal Layout & Dimensions --- */
 .profile-modal {
-  width: min(480px, calc(100vw - 32px)) !important; /* Increased width to accommodate grid */
+  position: relative !important;
+  width: min(480px, calc(100vw - 32px)) !important;
   padding: 40px !important;
   text-align: center;
-  max-height: 90vh; /* Prevent modal from being larger than screen */
-  overflow-y: auto; /* Allow scrolling inside modal if needed */
+  max-height: 90vh;
+  overflow-y: auto;
 }
-
 /* --- Avatar Bubble --- */
 .avatar-display-section {
   display: flex;

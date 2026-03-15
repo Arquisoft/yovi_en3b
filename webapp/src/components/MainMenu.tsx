@@ -3,7 +3,7 @@ import { Languages, Settings, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import HowToPlay from '../components/HowToPlay/HowToPlay';
 import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
-import  GamePreviewModal  from '../components/GamePreviewModal/GamePreviewModal';
+import GamePreviewModal from '../components/GamePreviewModal/GamePreviewModal'; // Adjust path if needed
 import '../App.css';
 
 const MainMenu: React.FC = () => {
@@ -14,9 +14,9 @@ const MainMenu: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleStartGame = (settings: any) => {
+  const handleStartGame = (settings: { size: number; difficulty: string; time: number | null }) => {
     setShowPlayOptions(false);
-    navigate('/game', { state: settings }); 
+    navigate('/game', { state: settings }); // Sends chosen settings to GameScreen
   };
 
   return (
@@ -32,12 +32,17 @@ const MainMenu: React.FC = () => {
         <h1 className="title-game">game y</h1>
 
         <div className="grid-buttons">
-          <button className="main-button btn-blue full-width" onClick={() => setShowPlayOptions(true)}>PLAY</button>
-          <button className="main-button" onClick={() => setShowHowTo(true)}>HOW TO PLAY</button>
-          <button className="main-button">RANKING</button>
+          <button className="main-button btn-blue full-width" onClick={() => setShowPlayOptions(true)}>
+            PLAY
+          </button>
+          <button className="main-button" onClick={() => setShowHowTo(true)}>
+            HOW TO PLAY
+          </button>
+          <button className="main-button">
+            RANKING
+          </button>
         </div>
 
-        {/* --- MODALES --- */}
         <GamePreviewModal 
           isOpen={showPlayOptions} 
           onClose={() => setShowPlayOptions(false)} 
@@ -51,8 +56,12 @@ const MainMenu: React.FC = () => {
               <h2 className="modal-title">EXIT</h2>
               <p className="modal-text">Are you sure you want to log out?</p>
               <div className="modal-grid">
-                <button className="opt-btn" style={{ background: '#7f1d1d' }} onClick={() => navigate('/')}>YES, LOGOUT</button>
-                <button className="opt-btn" onClick={() => setShowLogoutConfirm(false)}>CANCEL</button>
+                <button className="opt-btn" style={{ background: '#7f1d1d' }} onClick={() => navigate('/')}>
+                  YES, LOGOUT
+                </button>
+                <button className="opt-btn" onClick={() => setShowLogoutConfirm(false)}>
+                  CANCEL
+                </button>
               </div>
             </div>
           </div>

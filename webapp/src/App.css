@@ -1,11 +1,7 @@
-/* --- App.css UNIFICADO --- */
-
 :root {
-  --bg-dark: #0f172a;
   --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
   --game-blue: #60a5fa;
   --game-blue-dark: #2563eb;
-  --game-red: #ef4444;
   --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
 }
 
@@ -16,17 +12,8 @@ body {
   font-family: 'Orbitron', sans-serif;
 }
 
-@font-face {
-  font-family: 'Cubic';
-  src: url('./assets/fonts/cubic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
 .App {
-  background: var(--bg-gradient);
   min-height: 100vh;
-  width: 100vw;
   display: flex;
   justify-content: center;
 }
@@ -34,21 +21,17 @@ body {
 .menu-container {
   width: 100%;
   max-width: 1200px;
-  height: 100vh;
-  padding: 30px;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
   justify-content: center;
 }
 
 .header-icons {
-  position: absolute; 
-  top: 40px; 
-  right: 40px; 
+  position: absolute;
+  top: 40px;
+  right: 40px;
   display: flex;
   gap: 20px;
-  z-index: 100;
 }
 
 .icon-btn {
@@ -59,20 +42,13 @@ body {
   transition: 0.3s;
 }
 
-.icon-btn:hover {
-  color: #ffffff !important;
-  filter: drop-shadow(0 0 8px #60a5fa);
-  transform: scale(1.1);
-}
-
 .title-game {
   font-family: 'Cubic', sans-serif;
   font-size: 8rem;
   text-align: center;
-  margin: 30px 0 100px 0;
+  margin-bottom: 80px;
   color: var(--game-blue);
   text-shadow: var(--text-shadow);
-  text-transform: uppercase;
 }
 
 .grid-buttons {
@@ -82,187 +58,68 @@ body {
   justify-content: center;
 }
 
-/* UNIFICACIÓN DE FUENTES EN BOTONES */
-.main-button, .opt-btn, .boton-cerrar-fijo, .btn-play-now {
-  font-family: 'Orbitron', sans-serif !important;
-}
-
 .main-button {
   background: rgba(15, 23, 42, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 45px;
+  padding: 40px;
   border-radius: 25px;
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   cursor: pointer;
   transition: 0.3s;
-  letter-spacing: 3px;
 }
 
 .main-button:hover {
-  transform: translateY(-8px);
+  transform: translateY(-5px);
   border-color: var(--game-blue);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
-.btn-blue {
-  background: linear-gradient(to right, #2563eb, #1d4ed8);
-  border: none;
-}
+.btn-blue { background: linear-gradient(to right, #2563eb, #1d4ed8); border: none; }
+.full-width { grid-column: 1 / span 2; }
 
-/* MODALES (BASE UNIFICADA) */
+/* MODALS */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .modal-content {
-  position: relative !important;
-  background: rgba(15, 23, 42, 0.95);
-  padding: 60px 40px 40px 40px;
+  background: #0f172a;
+  padding: 40px;
   border-radius: 30px;
   border: 2px solid var(--game-blue);
+  position: relative;
   width: 90%;
   max-width: 500px;
-}
-
-/* CLASE ESPECIAL PARA EL MODAL DE PREVIEW (MÁS ANCHO) */
-.preview-modal-wide {
-  max-width: 900px !important;
+  color: white;
 }
 
 .boton-cerrar-fijo {
-  position: absolute !important;
-  top: 15px !important;
-  right: 20px !important;
-  background: none !important;
-  border: none !important;
-  color: var(--game-blue) !important;
-  font-size: 3rem !important;
-  cursor: pointer;
-  line-height: 1 !important;
-  z-index: 1010;
-}
-
-.modal-title {
-  font-family: 'Cubic', sans-serif;
+  position: absolute;
+  top: 15px; right: 20px;
+  background: none; border: none;
   color: var(--game-blue);
   font-size: 2.5rem;
-  margin-bottom: 30px;
+  cursor: pointer;
 }
 
-.opt-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 15px;
-  color: white;
-  transition: 0.3s;
-  letter-spacing: 3px;
-}
-
-.opt-btn:hover {
-  background: #2563eb;
-  transform: translateX(10px);
-}
-
-.full-width { grid-column: 1 / span 2; }
-
-/* NUEVAS CLASES DE PREVIEW (SIN DUPLICAR ESTILOS BASE) */
-.preview-layout {
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
-  padding: 20px;
-}
-
-.preview-left-board {
-  flex: 1.2;
-  background: rgba(255, 255, 255, 0.1); /* Estilo adaptado al fondo oscuro */
-  border-radius: 20px;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed var(--game-blue);
-}
-
-.preview-right-settings {
-  flex: 1;
+.modal-grid {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  text-align: left;
-}
-
-.bots-section {
-  display: flex;
-  justify-content: center;
   gap: 15px;
 }
 
-.bot-avatar {
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  border: 3px solid var(--game-blue);
-}
-
-.bot-orange { background-color: #ffd8a8; }
-.bot-teal { background-color: #96f2d7; }
-
-.setting-control {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.size-box {
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 15px;
+.opt-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 15px;
   border-radius: 12px;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-}
-
-.size-number-input {
-  width: 60px;
-  background: transparent;
-  color: var(--game-blue);
-  border: none;
-  border-bottom: 2px solid var(--game-blue);
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.difficulty-slider {
-  accent-color: var(--game-blue);
+  color: white;
   cursor: pointer;
-}
-
-.btn-play-now {
-  background-color: var(--game-blue-dark) !important;
-  color: white !important;
-  margin-top: auto;
-  padding: 20px !important;
-  border-radius: 15px;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: 0.3s;
-}
-
-.btn-play-now:hover {
-  background-color: white !important;
-  color: var(--game-blue-dark) !important;
-  transform: scale(1.02);
 }
