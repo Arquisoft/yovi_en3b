@@ -13,17 +13,26 @@ const validateGameSaveData = (data) => {
         throw new Error("Move number must be a positive integer.");
     }
 
-    // playerLastMove should be a string
+    // Regex kuralımız: Sadece sayılar ve aralarında virgül olabilir
+    const barycentricRegex = /^\d+,\d+,\d+$/;
+
+    // playerLastMove gönderilmişse formatını kontrol et
     if (data.playerLastMove !== undefined && data.playerLastMove !== null) {
         if (typeof data.playerLastMove !== 'string') {
             throw new Error("Player last move must be a string.");
         }
+        if (!barycentricRegex.test(data.playerLastMove)) {
+            throw new Error("Invalid coordinate format. Must be Barycentric (e.g., '1,2,0').");
+        }
     }
 
-    // botLastMove should be a string
+    // botLastMove gönderilmişse formatını kontrol et
     if (data.botLastMove !== undefined && data.botLastMove !== null) {
         if (typeof data.botLastMove !== 'string') {
             throw new Error("Bot last move must be a string.");
+        }
+        if (!barycentricRegex.test(data.botLastMove)) {
+            throw new Error("Invalid coordinate format. Must be Barycentric (e.g., '1,2,0').");
         }
     }
 
@@ -31,7 +40,7 @@ const validateGameSaveData = (data) => {
         throw new Error("Board state must be a non-empty JSON string.");
     }
 
-    // Try to parse JSON to validate it's valid
+    // JSON formatı geçerli mi diye kontrol et
     try {
         JSON.parse(data.resultingBoardState);
     } catch (e) {

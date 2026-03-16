@@ -26,7 +26,7 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 1,
-                    player_last_move: 'C3',
+                    player_last_move: '1,3,0',
                     bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
@@ -38,14 +38,14 @@ describe('GameSave API', () => {
                 .send({
                     matchId: fakeMatchId,
                     moveNumber: 1,
-                    playerLastMove: 'C3',
+                    playerLastMove: '1,3,0',
                     resultingBoardState: boardState
                 })
                 .set('Accept', 'application/json');
 
             expect(res.status).toBe(201);
             expect(res.body.message).toMatch(/Game save created successfully/i);
-            expect(res.body.gameSave.player_last_move).toBe('C3');
+            expect(res.body.gameSave.player_last_move).toBe('1,3,0');
             expect(res.body.gameSave.move_number).toBe(1);
         });
 
@@ -130,7 +130,7 @@ describe('GameSave API', () => {
                         id: '999e4567-e89b-12d3-a456-426614174999',
                         match_id: fakeMatchId,
                         move_number: 1,
-                        player_last_move: 'C3',
+                        player_last_move: '1,3,0',
                         bot_last_move: null,
                         resulting_board_state: boardState1,
                         created_at: new Date().toISOString()
@@ -140,7 +140,7 @@ describe('GameSave API', () => {
                         match_id: fakeMatchId,
                         move_number: 2,
                         player_last_move: null,
-                        bot_last_move: 'D4',
+                        bot_last_move: '0,3,1',
                         resulting_board_state: boardState2,
                         created_at: new Date().toISOString()
                     }
@@ -179,7 +179,7 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 1,
-                    player_last_move: 'C3',
+                    player_last_move: '1,2,0',
                     bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
@@ -224,7 +224,7 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 5,
-                    player_last_move: 'D4',
+                    player_last_move: '0,3,1',
                     bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
