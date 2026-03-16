@@ -3,54 +3,43 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-context-and-scope]]
 == Context and Scope
 
+=== Business context
 
-image::03_1_business_context.png["Business Context"]
-
-[cols="1,3" options="header"]
+[cols="1,2a,2a", options="header"]
 |===
-|Neighbor |Description
+| Actor | Input | Output
 
-|User
-|Human player who interacts with the **YOVI** web application. They can play matches of "Game Y", register in the system, and consult their win/loss statistics and rankings.
+| Player 
+| * Size of the board
+* Difficulty 
+* Movements
+* Email & Password 
+| * Result of the game
+* Game History
+* Statistics
+* Ranking
 
-|Bot / External API
-|External automated systems that interact with the application through a documented API. They can manage user data and play matches by sending board states in **YEN notation**.
-
-|Rust Module
-|External module that provides a web service interface. It is responsible for verifying match victories and suggesting the next move using JSON messages.
-
-|Database
-|Persistence system used to store user registration information, match history, and performance metrics.
+| External bot
+| * Petitions through play() 
+| * Answer with the next movement (in YEN notation)
 
 |===
 
 === Technical Context
 
-[cols="1,2,3" options="header"]
+[cols="1,2,1", options="header"]
 |===
-|Interface |Channel |Description / Format
+|  | Protocol | Format
 
-|User Interface
-|Web Browser
-|Allows human players to interact with the game, register, and view statistics.
+| Webapp ↔ Users Service
+| HTTP 
+| JSON
 
-|Bot / External API
-|External API
-|Allows automated systems to manage data and play matches using JSON (YEN Notation).
+| Webapp ↔ GameY
+| HTTP 
+| JSON (YEN notation)
 
-|Game Logic Service
-|Web Service
-|Internal communication with the Rust Module to verify match victories and request move suggestions using JSON (YEN Notation).
-
-|Persistence Layer
-|Database Connection
-|System used to store user registration information, match history, and performance metrics.
+| Users Service ↔ Database
+| Direct connection (driver de BD)
+| Structured Data 
 |===
-
-Technical Details
-YEN Notation: All game-related data exchange (size, turn, players, and layout) must strictly follow the JSON-based YEN notation.
-
-Coordinate Systems: The system handles the coordinates using both barycentric coordinates (x, y, z) and linear indices.
-
-Deployment: The application is designed to be deployed (through Docker) and publicly accessible via the Web.
-
