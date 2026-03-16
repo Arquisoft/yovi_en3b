@@ -13,12 +13,18 @@ const validateGameSaveData = (data) => {
         throw new Error("Move number must be a positive integer.");
     }
 
-    if (!data.playerId) {
-        throw new Error("Player ID is required.");
+    // playerLastMove should be a string
+    if (data.playerLastMove !== undefined && data.playerLastMove !== null) {
+        if (typeof data.playerLastMove !== 'string') {
+            throw new Error("Player last move must be a string.");
+        }
     }
 
-    if (!data.moveCoordinates || typeof data.moveCoordinates !== 'string') {
-        throw new Error("Move coordinates must be a non-empty string.");
+    // botLastMove should be a string
+    if (data.botLastMove !== undefined && data.botLastMove !== null) {
+        if (typeof data.botLastMove !== 'string') {
+            throw new Error("Bot last move must be a string.");
+        }
     }
 
     if (!data.resultingBoardState || typeof data.resultingBoardState !== 'string') {
@@ -39,8 +45,8 @@ const saveMove = async (data) => {
     const newGameSave = await gamesaveRepository.createGameSave({
         matchId: data.matchId,
         moveNumber: data.moveNumber,
-        playerId: data.playerId,
-        moveCoordinates: data.moveCoordinates,
+        playerLastMove: data.playerLastMove,
+        botLastMove: data.botLastMove,
         resultingBoardState: data.resultingBoardState
     });
 

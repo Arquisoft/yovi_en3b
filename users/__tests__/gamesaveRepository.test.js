@@ -15,9 +15,9 @@ describe('gamesaveRepository', () => {
     const data = {
       matchId: 'm1',
       moveNumber: 1,
-      playerId: 'p1',
-      moveCoordinates: 'A1',
-      resultingBoardState: '{}',
+      playerLastMove: '1,2,0', // Yeni YEN/Barycentric formatımız
+      botLastMove: null,       // Yeni kolonumuz
+      resultingBoardState: '{"size":4,"turn":"R","players":["B","R"],"layout":"B/.B/RB./B..R"}',
     };
 
     const spy = vi.spyOn(db, 'query').mockResolvedValue({ rows: [fakeRow] });
@@ -26,7 +26,8 @@ describe('gamesaveRepository', () => {
 
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO game_saves'),
-      [data.matchId, data.moveNumber, data.playerId, data.moveCoordinates, data.resultingBoardState]
+      // Burada dizinin sırası repository dosyasındaki values dizisiyle birebir aynı olmalı
+      [data.matchId, data.moveNumber, data.playerLastMove, data.botLastMove, data.resultingBoardState]
     );
     expect(result).toEqual(fakeRow);
   });

@@ -5,8 +5,8 @@ const createGameSave = async (gameSaveData) => {
     const values = [
         gameSaveData.matchId,
         gameSaveData.moveNumber,
-        gameSaveData.playerId,
-        gameSaveData.moveCoordinates,
+        gameSaveData.playerLastMove || null,
+        gameSaveData.botLastMove || null,
         gameSaveData.resultingBoardState
     ];
 

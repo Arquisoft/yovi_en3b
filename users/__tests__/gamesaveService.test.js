@@ -14,8 +14,8 @@ describe('gamesaveService', () => {
     const payload = {
       matchId: 'm1',
       moveNumber: 1,
-      playerId: 'p1',
-      moveCoordinates: 'C3',
+      playerLastMove: 'C3',
+      botLastMove: null,
       resultingBoardState: JSON.stringify({ size: 3 }),
     };
 
@@ -33,8 +33,7 @@ describe('gamesaveService', () => {
     await expect(
       gamesaveService.saveMove({
         moveNumber: 1,
-        playerId: 'p1',
-        moveCoordinates: 'A1',
+        playerLastMove: 'A1',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Match ID is required');
@@ -46,8 +45,7 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 0,
-        playerId: 'p1',
-        moveCoordinates: 'A1',
+        playerLastMove: 'A1',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Move number must be a positive integer');
@@ -57,34 +55,32 @@ describe('gamesaveService', () => {
     await expect(
       gamesaveService.saveMove({
         matchId: 'm1',
-        playerId: 'p1',
-        moveCoordinates: 'A1',
+        playerLastMove: 'A1',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Move number is required');
   });
 
-  it('saveMove rejects missing playerId', async () => {
+  it('saveMove rejects invalid playerLastMove', async () => {
     await expect(
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        moveCoordinates: 'A1',
+        playerLastMove: 123, // String olmalı
         resultingBoardState: '{}',
       })
-    ).rejects.toThrow('Player ID is required');
+    ).rejects.toThrow('Player last move must be a string.');
   });
 
-  it('saveMove rejects invalid moveCoordinates', async () => {
+  it('saveMove rejects invalid botLastMove', async () => {
     await expect(
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerId: 'p1',
-        moveCoordinates: 123,
+        botLastMove: 123, // String olmalı
         resultingBoardState: '{}',
       })
-    ).rejects.toThrow('Move coordinates must be a non-empty string');
+    ).rejects.toThrow('Bot last move must be a string.');
   });
 
   it('saveMove rejects missing board state', async () => {
@@ -92,8 +88,7 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerId: 'p1',
-        moveCoordinates: 'A1',
+        playerLastMove: 'A1',
       })
     ).rejects.toThrow('Board state must be a non-empty JSON string');
   });
@@ -103,9 +98,8 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerId: 'p1',
-        moveCoordinates: 'A1',
-        resultingBoardState: { size: 3 },
+        playerLastMove: 'A1',
+        resultingBoardState: { size: 3 }, // Object değil string(stringify edilmiş) olmalı
       })
     ).rejects.toThrow('Board state must be a non-empty JSON string');
   });
@@ -115,8 +109,7 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerId: 'p1',
-        moveCoordinates: 'A1',
+        playerLastMove: 'A1',
         resultingBoardState: 'not-json',
       })
     ).rejects.toThrow('Board state must be valid JSON');
