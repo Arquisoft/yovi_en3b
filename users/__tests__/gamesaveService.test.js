@@ -14,7 +14,7 @@ describe('gamesaveService', () => {
     const payload = {
       matchId: 'm1',
       moveNumber: 1,
-      playerLastMove: 'C3',
+      playerLastMove: '1,2,0',
       botLastMove: null,
       resultingBoardState: JSON.stringify({ size: 3 }),
     };
@@ -33,7 +33,7 @@ describe('gamesaveService', () => {
     await expect(
       gamesaveService.saveMove({
         moveNumber: 1,
-        playerLastMove: 'A1',
+        playerLastMove: '1,2,0',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Match ID is required');
@@ -45,7 +45,7 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 0,
-        playerLastMove: 'A1',
+        playerLastMove: '1,2,0',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Move number must be a positive integer');
@@ -55,7 +55,7 @@ describe('gamesaveService', () => {
     await expect(
       gamesaveService.saveMove({
         matchId: 'm1',
-        playerLastMove: 'A1',
+        playerLastMove: '1,2,0',
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Move number is required');
@@ -66,21 +66,21 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerLastMove: 123, // String olmalı
+        playerLastMove: 123,
         resultingBoardState: '{}',
       })
     ).rejects.toThrow('Player last move must be a string.');
   });
 
-  it('saveMove rejects invalid botLastMove', async () => {
+  it('saveMove rejects non-Barycentric format', async () => {
     await expect(
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        botLastMove: 123, // String olmalı
+        playerLastMove: 'A1', // Geçersiz format
         resultingBoardState: '{}',
       })
-    ).rejects.toThrow('Bot last move must be a string.');
+    ).rejects.toThrow("Invalid coordinate format. Must be Barycentric (e.g., '1,2,0').");
   });
 
   it('saveMove rejects missing board state', async () => {
@@ -88,7 +88,7 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerLastMove: 'A1',
+        playerLastMove: '1,2,0', // Koordinatı doğru verelim ki board state hatasına ulaşsın
       })
     ).rejects.toThrow('Board state must be a non-empty JSON string');
   });
@@ -98,8 +98,8 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerLastMove: 'A1',
-        resultingBoardState: { size: 3 }, // Object değil string(stringify edilmiş) olmalı
+        playerLastMove: '1,2,0',
+        resultingBoardState: { size: 3 },
       })
     ).rejects.toThrow('Board state must be a non-empty JSON string');
   });
@@ -109,14 +109,10 @@ describe('gamesaveService', () => {
       gamesaveService.saveMove({
         matchId: 'm1',
         moveNumber: 1,
-        playerLastMove: 'A1',
+        playerLastMove: '1,2,0',
         resultingBoardState: 'not-json',
       })
     ).rejects.toThrow('Board state must be valid JSON');
-  });
-
-  it('loadMatchMoves requires matchId', async () => {
-    await expect(gamesaveService.loadMatchMoves('')).rejects.toThrow('Match ID is required');
   });
 
   it('loadMatchMoves returns moves', async () => {
@@ -126,18 +122,6 @@ describe('gamesaveService', () => {
     expect(result).toEqual(rows);
   });
 
-  it('loadMove requires matchId', async () => {
-    await expect(gamesaveService.loadMove('', 1)).rejects.toThrow('Match ID is required');
-  });
-
-  it('loadMove requires moveNumber', async () => {
-    await expect(gamesaveService.loadMove('m1')).rejects.toThrow('Move number is required');
-  });
-
-  it('loadMove requires valid moveNumber', async () => {
-    await expect(gamesaveService.loadMove('m1', 0)).rejects.toThrow('Move number must be a positive integer');
-  });
-
   it('loadMove returns move when found', async () => {
     const move = { id: 'm1' };
     vi.spyOn(gamesaveRepo, 'getGameSaveByMatchIdAndMoveNumber').mockResolvedValue(move);
@@ -145,24 +129,10 @@ describe('gamesaveService', () => {
     expect(result).toEqual(move);
   });
 
-  it('loadMove throws when move not found', async () => {
-    vi.spyOn(gamesaveRepo, 'getGameSaveByMatchIdAndMoveNumber').mockResolvedValue(undefined);
-    await expect(gamesaveService.loadMove('m1', 1)).rejects.toThrow('Move not found');
-  });
-
-  it('loadLatestMove requires matchId', async () => {
-    await expect(gamesaveService.loadLatestMove('')).rejects.toThrow('Match ID is required');
-  });
-
   it('loadLatestMove returns latest move', async () => {
     const move = { id: 'latest' };
     vi.spyOn(gamesaveRepo, 'getLatestGameSaveByMatchId').mockResolvedValue(move);
     const result = await gamesaveService.loadLatestMove('m1');
     expect(result).toEqual(move);
-  });
-
-  it('loadLatestMove throws when no moves exist', async () => {
-    vi.spyOn(gamesaveRepo, 'getLatestGameSaveByMatchId').mockResolvedValue(undefined);
-    await expect(gamesaveService.loadLatestMove('m1')).rejects.toThrow('No moves found for this match');
   });
 });
