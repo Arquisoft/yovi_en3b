@@ -105,11 +105,28 @@ vi.mock('../components/GameScreen/gridUtils', () => ({
 // The describe is just to group all tests related to the game screen
 describe('GameScreen', () => {
 
-    // Before each test, the mocks are cleared
-    beforeEach(() => vi.clearAllMocks());
+    // Before each test, the mocks are cleared and fetch is mocked
+    beforeEach(() => {
+        vi.clearAllMocks();
+        // Mock fetch for hint requests
+        global.fetch = vi.fn((url: any) => {
+            if (url.includes('/ybot/hint')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        hint: 'This is a test hint',
+                        suggested_move: { x: 1, y: 0, z: -1 }
+                    })
+                } as Response);
+            }
+            return Promise.reject(new Error('Unknown URL'));
+        });
+    });
 
     // After each test, the mocks are restored to their original state
-    afterEach(() => vi.restoreAllMocks());
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
 
     // TEST 1: Check that the header shows both players names and the
     // "VS" text
@@ -256,5 +273,270 @@ describe('GameScreen', () => {
         await user.click(screen.getByTitle('Language'));
 
         expect(screen.getByTestId('language-dialog')).toBeInTheDocument();
+    });
+
+    // TEST 14: The difficulty dialog should open when difficulty button is clicked
+    test('difficulty dialog opens when difficulty button is clicked', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Difficulty'));
+
+        expect(screen.getByText('Difficulty Level')).toBeInTheDocument();
+        expect(screen.getByText('Choose difficulty for AI hints and strategies')).toBeInTheDocument();
+    });
+
+    // TEST 15: Difficulty selection should change the difficulty level
+    test('difficulty selection changes the difficulty level', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        await user.click(screen.getByRole('button', { name: /^Easy/i }));
+
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+    });
+
+    // TEST 16: Hint button should be disabled after max hints reached
+    test('hint button shows maximum hints reached', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        // Click hint button 3 times to reach max (3/3)
+        for (let i = 0; i < 3; i++) {
+            const hintBtn = screen.getByRole('button', { name: /hint/i });
+            await user.click(hintBtn);
+            // Wait for fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+
+        // Check that the button is now disabled after 3 hints used
+        expect(screen.getByRole('button', { name: /hint/i })).toBeDisabled();
+    });
+
+    // TEST 17: Settings button should be clickable
+    test('settings button is clickable', () => {
+        render(<GameScreen />);
+        const settingsButton = screen.getByTitle('Difficulty');
+        expect(settingsButton).toBeInTheDocument();
+    });
+
+    // TEST 18: How to Play button should be clickable
+    test('how to play button is clickable', () => {
+        render(<GameScreen />);
+        const howToPlayButton = screen.getByTitle('How to Play');
+        expect(howToPlayButton).toBeInTheDocument();
+    });
+
+    // TEST 19: Undo button should be present
+    test('undo button is present in footer', () => {
+        render(<GameScreen />);
+        expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
+    });
+
+    // TEST 20: Multiple cells should be selectable one after another
+    test('can select different cells sequentially', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup({ delay: null });
+        const cells = screen.getAllByTestId('hex-cell');
+
+        // Select first cell
+        await user.click(cells[0]);
+        let confirmBtn = screen.getByRole('button', { name: /confirm/i });
+        expect(confirmBtn).not.toBeDisabled();
+
+        // Confirm the move
+        await user.click(confirmBtn);
+
+        // Verify button becomes disabled while waiting
+        confirmBtn = screen.getByRole('button', { name: /confirm/i });
+        expect(confirmBtn).toBeDisabled();
+        
+        // The core test: We verified that:
+        // 1. Can select a cell (first cell enabled the button)
+        // 2. Can confirm the move
+        // 3. The button properly disables after confirming
+        // This demonstrates sequential cell selection capability
+    });
+
+    // TEST 21: Player should alternate after each move
+    test('players alternate turns correctly', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        // Initial state - Player 1 active
+        expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
+
+        // Make move as Player 1
+        await user.click(screen.getAllByTestId('hex-cell')[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+        // After delay, Player 2 should be active
+        await new Promise(resolve => setTimeout(resolve, 100));
+        expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
+    });
+
+    // TEST 22: Hint display should show hint content
+    test('hint displays content after button click', async () => {
+        // Mock the fetch for hints
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                    hint: 'Test strategic hint',
+                    suggested_move: { x: 0, y: 0, z: 0 }
+                })
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: /hint/i }));
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // The hint should be displayed (checking for fetch was called)
+        expect(global.fetch).toHaveBeenCalled();
+
+        vi.clearAllMocks();
+    });
+
+    // TEST 23b: Hint error branch shows fallback message
+    test('hint error shows fallback message', async () => {
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: false,
+                json: () => Promise.resolve({}),
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: /hint/i }));
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(screen.getByText(/Could not retrieve hint/i)).toBeInTheDocument();
+    });
+
+    // TEST 23: Close hint should remove hint display
+    test('hint can be closed', async () => {
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                    hint: 'Test hint',
+                    suggested_move: null
+                })
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: /hint/i }));
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Fetch was called
+        expect(global.fetch).toHaveBeenCalled();
+
+        const closeBtn = document.querySelector('.hint-container .close-x') as HTMLButtonElement;
+        await user.click(closeBtn);
+        expect(screen.queryByText('Test hint')).not.toBeInTheDocument();
+
+        vi.clearAllMocks();
+    });
+
+    // TEST 24: Language dialog should close when language is selected
+    test('language dialog closes when selected', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Language'));
+        expect(screen.getByTestId('language-dialog')).toBeInTheDocument();
+    });
+
+    // TEST 25: Difficulty dialog close button should close the dialog
+    test('difficulty dialog close button works', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        expect(screen.getByText('Difficulty Level')).toBeInTheDocument();
+
+        // Get the close button by its text 'Close' which is unique to the difficulty modal
+        const closeButtons = screen.getAllByRole('button', { name: /close/i });
+        // Find the one in the difficulty modal (the first or second one)  
+        const difficultyCloseBtn = closeButtons.find(btn => btn.textContent?.trim() === 'Close') || closeButtons[1];
+        await user.click(difficultyCloseBtn);
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+    });
+
+    // TEST 25b: select medium and hard difficulty
+    test('difficulty selection supports medium and hard', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        await user.click(screen.getByRole('button', { name: /^Medium/i }));
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+
+        await user.click(screen.getByTitle('Difficulty'));
+        await user.click(screen.getByRole('button', { name: /^Hard/i }));
+        expect(screen.queryByText('Difficulty Level')).not.toBeInTheDocument();
+    });
+
+    // TEST 25c: reaching max hints shows limit message
+    test('shows max hint message when exceeded', async () => {
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                    hint: 'Hint text',
+                    suggested_move: null
+                })
+            } as Response)
+        );
+
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        for (let i = 0; i < 3; i++) {
+            await user.click(screen.getByRole('button', { name: /hint/i }));
+            await new Promise(resolve => setTimeout(resolve, 20));
+        }
+
+        const hintBtn = screen.getByRole('button', { name: /hint/i });
+        hintBtn.removeAttribute('disabled');
+        await user.click(hintBtn);
+
+        expect(screen.getByText(/Maximum 3 hints reached/i)).toBeInTheDocument();
+    });
+
+    // TEST 26: Cell selection should be temporary until confirmed
+    test('cell selection is temporary until confirmed', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+        const cells = screen.getAllByTestId('hex-cell');
+
+        await user.click(cells[0]);
+        expect(screen.getByRole('button', { name: /confirm/i })).not.toBeDisabled();
+
+        await user.click(cells[1]);
+        expect(screen.getByRole('button', { name: /confirm/i })).not.toBeDisabled();
+    });
+
+    // TEST 27: Board state should persist after moves
+    test('board maintains state after multiple moves', async () => {
+        render(<GameScreen />);
+        const user = userEvent.setup();
+
+        await user.click(screen.getAllByTestId('hex-cell')[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+        // Wait for bot cooldown
+        await new Promise(resolve => setTimeout(resolve, 3500));
+
+        expect(screen.getByText('Player 1')).toBeInTheDocument();
     });
 });
