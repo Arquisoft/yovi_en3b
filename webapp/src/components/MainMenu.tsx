@@ -1,117 +1,86 @@
+
 import React, { useState } from 'react';
-/* Added LogOut icon to the import */
 import { Languages, Settings, User, LogOut } from 'lucide-react'; 
-import '../App.css';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '../i18n/useTranslation';
+import { useI18n } from '../i18n/useTranslation'; // Importamos el hook global
 import HowToPlay from '../components/HowToPlay/HowToPlay';
 import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
+import GamePreviewModal from '../components/GamePreviewModal/GamePreviewModal';
 import { LanguageDialog } from '../components/LanguageDialog/LanguageDialog';
+import '../App.css';
 
 const MainMenu: React.FC = () => {
-  const { t, language } = useI18n();
+  const { t } = useI18n(); // Accedemos a las traducciones
   const [showPlayOptions, setShowPlayOptions] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [showLanguageDialog, setShowLanguageDialog] = useState(false);
-  /* State to manage the Logout confirmation modal */
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
+  const [languageOpen, setLanguageOpen] = useState(false);
 
   const navigate = useNavigate();
-
-  const handleStartGame = (size: number) => {
-    setShowPlayOptions(false);
-    navigate('/game', { state: { size }});
-  };
-
-  /* Function to handle the final logout */
-  const handleConfirmLogout = () => {
-    setShowLogoutConfirm(false);
-    navigate('/'); /* Takes the user back to the login page */
-  };
 
   return (
     <div className="App">
       <div className="menu-container">
         <div className="header-icons">
-          <button 
-            className="icon-btn" 
-            title={t.buttons.language}
-            onClick={() => setShowLanguageDialog(true)}
-          >
+          <button className="icon-btn" title={t.buttons.language} onClick={() => setLanguageOpen(true)}>
             <Languages size={28} />
           </button>
           <button className="icon-btn" title={t.buttons.settings}><Settings size={28} /></button>
-          <button
-            className="icon-btn"
-            title={t.buttons.profile}
-            onClick={() => setProfileOpen(true)}
-          >
+          <button className="icon-btn" title={t.buttons.profile} onClick={() => setProfileOpen(true)}>
             <User size={28} />
           </button>
-          {/* New Logout Button */}
-          <button 
-            className="icon-btn" 
-            title={t.buttons.logout}
-            onClick={() => setShowLogoutConfirm(true)}
-          >
+          <button className="icon-btn" title={t.buttons.logout} onClick={() => setShowLogoutConfirm(true)}>
             <LogOut size={28} />
           </button>
         </div>
 
-        <h1 className="title-game">game y</h1>
+        <h1 className="title-game">GAME Y</h1>
 
         <div className="grid-buttons">
+          {/* Usamos t.buttons.play en lugar de "PLAY" */}
           <button className="main-button btn-blue full-width" onClick={() => setShowPlayOptions(true)}>
-            {t.buttons.play}
+            {t.buttons.play} 
           </button>
+          {/* Usamos t.buttons.howToPlay en lugar de "HOW TO PLAY" */}
           <button className="main-button" onClick={() => setShowHowTo(true)}>
             {t.buttons.howToPlay}
           </button>
+          {/* Usamos t.buttons.overallRanking en lugar de "RANKING" */}
           <button className="main-button">
             {t.buttons.overallRanking}
           </button>
         </div>
 
-        {/* Game options modal */}
-        {showPlayOptions && (
-          <div className="modal-overlay"> 
-            <div className="modal-content">
-              <button className="boton-cerrar-fijo" onClick={() => setShowPlayOptions(false)}>&times;</button>
-              <h2 className="modal-title">{t.labels.selectLevel}</h2>
-              <div className="modal-grid">
-                <button className="opt-btn" onClick={() => handleStartGame(3)}>{t.buttons.easy}</button>
-                <button className="opt-btn" onClick={() => handleStartGame(5)}>{t.buttons.medium}</button>
-                <button className="opt-btn" onClick={() => handleStartGame(7)}>{t.buttons.hard}</button>
-              </div>
-            </div>
-          </div>
-        )}
+        <LanguageDialog open={languageOpen} onClose={() => setLanguageOpen(false)} />
 
-        {/* Logout Confirmation Modal - Matches aesthetic and click-outside behavior */}
         {showLogoutConfirm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
+          <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <button className="boton-cerrar-fijo" onClick={() => setShowLogoutConfirm(false)}>&times;</button>
-              <h2 className="modal-title">{t.buttons.exit}</h2>
-              <p className="modal-text">
-                {language === 'es' ? '¿Seguro que quieres cerrar sesión?' : 'Are you sure you want to log out?'}
+              <h2 className="modal-title">{t.messages.areYouSure}</h2>
+              <p className="modal-text" style={{ color: 'white', opacity: 0.9 }}>
+                {t.messages.loseWarning}
               </p>
               <div className="modal-grid">
-                <button className="opt-btn" style={{ background: '#7f1d1d' }} onClick={handleConfirmLogout}>
-                  {language === 'es' ? 'SÍ, CERRAR SESIÓN' : 'YES, LOGOUT'}
+                <button className="opt-btn btn-danger" onClick={() => navigate('/')}>
+                  {t.buttons.yesExitAndLose}
                 </button>
-                <button className="opt-btn" onClick={() => setShowLogoutConfirm(false)}>
-                  {t.buttons.cancel}
+                <button className="opt-btn active" onClick={() => setShowLogoutConfirm(false)}>
+                  {t.buttons.backToGame}
                 </button>
               </div>
             </div>
           </div>
         )}
 
+        <GamePreviewModal 
+          isOpen={showPlayOptions} 
+          onClose={() => setShowPlayOptions(false)} 
+          onStart={(settings) => { setShowPlayOptions(false); navigate('/game', { state: settings }); }} 
+        />
         {showHowTo && <HowToPlay onClose={() => setShowHowTo(false)} />}
         <ProfileOverlay open={profileOpen} onClose={() => setProfileOpen(false)} />
-        <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
       </div>
     </div>
   );

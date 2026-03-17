@@ -1,213 +1,125 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Languages,
-    Settings,
-    X,
-    Undo2,
-    Lightbulb,
-    CheckCircle2,
-    LogOut,
-    MoreVertical,
-    MessageSquare,
-    HelpCircle
+    Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
+import { checkWin } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LanguageDialog } from '../../components/LanguageDialog/LanguageDialog';
+import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 
-type DifficultyLevel = 'easy' | 'medium' | 'hard';
-
 const GameScreen: React.FC = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate(); // Hook to handle navigation between pages
+    const location = useLocation(); // Hook to access state passed from the menu
+    const { t } = useI18n(); // Translation hook for internationalization
+    
+    const { 
+        size = 5, 
+        time: initialTime = null, 
+        botType = 'robot' 
+    } = location.state || {}; // Get game settings from navigation state
 
-    // Size of the board
-    const size = location.state?.size || 3;
+    const [timeLeft, setTimeLeft] = useState<number | null>(initialTime); // State for the countdown timer
+    const [cells] = useState(generateBoard(size)); // Generate the hexagonal grid based on size
+    const [isChatOpen, setIsChatOpen] = useState(true); // State to toggle sidebar chat visibility
+    const [showExitConfirmation, setShowExitConfirmation] = useState(false); // State for exit modal
+    const [showLanguageDialog, setShowLanguageDialog] = useState(false); // State for language settings modal
+    const [boardState, setBoardState] = useState<Record<string, number>>({}); // Map of cell keys to player IDs
+    const [currentPlayer, setCurrentPlayer] = useState(1); // Track whose turn it is (1 or 2)
+    const [pendingMove, setPendingMove] = useState<Cell | null>(null); // Temporary selection before confirming
+    const [botCooldown, setBotCooldown] = useState(false); // Prevents player interaction during bot's turn
+    const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null); // Stores final game outcome
 
-    // Cells generated 
-    const cells = generateBoard(size);
+    // Function to format seconds into M:SS format
+    const formatDisplayTime = (seconds: number | null) => {
+        if (seconds === null) return "∞"; // Return infinity symbol if no time limit
+        const mins = Math.floor(seconds / 60); // Calculate whole minutes
+        const secs = seconds % 60; // Calculate remaining seconds
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`; // Format as M:SS with leading zero
+    };
 
-    // Offsets to center the board
-    // Not exact values, just try and error to try to center it
-    const offsetX = size * 4.75;
-    const offsetY = (size - 1) * 5;
+    useEffect(() => {
+        if (timeLeft === null || gameResult) return; // Stop timer if infinite or game ended
+        if (timeLeft <= 0) {
+            setGameResult('lose'); // Set game as lost if time runs out
+            return;
+        }
+        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000); // Decrease seconds
+        return () => clearInterval(timer); // Cleanup interval on component unmount
+    }, [timeLeft, gameResult]);
 
-
-    const { t } = useI18n();
-    const [isChatOpen, setIsChatOpen] = useState(true);
-    const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-    const [showLanguageDialog, setShowLanguageDialog] = useState(false);
-    const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
-    const [difficulty, setDifficulty] = useState<DifficultyLevel>('medium');
-    const [hint, setHint] = useState<string | null>(null);
-    const [suggestedMove, setSuggestedMove] = useState<{ x: number; y: number; z: number } | null>(null);
-    const [hintsUsed, setHintsUsed] = useState(0);
-    const [maxHints] = useState(3);
-
-    // Saves who (player 1 or player 2) has occupied each cell -> Key: "x-y-z"
-    const [boardState, setBoardState] = useState<Record<string, number>>({});
-    // Tracks current turn
-    const [currentPlayer, setCurrentPlayer] = useState(1);
-    // Temporarily stores what cell is selected before clicking confirm
-    const [pendingMove, setPendingMove] = useState<Cell | null>(null);
-    // Track bot move cooldown (3 seconds)
-    const [botCooldown, setBotCooldown] = useState(false);
-
-    // Manages the clicks on the board
     const handleClick = (cell: Cell) => {
-        const key = `${cell.x}-${cell.y}-${cell.z}`;
-
-        // If it has already an owner, ignore it
-        if (boardState[key]) return;
-
-        // Mark it as "pending to confirm" 
-        setPendingMove(cell);
+        const key = `${cell.x}-${cell.y}-${cell.z}`; // Generate unique key for the cell
+        if (gameResult || botCooldown || boardState[key]) return; // Block click if game over, bot's turn, or cell taken
+        setPendingMove(cell); // Highlight cell as pending selection
     };
 
     const handleConfirm = () => {
-        if (!pendingMove) return;
-
-        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
-
-        // Save the movement
-        setBoardState(prev => ({
-            ...prev,
-            [key]: currentPlayer
-        }));
-
-        // Clear the "pending to confirm" move
-        setPendingMove(null);
-        // Clear hint when a move is confirmed
-        setHint(null);
-        setSuggestedMove(null);
+        if (!pendingMove || gameResult) return; // Ensure a move is selected and game is active
+        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`; // Key for the confirmed move
         
-        // Change to the other player
-        const nextPlayer = currentPlayer === 1 ? 2 : 1;
-        setCurrentPlayer(nextPlayer);
-        
-        // If next player is player 2 (bot), start cooldown and make bot move
-        if (nextPlayer === 2) {
-            setBotCooldown(true);
-            setTimeout(() => {
-                // Make bot move logic here - pick a random available cell
-                const availableCells = cells.filter(cell => {
-                    const cellKey = `${cell.x}-${cell.y}-${cell.z}`;
-                    return !boardState[cellKey] && cellKey !== key;
-                });
-                
-                if (availableCells.length > 0) {
-                    const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
-                    const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
-                    
-                    setBoardState(prev => ({
-                        ...prev,
-                        [botKey]: 2
-                    }));
-                    
-                    // Switch back to player 1
-                    setCurrentPlayer(1);
-                }
-                setBotCooldown(false);
-            }, 3000); // 3 second cooldown
-        }
-    };
+        const newBoardState = { ...boardState, [key]: 1 }; // Update board with player 1's move
+        setBoardState(newBoardState); // Save new board state
+        setPendingMove(null); // Clear the temporary selection
 
-    const handleGetHint = async () => {
-        if (hintsUsed >= maxHints) {
-            setHint(`Maximum ${maxHints} hints reached`);
+        if (checkWin(newBoardState, 1, size, cells)) {
+            setGameResult('win'); // Trigger win modal if connection is formed
             return;
         }
 
-        try {
-            // Format current board state for the API
-            const gameState = {
-                board: {
-                    size: size,
-                    state: boardState
+        setCurrentPlayer(2); // Pass turn to the bot
+        setBotCooldown(true); // Disable user input
+        setTimeout(() => {
+            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]); // Find empty cells
+            if (availableCells.length > 0) {
+                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)]; // Pick random move
+                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`; // Bot's selected cell key
+                const stateAfterBot = { ...newBoardState, [botKey]: 2 }; // Update state with bot's move
+                setBoardState(stateAfterBot); // Save bot's move
+
+                if (checkWin(stateAfterBot, 2, size, cells)) {
+                    setGameResult('lose'); // Trigger lose modal if bot wins
                 }
-            };
-
-            const response = await fetch(`http://localhost:4000/v1/ybot/hint?difficulty=${difficulty}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(gameState),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to get hint');
             }
-
-            const data = await response.json();
-            setHint(data.hint);
-            setSuggestedMove(data.suggested_move);
-            setHintsUsed(hintsUsed + 1);
-        } catch (error) {
-            console.error('Error getting hint:', error);
-            setHint('Could not retrieve hint. Try again later.');
-        }
+            setCurrentPlayer(1); // Return turn to player
+            setBotCooldown(false); // Re-enable user input
+        }, 1200); // Artificial delay to simulate bot "thinking"
     };
 
-    const selectDifficulty = (level: DifficultyLevel) => {
-        setDifficulty(level);
-        setShowDifficultyDialog(false);
+    const restartGame = () => {
+        setBoardState({}); // Clear all pieces from the board
+        setGameResult(null); // Reset game outcome state
+        setCurrentPlayer(1); // Set turn back to player 1
+        setTimeLeft(initialTime); // Reset timer to initial settings
     };
 
     return (
         <div className="game-layout">
-            {/* LEFT PART -> Board & Buttons */}
             <div className="game-main-content">
                 <header className="game-header">
-                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}>
-                        {t.labels.player1}
+                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}>{(t.labels as any).player1}</div>
+                    <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`}>
+                        <span className="timer-value">{formatDisplayTime(timeLeft)}</span>
                     </div>
-                    <span className="vs-text">{t.labels.vs}</span>
-                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}>
-                        {t.labels.player2}
-                    </div>
+                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}>{(t.labels as any).player2}</div>
                 </header>
 
                 <main className="board-area">
-                    <div className="triangle-board" style={{ width: '100%', height: '100%' }}>
+                    <div className="triangle-board">
                         <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
-                            <Layout
-                                size={{ x: 6, y: 6 }}
-                                flat={false}
-                                spacing={1.1}
-                                origin={{ x: offsetX, y: offsetY }}
-                            >
+                            <Layout size={{ x: 6, y: 6 }} flat={false} spacing={1.08} origin={{ x: size * 4.75, y: (size - 1) * 5 }}>
                                 {cells.map((cell) => {
-                                    // Generating unique key to identify each cell
-                                    const key = `${cell.x}-${cell.y}-${cell.z}`;
-                                    // Owner of the cell (if there is any)
-                                    const owner = boardState[key];
-                                    // Gets whether the cell is selected
-                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z;
-                                    // Gets whether this is the suggested move
-                                    const isSuggested = suggestedMove?.x === cell.x && suggestedMove?.y === cell.y && suggestedMove?.z === cell.z;
-
+                                    const key = `${cell.x}-${cell.y}-${cell.z}`; // Key for mapping cells
+                                    const owner = boardState[key]; // Identify if player 1, 2 or none owns the cell
+                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z; // UI state for selection
                                     return (
-                                        <Hexagon
-                                            key={key}
-                                            q={cell.q}
-                                            r={cell.r}
-                                            s={cell.s}
-                                            className={`hex-cell 
-                                                ${owner === 1 ? 'p1-selected' : ''} 
-                                                ${owner === 2 ? 'p2-selected' : ''}
-                                                ${isSelected ? 'pending-selection' : ''}
-                                                ${isSuggested && !owner ? 'suggested-move' : ''}`}
-                                            onClick={() => handleClick(cell)}
-
-                                        >
-                                            {/* <text x="0" y="1" fontSize="2" textAnchor="middle" fill="#999">
-                                                {`${cell.x},${cell.y},${cell.z}`}
-                                            </text> */}
-                                        </Hexagon>
+                                        <Hexagon 
+                                            key={key} q={cell.q} r={cell.r} s={cell.s}
+                                            className={`hex-cell ${owner === 1 ? 'p1-selected' : ''} ${owner === 2 ? 'p2-selected' : ''} ${isSelected ? 'pending-selection' : ''}`}
+                                            onClick={() => handleClick(cell)} 
+                                        />
                                     );
                                 })}
                             </Layout>
@@ -216,191 +128,67 @@ const GameScreen: React.FC = () => {
                 </main>
 
                 <footer className="game-footer">
-                    <button className="game-action-btn"><Undo2 size={16} /> {t.buttons.undo}</button>
-                    <button 
-                        className="game-action-btn"
-                        onClick={handleGetHint}
-                        disabled={hintsUsed >= maxHints}
-                        title={`Hints: ${hintsUsed}/${maxHints}`}
-                    >
-                        <Lightbulb size={16} /> {t.buttons.hint} ({hintsUsed}/{maxHints})
-                    </button>
-                    <button
-                        className="game-action-btn btn-confirm-blue"
-                        onClick={handleConfirm}
-                        disabled={!pendingMove || botCooldown}
-                        title={botCooldown ? "Waiting for bot move..." : ""}
-                    >
-                        <CheckCircle2 size={16} /> {t.buttons.confirm}
-                    </button>
-                    <button className="game-action-btn" onClick={() => setShowExitConfirmation(true)}>
-                        <LogOut size={16} /> {t.buttons.exit}
-                    </button>
+                    <button className="game-action-btn"><Undo2 size={18} /> <span>{t.buttons.undo}</span></button>
+                    <button className="game-action-btn btn-confirm-blue" onClick={handleConfirm} disabled={!pendingMove || botCooldown}><CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span></button>
+                    <button className="game-action-btn btn-exit-footer" onClick={() => setShowExitConfirmation(true)}><LogOut size={18} /> <span>{t.buttons.exit}</span></button>
                 </footer>
             </div>
 
-            {/* CHAT & SETTINGS BAR */}
             <aside className="game-sidebar">
-
-                {/* Settings bar */}
                 <div className="global-settings-bar">
-                    <button
-                        className="icon-btn"
-                        title={t.buttons.language}
-                        onClick={() => setShowLanguageDialog(true)}
-                    >
-                        <Languages size={28} />
-                    </button>
-
-                    <button 
-                        className="icon-btn-global" 
-                        title="Difficulty"
-                        onClick={() => setShowDifficultyDialog(true)}
-                    >
-                        <Settings size={20} />
-                    </button>
-
-                    <button className="icon-btn-global" title={t.buttons.howToPlay}>
-                        <HelpCircle size={20} />
-                    </button>
-
-                    <button
-                        className={`icon-btn-global ${isChatOpen ? 'active-link' : ''}`}
-                        onClick={() => setIsChatOpen(!isChatOpen)}
-                        title={t.messages.openChat}
-                    >
-                        <MessageSquare size={20} />
-                    </button>
+                    <button className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
+                    <button className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
                 </div>
-
-                {/* Hint Display */}
-                {hint && (
-                    <div className="hint-container">
-                        <div className="hint-header">
-                            <Lightbulb size={18} />
-                            <span>Hint (Level: {difficulty.toUpperCase()})</span>
-                            <button 
-                                className="close-x" 
-                                onClick={() => { 
-                                    setHint(null); 
-                                    setSuggestedMove(null); 
-                                }}
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
-                        <div className="hint-content">
-                            <p>{hint}</p>
-                            {suggestedMove && (
-                                <div className="suggested-move-info">
-                                    Suggested: ({suggestedMove.x}, {suggestedMove.y}, {suggestedMove.z})
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-                {hintsUsed >= maxHints && (
-                    <div className="hint-limit-message">
-                        Maximum {maxHints} hints reached
-                    </div>
-                )}
-
-                {/* Chat */}
                 {isChatOpen && (
                     <div className="chat-container">
                         <div className="chat-header">
-                            <div className="chat-user-info">
-                                <div className="avatar-circle">P2</div>
-                                <div className="user-details">
-                                    <span className="user-name">PLAYER 2 </span>
-                                    <span className="status-online">Online</span>
-                                </div>
-                            </div>
-                            <div className="chat-actions">
-                                <button className="icon-btn-chat" title="More options"><MoreVertical size={18} /></button>
-                                <button className="icon-btn-chat close-x" onClick={() => setIsChatOpen(false)} title="Close chat">
-                                    <X size={18} />
-                                </button>
+                            <div className="bot-profile-badge">
+                                <div className="bot-avatar-circle">{botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}</div>
+                                <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
                             </div>
                         </div>
-
-                        <div className="chat-messages">
-                            <div className="message received">Good luck!</div>
-                            <div className="message sent">Thanks! You too.</div>
-                            <div className="message received">This is a tough game.</div>
-                        </div>
-
-                        <div className="chat-input-wrapper">
-                            <input type="text" placeholder="..." className="chat-input-field" />
-                            <button className="send-confirm-btn">✓</button>
-                        </div>
+                        <div className="chat-messages"><div className="message received">Good luck!</div></div>
                     </div>
                 )}
             </aside>
 
-            {/* DIFFICULTY SELECTION DIALOG */}
-            {showDifficultyDialog && (
-                <div className="modal-overlay">
-                    <div className="modal-content difficulty-modal">
-                        <h2>Difficulty Level</h2>
-                        <p>Choose difficulty for AI hints and strategies</p>
-                        
-                        <div className="difficulty-options">
-                            <button 
-                                className={`difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
-                                onClick={() => selectDifficulty('easy')}
-                            >
-                                <div className="difficulty-name">Easy</div>
-                                <div className="difficulty-desc">20% random moves</div>
-                            </button>
-                            
-                            <button 
-                                className={`difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
-                                onClick={() => selectDifficulty('medium')}
-                            >
-                                <div className="difficulty-name">Medium</div>
-                                <div className="difficulty-desc">10% random moves</div>
-                            </button>
-                            
-                            <button 
-                                className={`difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
-                                onClick={() => selectDifficulty('hard')}
-                            >
-                                <div className="difficulty-name">Hard</div>
-                                <div className="difficulty-desc">3% random moves</div>
-                            </button>
-                        </div>
+           {/* MODAL FOR GAME OUTCOME (WIN/LOSS) */}
+{gameResult && (
+    <div className="modal-overlay">
+        <div className="modal-content result-modal">
+            <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
+                {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
+            </h2>
+            
+            {/* Añadimos la clase modal-text aquí */}
+            <p className="modal-text">
+                {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+            </p>
+            
+            <div className="modal-buttons-column">
+                <button className="main-button btn-blue" onClick={restartGame}>
+                    {t.buttons.playAgain}
+                </button>
+                <button className="main-button btn-red-outline" onClick={() => navigate('/menu')}>
+                    {t.buttons.mainMenu}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
 
-                        <button className="btn-cancel" onClick={() => setShowDifficultyDialog(false)}>
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* EXIT CONFIRMATION WINDOW */}
+            {/* EXIT CONFIRMATION MODAL */}
             {showExitConfirmation && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <div className="modal-icon">
-                            <span style={{ fontSize: '40px' }}>⚠️</span>
-                        </div>
                         <h2>{t.messages.areYouSure}</h2>
-                        <p>{t.messages.loseWarning}</p>
-
-                        <div className="modal-buttons">
-                            <button className="btn-confirm-exit" onClick={() => navigate('/menu')}>
-                                {t.buttons.yesExitAndLose}
-                            </button>
-                            <button className="btn-cancel" onClick={() => setShowExitConfirmation(false)}>
-                                {t.buttons.backToGame}
-                            </button>
+                        <div className="modal-buttons-column">
+                            <button className="main-button btn-red" onClick={() => navigate('/menu')}>{t.buttons.yesExitAndLose}</button>
+                            <button className="main-button btn-blue-outline" onClick={() => setShowExitConfirmation(false)}>{t.buttons.backToGame}</button>
                         </div>
                     </div>
                 </div>
             )}
-
-            {/* LANGUAGE DIALOG */}
             <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
         </div>
     );
