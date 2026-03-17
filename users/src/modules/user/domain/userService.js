@@ -75,8 +75,29 @@ const loginUser = async (data) => {
 
     return user;
 }
+
+// Changes the password of a user
+const changePassword = async (data) => {
+    // 1. Search the username
+    const user = await userRepository.findUserByUsername(data.username);
+    
+    // 2. Check if the password and user are correct
+    
+    if (!user||!await bcrypt.compare(data.currentPassword, user.password)) {
+        throw new Error('Invalid username or password');
+    }
+
+    // 3. Encrypt the new password
+    const hashedNewPassword = await bcrypt.hash(data.newPassword, 10);
+
+    // 4. Save the new password in the db
+    const updatedUser = await userRepository.updateUserPassword(data.username, hashedNewPassword);
+
+    return updatedUser;
+};
 module.exports = {
     createUser,
     findUserByUsername,
-    loginUser
+    loginUser,
+    changePassword
 };

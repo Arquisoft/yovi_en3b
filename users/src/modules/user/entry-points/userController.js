@@ -70,10 +70,29 @@ const loginUser = async (req, res) => {
     }
 };
 
+// POST /users/changePassword
+//Changes the password of the indicated user
+// STATUS:
+    //200: resource successfully read
+    //401: unauthorized
+    //500: server error
+const changePassword = async (req, res) => {
+    try {
+        const user =await userService.changePassword(req.body);
+        res.status(200).json(userResponseDto.toUserResponseDto(user));
+    } catch (error) {
+        console.log(error);
+        if (error.message === "Invalid username or password") {
+            return res.status(401).json({ error: error.message });
+        }
+        return res.status(500).json({ error: "Internal server error"});
+    }
+};
 
 
 module.exports = {
     createUser,
     findUserByUsername,
-    loginUser
+    loginUser,
+    changePassword
 };
