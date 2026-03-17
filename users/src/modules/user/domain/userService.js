@@ -80,10 +80,11 @@ const loginUser = async (data) => {
 const changePassword = async (data) => {
     // 1. Search the username
     const user = await userRepository.findUserByUsername(data.username);
+    const currentPassword = data.currentPassword ?? data.password;
     
     // 2. Check if the password and user are correct
     
-    if (!user||!await bcrypt.compare(data.currentPassword, user.password)) {
+    if (!user||!await bcrypt.compare(currentPassword, user.password)) {
         throw new Error('Invalid username or password');
     }
 
@@ -112,6 +113,7 @@ const changeNickname = async (data) => {
 
     return updatedUser;
 };
+
 module.exports = {
     createUser,
     findUserByUsername,

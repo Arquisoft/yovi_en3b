@@ -88,6 +88,7 @@ const changePassword = async (req, res) => {
         return res.status(500).json({ error: "Internal server error"});
     }
 };
+
 // POST /users/changeNickname
 //Changes the nickname of the indicated user
 // STATUS:
