@@ -29,7 +29,7 @@ const SignUpForm: React.FC = () => {
   const allValidationsPass = Object.values(passwordValidations).every(Boolean);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value }); // Updates specific field in state
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -97,24 +97,25 @@ const SignUpForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">NICKNAME</label>
-            <input name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-nickname">NICKNAME</label>
+            <input id="signup-nickname" name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">USERNAME</label>
-            <input name="username" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-username">USERNAME</label>
+            <input id="signup-username" name="username" type="text" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">EMAIL</label>
-            <input name="email" type="email" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-email">EMAIL</label>
+            <input id="signup-email" name="email" type="email" className="orbitron-text" onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text">PASSWORD</label>
+            <label htmlFor="password" className="orbitron-text">PASSWORD</label>
             <div className="password-wrapper">
               <input 
+                id="password"
                 name="password" 
                 type={showPass ? "text" : "password"} 
                 className="orbitron-text" 

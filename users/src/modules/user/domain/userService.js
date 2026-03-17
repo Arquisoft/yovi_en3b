@@ -21,6 +21,7 @@ const createUser = async (data) => {
         throw new Error("The username already exists");
     }
 
+
     // 2.2 Check non-repeted email
     const existingEmail = await userRepository.findUserByEmail(data.email);
     if (existingEmail) {

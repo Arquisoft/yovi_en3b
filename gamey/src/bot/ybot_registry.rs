@@ -1,7 +1,7 @@
 //! Registry for managing YBot implementations.
 //!
 //! The [`YBotRegistry`] provides a centralized way to register and retrieve
-//! bot implementations by name.
+//! bot implementations by name, supporting both synchronous and asynchronous bots.
 
 use std::{collections::HashMap, sync::Arc};
 
@@ -48,7 +48,7 @@ impl YBotRegistry {
     ///
     /// Returns `Some(bot)` if a bot with the given name exists, `None` otherwise.
     pub fn find(&self, name: &str) -> Option<Arc<dyn YBot>> {
-        self.bots.get(name).cloned()
+        self.bots.get(name).map(Arc::clone)
     }
 
     /// Returns a list of all registered bot names.
@@ -62,6 +62,8 @@ impl Default for YBotRegistry {
         YBotRegistry::new()
     }
 }
+
+
 
 #[cfg(test)]
 mod tests {
