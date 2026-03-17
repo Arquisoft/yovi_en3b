@@ -1,33 +1,37 @@
 import './App.css'; // Importing global styles
-import { Routes, Route, Navigate } from 'react-router-dom'; // Importing routing components
-import MainMenu from './components/MainMenu'; // Your main menu component
-import GameScreen from './components/GameScreen/GameScreen'; // Your game screen component
-import RegisterForm from './components/Login/RegisterForm'; // Your colleague's login component
-import SignUpForm from './components/SignUp/SignUpForm';
-import HistoryPage from './components/HistoryPage/HistoryPage';
+import { I18nProvider } from './i18n/Provider'; // Envolvente de idiomas
+import { Routes, Route, Navigate } from 'react-router-dom'; // Componentes de rutas
+import MainMenu from './components/MainMenu'; // Menú principal
+import GameScreen from './components/GameScreen/GameScreen'; // Pantalla de juego
+import RegisterForm from './components/Login/RegisterForm'; // Formulario de Login
+import SignUpForm from './components/SignUp/SignUpForm'; // Formulario de registro
+import HistoryPage from './components/HistoryPage/HistoryPage'; // Historial
 
 function App() {
   return (
-    <Routes>
-      {/* 1. Login/Register is now the entry point (Colleague's part) */}
-      <Route path="/" element={<RegisterForm />} /> 
-
-      {/* 2. Main Menu with all your buttons (Your part) */}
-      <Route path="/menu" element={<MainMenu />} /> 
-
-      {/* 3. The actual Game screen (Your part) */}
-      <Route path="/game" element={<GameScreen />} />
-
-      {/* 4. Redirect any unknown route to login */}
-      <Route path="*" element={<Navigate to="/" />} />
-
-      {/* 5. Sign Up route for new users */}          
-      <Route path="/signup" element={<SignUpForm />} />
+    <I18nProvider> 
       
-      {/* 6. History page route */}          
-      <Route path="/history" element={<HistoryPage />} />
+        <Routes>
+          {/* 1. Entrada de la App: Login */}
+          <Route path="/" element={<RegisterForm />} /> 
 
-    </Routes>
+          {/* 2. Menú Principal */}
+          <Route path="/menu" element={<MainMenu />} /> 
+
+          {/* 3. Pantalla de Juego */}
+          <Route path="/game" element={<GameScreen />} />
+
+          {/* 4. Registro de nuevos usuarios */}          
+          <Route path="/signup" element={<SignUpForm />} />
+          
+          {/* 5. Página de historial */}          
+          <Route path="/history" element={<HistoryPage />} />
+
+          {/* 6. Redirección por defecto a Login si la ruta no existe */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      
+    </I18nProvider>
   );
 }
 

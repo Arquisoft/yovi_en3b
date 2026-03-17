@@ -1,70 +1,119 @@
-import React, { useState, useMemo } from 'react';
+// UBICACIÓN: webapp/src/components/GamePreviewModal/GamePreviewModal.tsx
+import React, { useState } from 'react';
+import { useI18n } from '../../i18n/useTranslation'; 
+import { Bot, Cpu } from 'lucide-react'; 
+import './GamePreviewModal.css';
 
-interface Props {
+interface GamePreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  onStart: (settings: { size: number; difficulty: string; time: number | null }) => void;
+  onStart: (settings: any) => void;
 }
 
-const GamePreviewModal: React.FC<Props> = ({ isOpen, onClose, onStart }) => {
-  const [size, setSize] = useState(10);
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'difficult'>('medium');
-
-  const timeLimit = useMemo(() => {
-    const numCells = (size * (size + 1)) / 2;
-    const botMoveTime = 3;
-    if (difficulty === 'easy') return null;
-    if (difficulty === 'medium') return numCells * botMoveTime * 3;
-    return numCells * botMoveTime * 2;
-  }, [size, difficulty]);
+const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart }) => {
+  const { t } = useI18n(); 
+  const [boardSize, setBoardSize] = useState(5);
+  const [difficulty, setDifficulty] = useState(1);
+  const [selectedBot, setSelectedBot] = useState(0);
 
   if (!isOpen) return null;
 
+  const totalCells = (boardSize * (boardSize + 1)) / 2;
+  
+  const calculateSeconds = () => {
+    if (difficulty === 0) return null;
+    return difficulty === 1 ? (totalCells * 3) * 3 : (totalCells * 3) * 2;
+  };
+
+  const formatTime = (seconds: number | null) => {
+    if (seconds === null) return t.labels.noLimit;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs} ${t.labels.minutesShort}`;
+  };
+
+  const renderTriangle = () => {
+    const rows = [];
+    for (let i = 0; i < boardSize; i++) {
+      const dots = [];
+      for (let j = 0; j <= i; j++) {
+        dots.push(<div key={`${i}-${j}`} className="triangle-cell"></div>);
+      }
+      rows.push(
+        <div key={i} className="triangle-row">
+          {dots}
+        </div>
+      );
+    }
+    return <div className="triangle-wrapper">{rows}</div>;
+  };
+
   return (
-    <div className="modal-overlay">
-      <div className="modal-content preview-modal-wide">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content preview-modal-wide" onClick={(e) => e.stopPropagation()}>
         <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
-        <h2 className="modal-title">PREVIEW</h2>
+        <h2 className="modal-title h2-preview-title">{t.labels.preview}</h2>
 
         <div className="preview-layout">
-          <div className="preview-left-board">
-            {/* Visual Board Mockup based on Size */}
-            <div className="triangle-mockup">
-               <p style={{color: 'var(--game-blue)'}}>Board Size: {size}x{size}</p>
+          <div className="preview-left-column">
+            <p className="p-time-limit-top">{t.labels.timeLimit}: {formatTime(calculateSeconds())}</p>
+            
+            {/* Renderizado del tablero */}
+            <div className="visual-preview-area">
+               {renderTriangle()}
             </div>
           </div>
 
-          <div className="preview-right-settings">
-            <div className="bots-section">
-              <div className="bot-avatar bot-orange"></div>
-              <div className="bot-avatar bot-teal"></div>
+          <div className="preview-right-column">
+            <div className="setting-control">
+              <label className="label-white-bold">{t.labels.opponent}</label>
+              <div className="bot-selector">
+                <button 
+                  className={`bot-btn ${selectedBot === 0 ? 'active' : ''}`} 
+                  onClick={() => setSelectedBot(0)}
+                >
+                  <Bot size={48} color={selectedBot === 0 ? "#60a5fa" : "#fff"} />
+                </button>
+                <button 
+                  className={`bot-btn ${selectedBot === 1 ? 'active' : ''}`} 
+                  onClick={() => setSelectedBot(1)}
+                >
+                  <Cpu size={48} color={selectedBot === 1 ? "#60a5fa" : "#fff"} />
+                </button>
+              </div>
             </div>
 
             <div className="setting-control">
-              <label>DIFFICULTY: <span style={{color: 'var(--game-blue)'}}>{difficulty.toUpperCase()}</span></label>
+              <label className="label-white-bold">{t.labels.difficulty}</label>
               <input 
-                type="range" min="1" max="3" step="1" defaultValue="2"
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setDifficulty(v==="1" ? "easy" : v==="2" ? "medium" : "difficult");
-                }}
-                className="difficulty-slider"
+                type="range" 
+                min="0" 
+                max="2" 
+                value={difficulty} 
+                onChange={(e) => setDifficulty(parseInt(e.target.value))} 
+                className="neon-slider" 
               />
+              <div className="slider-labels-below">
+                <span className={difficulty === 0 ? 'active' : ''}>{t.labels.easy}</span>
+                <span className={difficulty === 1 ? 'active' : ''}>{t.labels.medium}</span>
+                <span className={difficulty === 2 ? 'active' : ''}>{t.labels.hard}</span>
+              </div>
             </div>
 
-            <div className="setting-control size-box">
-              <label>BOARD SIZE:</label>
-              <input 
-                type="number" min="3" max="10" value={size}
-                onChange={(e) => setSize(Number(e.target.value))}
-                className="size-number-input"
-              />
+            <div className="setting-control">
+              <label className="label-white-bold">{t.labels.boardSize}</label>
+              <div className="stepper-horizontal">
+                <button className="step-btn" onClick={() => setBoardSize(Math.max(3, boardSize - 1))}>-</button>
+                <span className="stepper-value">{boardSize}</span>
+                <button className="step-btn" onClick={() => setBoardSize(Math.min(10, boardSize + 1))}>+</button>
+              </div>
             </div>
 
-            <p>{timeLimit ? `TIME LIMIT: ${timeLimit}s` : "NO TIME LIMIT"}</p>
-
-            <button className="btn-play-now" onClick={() => onStart({ size, difficulty, time: timeLimit })}>
-              PLAY NOW
+            <button 
+              className="main-button btn-blue" 
+              onClick={() => onStart({ size: boardSize, difficulty, bot: selectedBot, time: calculateSeconds() })}
+            >
+              {t.buttons.playNow}
             </button>
           </div>
         </div>

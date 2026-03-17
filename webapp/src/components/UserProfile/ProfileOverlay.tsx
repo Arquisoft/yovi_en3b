@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from "react"; // Added useRef
-import { Edit2, Check, Lock, X } from "lucide-react"; // Added X icon
+// UBICACIÓN: webapp/src/components/UserProfile/ProfileOverlay.tsx
+import React, { useEffect, useState, useRef } from "react";
+import { Edit2, Check, Lock, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "./useUserProfile";
+import { useI18n } from "../../i18n/useTranslation"; // Hook de traducción
 import "./ProfileOverlay.css";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
@@ -9,11 +11,11 @@ interface ProfileOverlayProps { open: boolean; onClose: () => void; }
 const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
 
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
+  const { t } = useI18n(); // Acceso a traducciones
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null); // Defined inputRef
+  const inputRef = useRef<HTMLInputElement>(null);
   
-  // States for password change logic
   const [showPassFields, setShowPassFields] = useState(false);
   const [passData, setPassData] = useState({ current: '', next: '', confirm: '' });
 
@@ -24,11 +26,10 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   useEffect(() => {
     if (!open) {
       setIsEditing(false);
-      setShowPassFields(false); // Reset password view when closing
+      setShowPassFields(false);
     }
   }, [open]);
 
-  // Defined handleConfirmName
   const handleConfirmName = () => {
     if (!isNameEmpty) {
       setIsEditing(false);
@@ -36,7 +37,6 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   };
 
   const handlePasswordChange = () => {
-    // Here you would call your API to update the password
     console.log("Changing password to:", passData.next);
     setShowPassFields(false);
     setPassData({ current: '', next: '', confirm: '' });
@@ -48,7 +48,6 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
     <div className="modal-overlay" onClick={isEditing ? undefined : onClose}>
       <div className="modal-content profile-modal" onClick={(e) => e.stopPropagation()}>
 
-        {/* Prevent closing while editing */}
         <button
           className="boton-cerrar-fijo"
           onClick={isEditing ? undefined : onClose}
@@ -58,10 +57,10 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
           <X size={35} />
         </button>
 
-        <h2 className="modal-title">USER PROFILE</h2>
+        <h2 className="modal-title">{t.labels.userProfile}</h2>
 
         {loading ? (
-          <div className="loading-text">LOADING...</div>
+          <div className="loading-text">{t.messages.loading}</div>
         ) : error ? (
           <div className="error">{error}</div>
         ) : profile && (
@@ -73,9 +72,8 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
             </div>
 
             <div className="profile-fields">
-              {/* DISPLAY NAME FIELD */}
               <div className="profile-row">
-                <label>DISPLAY NAME</label>
+                <label>{t.labels.displayName}</label>
                 <div className="input-row">
                   <input
                     ref={inputRef}
@@ -101,70 +99,67 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                       className="edit-btn"
                       onClick={handleConfirmName}
                       disabled={isNameEmpty}
-                      title={isNameEmpty ? "Name cannot be empty" : "Confirm name"}
+                      title={isNameEmpty ? t.messages.usernameMustBeCompleted : t.buttons.confirm}
                     >
                       <Check size={18} color={isNameEmpty ? "gray" : "#60a5fa"} />
                     </button>
                   )}
                 </div>
-                {isNameEmpty && <p className="error-text">Username must be completed!</p>}
+                {isNameEmpty && <p className="error-text">{t.messages.usernameMustBeCompleted}</p>}
               </div>
 
-              {/* READ-ONLY USERNAME */}
               <div className="profile-row readonly">
-                <label>USERNAME</label>
+                <label>{t.labels.username}</label>
                 <span className="value orbitron-text">{profile.username}</span>
-                <span className="input-hint" style={{fontSize: '0.6rem'}}>UNIQUE ID - CANNOT BE CHANGED</span>
               </div>
 
-              {/* PASSWORD CHANGE SECTION */}
               <div className="profile-row">
-                <label>SECURITY</label>
+                <label>{t.labels.security}</label>
                 {!showPassFields ? (
                   <button className="change-pass-trigger orbitron-text" onClick={() => setShowPassFields(true)}>
-                    <Lock size={14} /> CHANGE PASSWORD
+                    <Lock size={14} /> {t.buttons.changePassword}
                   </button>
                 ) : (
                   <div className="password-edit-box">
                     <input 
                       type="password" 
-                      placeholder="CURRENT PASSWORD" 
+                      placeholder={t.labels.currentPassword} 
                       className="orbitron-text small-input"
                       onChange={(e) => setPassData({...passData, current: e.target.value})}
                     />
                     <input 
                       type="password" 
-                      placeholder="NEW PASSWORD" 
+                      placeholder={t.labels.newPassword} 
                       className="orbitron-text small-input"
                       onChange={(e) => setPassData({...passData, next: e.target.value})}
                     />
                     <input 
                       type="password" 
-                      placeholder="CONFIRM NEW" 
+                      placeholder={t.labels.confirmNew} 
                       className="orbitron-text small-input"
                       onChange={(e) => setPassData({...passData, confirm: e.target.value})}
                     />
                     <div className="pass-actions">
-                      <button className="cancel-pass" onClick={() => setShowPassFields(false)}>CANCEL</button>
+                      <button className="cancel-pass" onClick={() => setShowPassFields(false)}>{t.buttons.cancel}</button>
                       <button 
                         className="confirm-pass" 
                         disabled={!passData.next || passData.next !== passData.confirm}
                         onClick={handlePasswordChange}
-                      >CONFIRM</button>
+                      >{t.buttons.confirm}</button>
                     </div>
                   </div>
                 )}
               </div>
 
               <div className="profile-row readonly">
-                <label>RANKING</label>
+                <label>{t.labels.ranking}</label>
                 <span className="value orbitron-text">
                   {ranking ? `${ranking.position} / ${ranking.totalPlayers}` : "—"}
                 </span>
               </div>
 
               <div className="profile-row">
-                <label>CHOOSE AVATAR</label>
+                <label>{t.labels.chooseAvatar}</label>
                 <div className="avatar-grid">
                   {AVATARS.map((emoji, i) => {
                     const id = `avatar_0${i + 1}`;
@@ -195,7 +190,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                     borderRadius: "8px",
                     backgroundColor: "rgba(0,0,0,0.25)",
                   }}
-                  title="Confirm the display name first"
+                  title={t.messages.confirmTheDisplayNameFirst}
                 />
               )}
               <button
@@ -203,12 +198,12 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                 onClick={() => navigate("/history")}
                 disabled={isEditing}
               >
-                ACCESS GAME HISTORY
+                {t.buttons.accessGameHistory}
               </button>
 
               <div className="btn-group">
-                <button className="main-button orbitron-text" onClick={resetDraft} disabled={!dirty}>RESET</button>
-                <button className="main-button btn-blue orbitron-text" onClick={save} disabled={!dirty || isNameEmpty}>SAVE</button>
+                <button className="main-button orbitron-text" onClick={resetDraft} disabled={!dirty}>{t.buttons.reset}</button>
+                <button className="main-button btn-blue orbitron-text" onClick={save} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
               </div>
             </div>
           </>

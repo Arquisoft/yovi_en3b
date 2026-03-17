@@ -1,112 +1,195 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Languages,
-    Settings,
-    X,
-    Undo2,
-    Lightbulb,
-    CheckCircle2,
-    LogOut,
-    MessageSquare,
-    HelpCircle,
-    Clock
+    Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot
 } from 'lucide-react';
 import './GameScreen.css';
+import { generateBoard, type Cell } from './gridUtils';
+import { checkWin } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
+import { useI18n } from '../../i18n/useTranslation';
+import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 
 const GameScreen: React.FC = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate(); // Hook to handle navigation between pages
+    const location = useLocation(); // Hook to access state passed from the menu
+    const { t } = useI18n(); // Translation hook for internationalization
+    
+    const { 
+        size = 5, 
+        time: initialTime = null, 
+        botType = 'robot' 
+    } = location.state || {}; // Get game settings from navigation state
 
-    // Get settings from navigation state (Size, Time, Difficulty)
-    const settings = location.state || { size: 10, difficulty: 'medium', time: 300 };
+    const [timeLeft, setTimeLeft] = useState<number | null>(initialTime); // State for the countdown timer
+    const [cells] = useState(generateBoard(size)); // Generate the hexagonal grid based on size
+    const [isChatOpen, setIsChatOpen] = useState(true); // State to toggle sidebar chat visibility
+    const [showExitConfirmation, setShowExitConfirmation] = useState(false); // State for exit modal
+    const [showLanguageDialog, setShowLanguageDialog] = useState(false); // State for language settings modal
+    const [boardState, setBoardState] = useState<Record<string, number>>({}); // Map of cell keys to player IDs
+    const [currentPlayer, setCurrentPlayer] = useState(1); // Track whose turn it is (1 or 2)
+    const [pendingMove, setPendingMove] = useState<Cell | null>(null); // Temporary selection before confirming
+    const [botCooldown, setBotCooldown] = useState(false); // Prevents player interaction during bot's turn
+    const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null); // Stores final game outcome
 
-    const [currentPlayer, _setCurrentPlayer] = useState(1);
-    const [isChatOpen, setIsChatOpen] = useState(true);
-    const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<number | null>(settings.time);
+    // Function to format seconds into M:SS format
+    const formatDisplayTime = (seconds: number | null) => {
+        if (seconds === null) return "∞"; // Return infinity symbol if no time limit
+        const mins = Math.floor(seconds / 60); // Calculate whole minutes
+        const secs = seconds % 60; // Calculate remaining seconds
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`; // Format as M:SS with leading zero
+    };
 
     useEffect(() => {
-        if (timeLeft === null || timeLeft <= 0) return;
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [timeLeft]);
+        if (timeLeft === null || gameResult) return; // Stop timer if infinite or game ended
+        if (timeLeft <= 0) {
+            setGameResult('lose'); // Set game as lost if time runs out
+            return;
+        }
+        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000); // Decrease seconds
+        return () => clearInterval(timer); // Cleanup interval on component unmount
+    }, [timeLeft, gameResult]);
+
+    const handleClick = (cell: Cell) => {
+        const key = `${cell.x}-${cell.y}-${cell.z}`; // Generate unique key for the cell
+        if (gameResult || botCooldown || boardState[key]) return; // Block click if game over, bot's turn, or cell taken
+        setPendingMove(cell); // Highlight cell as pending selection
+    };
+
+    const handleConfirm = () => {
+        if (!pendingMove || gameResult) return; // Ensure a move is selected and game is active
+        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`; // Key for the confirmed move
+        
+        const newBoardState = { ...boardState, [key]: 1 }; // Update board with player 1's move
+        setBoardState(newBoardState); // Save new board state
+        setPendingMove(null); // Clear the temporary selection
+
+        if (checkWin(newBoardState, 1, size, cells)) {
+            setGameResult('win'); // Trigger win modal if connection is formed
+            return;
+        }
+
+        setCurrentPlayer(2); // Pass turn to the bot
+        setBotCooldown(true); // Disable user input
+        setTimeout(() => {
+            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]); // Find empty cells
+            if (availableCells.length > 0) {
+                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)]; // Pick random move
+                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`; // Bot's selected cell key
+                const stateAfterBot = { ...newBoardState, [botKey]: 2 }; // Update state with bot's move
+                setBoardState(stateAfterBot); // Save bot's move
+
+                if (checkWin(stateAfterBot, 2, size, cells)) {
+                    setGameResult('lose'); // Trigger lose modal if bot wins
+                }
+            }
+            setCurrentPlayer(1); // Return turn to player
+            setBotCooldown(false); // Re-enable user input
+        }, 1200); // Artificial delay to simulate bot "thinking"
+    };
+
+    const restartGame = () => {
+        setBoardState({}); // Clear all pieces from the board
+        setGameResult(null); // Reset game outcome state
+        setCurrentPlayer(1); // Set turn back to player 1
+        setTimeLeft(initialTime); // Reset timer to initial settings
+    };
 
     return (
         <div className="game-layout">
             <div className="game-main-content">
                 <header className="game-header">
-                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}>PLAYER 1</div>
-                    <div className="game-timer-display">
-                        {timeLeft !== null ? (
-                            <div className={`timer-box ${timeLeft < 10 ? 'critical' : ''}`}>
-                                <Clock size={20} /> <span>{timeLeft}s</span>
-                            </div>
-                        ) : <span className="vs-text">vs.</span>}
+                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}>{(t.labels as any).player1}</div>
+                    <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`}>
+                        <span className="timer-value">{formatDisplayTime(timeLeft)}</span>
                     </div>
-                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}>PLAYER 2</div>
+                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}>{(t.labels as any).player2}</div>
                 </header>
 
                 <main className="board-area">
                     <div className="triangle-board">
-                        <div className="placeholder-text">BOARD SIZE: {settings.size}x{settings.size}</div>
+                        <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
+                            <Layout size={{ x: 6, y: 6 }} flat={false} spacing={1.08} origin={{ x: size * 4.75, y: (size - 1) * 5 }}>
+                                {cells.map((cell) => {
+                                    const key = `${cell.x}-${cell.y}-${cell.z}`; // Key for mapping cells
+                                    const owner = boardState[key]; // Identify if player 1, 2 or none owns the cell
+                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z; // UI state for selection
+                                    return (
+                                        <Hexagon 
+                                            key={key} q={cell.q} r={cell.r} s={cell.s}
+                                            className={`hex-cell ${owner === 1 ? 'p1-selected' : ''} ${owner === 2 ? 'p2-selected' : ''} ${isSelected ? 'pending-selection' : ''}`}
+                                            onClick={() => handleClick(cell)} 
+                                        />
+                                    );
+                                })}
+                            </Layout>
+                        </HexGrid>
                     </div>
                 </main>
 
                 <footer className="game-footer">
-                    <button className="game-action-btn"><Undo2 size={16} /> UNDO</button>
-                    <button className="game-action-btn"><Lightbulb size={16} /> HINT</button>
-                    <button className="game-action-btn btn-confirm-blue"><CheckCircle2 size={16} /> CONFIRM</button>
-                    <button className="game-action-btn" onClick={() => setShowExitConfirmation(true)}>
-                        <LogOut size={16} /> EXIT
-                    </button>
+                    <button className="game-action-btn"><Undo2 size={18} /> <span>{t.buttons.undo}</span></button>
+                    <button className="game-action-btn btn-confirm-blue" onClick={handleConfirm} disabled={!pendingMove || botCooldown}><CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span></button>
+                    <button className="game-action-btn btn-exit-footer" onClick={() => setShowExitConfirmation(true)}><LogOut size={18} /> <span>{t.buttons.exit}</span></button>
                 </footer>
             </div>
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button className="icon-btn-global"><Languages size={20} /></button>
-                    <button className="icon-btn-global"><HelpCircle size={20} /></button>
-                    <button className={`icon-btn-global ${isChatOpen ? 'active-link' : ''}`} onClick={() => setIsChatOpen(!isChatOpen)}>
-                        <MessageSquare size={20} />
-                    </button>
-                    <button className="icon-btn-global"><Settings size={20} /></button>
+                    <button className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
+                    <button className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
                 </div>
-
                 {isChatOpen && (
                     <div className="chat-container">
                         <div className="chat-header">
-                            <div className="chat-user-info">
-                                <div className="avatar-circle">P2</div>
-                                <div className="user-details"><span className="user-name">PLAYER 2</span><span className="status-online">Online</span></div>
+                            <div className="bot-profile-badge">
+                                <div className="bot-avatar-circle">{botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}</div>
+                                <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
                             </div>
-                            <button className="icon-btn-chat" onClick={() => setIsChatOpen(false)}><X size={18} /></button>
                         </div>
-                        <div className="chat-messages">
-                            <div className="message received">Good luck! Size: {settings.size}</div>
-                        </div>
-                        <div className="chat-input-wrapper">
-                            <input type="text" placeholder="..." className="chat-input-field" />
-                            <button className="send-confirm-btn">✓</button>
-                        </div>
+                        <div className="chat-messages"><div className="message received">Good luck!</div></div>
                     </div>
                 )}
             </aside>
 
+           {/* MODAL FOR GAME OUTCOME (WIN/LOSS) */}
+{gameResult && (
+    <div className="modal-overlay">
+        <div className="modal-content result-modal">
+            <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
+                {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
+            </h2>
+            
+            {/* Añadimos la clase modal-text aquí */}
+            <p className="modal-text">
+                {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+            </p>
+            
+            <div className="modal-buttons-column">
+                <button className="main-button btn-blue" onClick={restartGame}>
+                    {t.buttons.playAgain}
+                </button>
+                <button className="main-button btn-red-outline" onClick={() => navigate('/menu')}>
+                    {t.buttons.mainMenu}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+
+            {/* EXIT CONFIRMATION MODAL */}
             {showExitConfirmation && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>Are you sure?</h2>
-                        <p>If you leave now, you will lose the game.</p>
-                        <div className="modal-grid">
-                            <button className="opt-btn" style={{ background: '#7f1d1d' }} onClick={() => navigate('/menu')}>YES, EXIT</button>
-                            <button className="opt-btn" onClick={() => setShowExitConfirmation(false)}>CANCEL</button>
+                        <h2>{t.messages.areYouSure}</h2>
+                        <div className="modal-buttons-column">
+                            <button className="main-button btn-red" onClick={() => navigate('/menu')}>{t.buttons.yesExitAndLose}</button>
+                            <button className="main-button btn-blue-outline" onClick={() => setShowExitConfirmation(false)}>{t.buttons.backToGame}</button>
                         </div>
                     </div>
                 </div>
             )}
+            <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
         </div>
     );
 };
