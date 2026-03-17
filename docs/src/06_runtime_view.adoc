@@ -12,19 +12,32 @@ This diagram the action of the user login
 @startuml
 actor User
 participant WebApp
-participant UsersService
+participant userRoutes
+participant userController
+participant userService
+participant userResponseDTO
+participant userRepository
 database Database
 
 User -> WebApp: Enters credentials (username/password)
-WebApp -> UsersService: Auth Request
-UsersService -> Database: Search for user & validate password hash
-Database --> UsersService: Return user data (or error)
+WebApp -> userRoutes: POST /login
+userRoutes -> userController: login(req, res)
+
+userController -> userService: loginUser(credentials)
+userService -> userRepository: findUserByUsername(username)
+userRepository -> Database: SELECT * FROM users...
+Database --> userRepository: Raw Data
+userRepository --> userService: User Entity
 
 alt valid credentials
-    UsersService --> WebApp: Login Success
+    userService -> userResponseDTO: mapToDTO(user)
+    userResponseDTO --> userService: userDTO
+    userService --> userController: success(userDTO)
+    userController --> WebApp: 200 OK
     WebApp --> User: Redirect to Game Dashboard
 else invalid credentials
-    UsersService --> WebApp: Login Failed (401 Unauthorized)
+    userService --> userController: error(Unauthorized)
+    userController --> WebApp: 401 Unauthorized
     WebApp --> User: Show "Invalid username or password"
 end
 @enduml
