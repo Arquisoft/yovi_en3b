@@ -94,7 +94,7 @@ paths:
         "404":
           description: It did not find a user with that username
         "500":
-          description: Database server error
+          description: Database server error.
   /loginUser:
     post:
       tags: [Users]

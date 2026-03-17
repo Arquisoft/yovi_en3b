@@ -14,7 +14,6 @@ describe('GameSave API', () => {
     describe('POST /gamesaves/save', () => {
         it('Saves a move successfully', async () => {
             const fakeMatchId = '111e4567-e89b-12d3-a456-426614174111';
-            const fakePlayerId = '123e4567-e89b-12d3-a456-426614174000';
             const boardState = JSON.stringify({
                 size: 5,
                 turn: 1,
@@ -27,8 +26,8 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 1,
-                    player_id: fakePlayerId,
-                    move_coordinates: 'C3',
+                    player_last_move: '1,3,0',
+                    bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
                 }]
@@ -39,17 +38,15 @@ describe('GameSave API', () => {
                 .send({
                     matchId: fakeMatchId,
                     moveNumber: 1,
-                    playerId: fakePlayerId,
-                    moveCoordinates: 'C3',
+                    playerLastMove: '1,3,0',
                     resultingBoardState: boardState
                 })
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(201);
-            // expect(res.body.message).toMatch(/Game save created successfully/i);
-            // expect(res.body.gameSave.move_coordinates).toBe('C3');
-            // expect(res.body.gameSave.move_number).toBe(1);
-            expect(true).toBe(true);
+            expect(res.status).toBe(201);
+            expect(res.body.message).toMatch(/Game save created successfully/i);
+            expect(res.body.gameSave.player_last_move).toBe('1,3,0');
+            expect(res.body.gameSave.move_number).toBe(1);
         });
 
         it('Fails if matchId is missing', async () => {
@@ -59,14 +56,11 @@ describe('GameSave API', () => {
                 .post('/gamesaves/save')
                 .send({
                     moveNumber: 1,
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    moveCoordinates: 'C3',
                     resultingBoardState: boardState
                 });
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Match ID is required/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Match ID is required/i);
         });
 
         it('Fails if moveNumber is missing', async () => {
@@ -76,14 +70,11 @@ describe('GameSave API', () => {
                 .post('/gamesaves/save')
                 .send({
                     matchId: '111e4567-e89b-12d3-a456-426614174111',
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    moveCoordinates: 'C3',
                     resultingBoardState: boardState
                 });
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Move number is required/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Move number is required/i);
         });
 
         it('Fails if moveNumber is not a positive integer', async () => {
@@ -94,48 +85,11 @@ describe('GameSave API', () => {
                 .send({
                     matchId: '111e4567-e89b-12d3-a456-426614174111',
                     moveNumber: -1,
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    moveCoordinates: 'C3',
                     resultingBoardState: boardState
                 });
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Move number must be a positive integer/i);
-            expect(true).toBe(true);
-        });
-
-        it('Fails if playerId is missing', async () => {
-            const boardState = JSON.stringify({ size: 5, turn: 0, players: ['B', 'R'], layout: 'B/.../.../.../...../' });
-
-            const res = await request(app)
-                .post('/gamesaves/save')
-                .send({
-                    matchId: '111e4567-e89b-12d3-a456-426614174111',
-                    moveNumber: 1,
-                    moveCoordinates: 'C3',
-                    resultingBoardState: boardState
-                });
-
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Player ID is required/i);
-            expect(true).toBe(true);
-        });
-
-        it('Fails if moveCoordinates is missing', async () => {
-            const boardState = JSON.stringify({ size: 5, turn: 0, players: ['B', 'R'], layout: 'B/.../.../.../...../' });
-
-            const res = await request(app)
-                .post('/gamesaves/save')
-                .send({
-                    matchId: '111e4567-e89b-12d3-a456-426614174111',
-                    moveNumber: 1,
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    resultingBoardState: boardState
-                });
-
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Move coordinates must be a non-empty string/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Move number must be a positive integer/i);
         });
 
         it('Fails if resultingBoardState is missing', async () => {
@@ -143,14 +97,11 @@ describe('GameSave API', () => {
                 .post('/gamesaves/save')
                 .send({
                     matchId: '111e4567-e89b-12d3-a456-426614174111',
-                    moveNumber: 1,
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    moveCoordinates: 'C3'
+                    moveNumber: 1
                 });
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Board state must be a non-empty JSON string/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Board state must be a non-empty JSON string/i);
         });
 
         it('Fails if resultingBoardState is not valid JSON', async () => {
@@ -159,14 +110,11 @@ describe('GameSave API', () => {
                 .send({
                     matchId: '111e4567-e89b-12d3-a456-426614174111',
                     moveNumber: 1,
-                    playerId: '123e4567-e89b-12d3-a456-426614174000',
-                    moveCoordinates: 'C3',
                     resultingBoardState: 'invalid json'
                 });
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Board state must be valid JSON/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Board state must be valid JSON/i);
         });
     });
 
@@ -182,8 +130,8 @@ describe('GameSave API', () => {
                         id: '999e4567-e89b-12d3-a456-426614174999',
                         match_id: fakeMatchId,
                         move_number: 1,
-                        player_id: '123e4567-e89b-12d3-a456-426614174000',
-                        move_coordinates: 'C3',
+                        player_last_move: '1,3,0',
+                        bot_last_move: null,
                         resulting_board_state: boardState1,
                         created_at: new Date().toISOString()
                     },
@@ -191,8 +139,8 @@ describe('GameSave API', () => {
                         id: '888e4567-e89b-12d3-a456-426614174888',
                         match_id: fakeMatchId,
                         move_number: 2,
-                        player_id: '223e4567-e89b-12d3-a456-426614174001',
-                        move_coordinates: 'D4',
+                        player_last_move: null,
+                        bot_last_move: '0,3,1',
                         resulting_board_state: boardState2,
                         created_at: new Date().toISOString()
                     }
@@ -203,12 +151,11 @@ describe('GameSave API', () => {
                 .get(`/gamesaves/${fakeMatchId}`)
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(200);
-            // expect(res.body.message).toMatch(/Moves retrieved successfully/i);
-            // expect(res.body.moves).toHaveLength(2);
-            // expect(res.body.moves[0].move_number).toBe(1);
-            // expect(res.body.moves[1].move_number).toBe(2);
-            expect(true).toBe(true);
+            expect(res.status).toBe(200);
+            expect(res.body.message).toMatch(/Moves retrieved successfully/i);
+            expect(res.body.moves).toHaveLength(2);
+            expect(res.body.moves[0].move_number).toBe(1);
+            expect(res.body.moves[1].move_number).toBe(2);
         });
 
         it('Fails if matchId is invalid', async () => {
@@ -218,8 +165,7 @@ describe('GameSave API', () => {
                 .get('/gamesaves/invalid-id')
                 .set('Accept', 'application/json');
 
-            //expect(res.status).toBe(400);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
         });
     });
 
@@ -233,8 +179,8 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 1,
-                    player_id: '123e4567-e89b-12d3-a456-426614174000',
-                    move_coordinates: 'C3',
+                    player_last_move: '1,2,0',
+                    bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
                 }]
@@ -244,10 +190,9 @@ describe('GameSave API', () => {
                 .get(`/gamesaves/${fakeMatchId}/moves/1`)
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(200);
-            // expect(res.body.message).toMatch(/Move retrieved successfully/i);
-            // expect(res.body.move.move_number).toBe(1);
-            expect(true).toBe(true);
+            expect(res.status).toBe(200);
+            expect(res.body.message).toMatch(/Move retrieved successfully/i);
+            expect(res.body.move.move_number).toBe(1);
         });
 
         it('Fails if move is not found', async () => {
@@ -259,9 +204,8 @@ describe('GameSave API', () => {
                 .get(`/gamesaves/${fakeMatchId}/moves/999`)
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/Move not found/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/Move not found/i);
         });
     });
 
@@ -280,8 +224,8 @@ describe('GameSave API', () => {
                     id: '999e4567-e89b-12d3-a456-426614174999',
                     match_id: fakeMatchId,
                     move_number: 5,
-                    player_id: '223e4567-e89b-12d3-a456-426614174001',
-                    move_coordinates: 'D4',
+                    player_last_move: '0,3,1',
+                    bot_last_move: null,
                     resulting_board_state: boardState,
                     created_at: new Date().toISOString()
                 }]
@@ -291,10 +235,9 @@ describe('GameSave API', () => {
                 .get(`/gamesaves/${fakeMatchId}/latest`)
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(200);
-            // expect(res.body.message).toMatch(/Latest move retrieved successfully/i);
-            // expect(res.body.move.move_number).toBe(5);
-            expect(true).toBe(true);
+            expect(res.status).toBe(200);
+            expect(res.body.message).toMatch(/Latest move retrieved successfully/i);
+            expect(res.body.move.move_number).toBe(5);
         });
 
         it('Fails if no moves exist for the match', async () => {
@@ -306,9 +249,8 @@ describe('GameSave API', () => {
                 .get(`/gamesaves/${fakeMatchId}/latest`)
                 .set('Accept', 'application/json');
 
-            // expect(res.status).toBe(400);
-            // expect(res.body.error).toMatch(/No moves found for this match/i);
-            expect(true).toBe(true);
+            expect(res.status).toBe(400);
+            expect(res.body.error).toMatch(/No moves found for this match/i);
         });
     });
 });

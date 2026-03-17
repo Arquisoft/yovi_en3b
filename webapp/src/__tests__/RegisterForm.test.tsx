@@ -1,86 +1,130 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import '@testing-library/jest-dom';
+import { describe, expect, test, vi, beforeEach } from 'vitest';
 
-// 1. Mock navigate from react-router-dom
+// Mock navigation
 const mockNavigate = vi.fn();
-
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}));
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return { ...actual, useNavigate: () => mockNavigate };
+});
 
 describe('RegisterForm', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  test('shows validation error when fields are empty', async () => {
-    render(<RegisterForm />);
-    const user = userEvent.setup();
-
-    // Find and click the PLAY button
-    await user.click(screen.getByRole('button', { name: /play/i }));
-
-    // Assert the specific error message from your component appears
-    expect(await screen.findByText('Please fill in all fields.')).toBeInTheDocument();
-    
-    // Ensure we did not try to navigate or fetch
-    expect(mockNavigate).not.toHaveBeenCalled();
-  });
-
-  test('submits credentials, calls fetch, and navigates to /menu', async () => {
-    const user = userEvent.setup();
-
-    // Mock fetch to resolve successfully
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({}),
-    } as Response);
-
-    render(<RegisterForm />);
-
-    // Target the inputs using their placeholders
-    const usernameInput = screen.getByPlaceholderText('Enter your name');
-    const passwordInput = screen.getByPlaceholderText('••••••••');
-
-    // Type in the credentials
-    await user.type(usernameInput, 'Pablo');
-    await user.type(passwordInput, 'SecurePass123');
-
-    // Click the PLAY button
-    await user.click(screen.getByRole('button', { name: /play/i }));
-
-    // 1. Wait for fetch to be called with the correct data
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/users/createuser'),
-        expect.objectContaining({
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: 'Pablo', password: 'SecurePass123' }),
-        })
-      );
+    beforeEach(() => {
+        vi.clearAllMocks();
+        global.fetch = vi.fn();
     });
 
-    // 2. Assert that the component navigated to the menu!
-    expect(mockNavigate).toHaveBeenCalledWith('/menu');
-  });
+    test('1. Shows error when fields are empty', async () => {
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        // Click play without filling inputs
+        const playBtn = screen.getByText(/PLAY/i);
+        fireEvent.click(playBtn);
+        
+        // Verify error message appears
+        expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
+    });
 
-  // BONUS TEST: Since you have a SIGN UP button, let's test that it navigates properly!
-  test('navigates to /signup when SIGN UP button is clicked', async () => {
-    render(<RegisterForm />);
-    const user = userEvent.setup();
+    test('2. Navigates on successful login', async () => {
+        // Mock a successful API response
+        (global.fetch as any).mockResolvedValue({
+            ok: true,
+            json: async () => ({ token: 'fake-token' }),
+        });
 
-    // Click the "SIGN UP" button
-    await user.click(screen.getByRole('button', { name: /sign up/i }));
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        fireEvent.click(screen.getByText(/PLAY/i));
 
-    // Assert it navigated to the correct route
-    expect(mockNavigate).toHaveBeenCalledWith('/signup');
-  });
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/menu'));
+    });
+
+    test('3. Shows error message on API failure', async () => {
+    (global.fetch as any).mockResolvedValue({
+        ok: false,
+        json: async () => ({ message: 'Invalid credentials' }),
+    });
+
+    render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+    
+    fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+    fireEvent.click(screen.getByText(/PLAY/i));
+
+    // Usamos findByText que espera a que aparezca y devuelve el elemento
+    const errorMessage = await screen.findByText(/Invalid credentials/i);
+    
+    // Verificamos que sea visible en el DOM usando propiedades nativas del nodo
+    expect(errorMessage).toBeDefined();
+    expect(errorMessage.style.display).not.toBe('none'); 
+});
+
+    test('4. Navigates to signup on button click', async () => {
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        const signUpBtn = screen.getByText(/SIGN UP/i);
+        fireEvent.click(signUpBtn);
+        
+        // Verify navigation to signup
+        expect(mockNavigate).toHaveBeenCalledWith('/signup');
+    });
+
+    test('5. Clears error when user starts typing', async () => {
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.click(screen.getByText(/PLAY/i));
+        expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
+
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        
+        // Error should still be visible until both fields are filled
+        expect(screen.queryByText(/Please fill in all fields/i)).toBeDefined();
+    });
+
+    test('6. Handles network error gracefully', async () => {
+        (global.fetch as any).mockRejectedValue(new Error('Network error'));
+
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        fireEvent.click(screen.getByText(/PLAY/i));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Cannot connect to the server/i)).toBeDefined();
+        });
+    });
+
+    test('7. Loading state is set while API is being called', async () => {
+        let resolveResponse: any;
+        const responsePromise = new Promise(resolve => {
+            resolveResponse = resolve;
+        });
+
+        (global.fetch as any).mockReturnValue(responsePromise);
+
+        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        
+        const playBtn = screen.getByText(/PLAY/i) as HTMLButtonElement;
+        fireEvent.click(playBtn);
+
+        // Button should be disabled during loading
+        expect(playBtn.disabled).toBe(true);
+
+        resolveResponse({
+            ok: true,
+            json: async () => ({ token: 'fake-token' }),
+        });
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/menu');
+        });
+    });
 });

@@ -48,6 +48,10 @@ endif::arc42help[]
 | **Ranking System**
 | **Winrate Metric**
 | Focuses on the win/loss ratio to provide a simple but competitive ranking for the leaderboard.
+
+| **Game State Persistence**
+| **Dedicated 'game_saves' table**
+| To prevent database saturation and optimize network traffic, the `matches` table is only accessed at the start and end of a game. Turn-by-turn data and manual saves are isolated in a dedicated `game_saves` table, keeping the main matches metadata clean and fast.
 |===
 
 === Organizational & Development Strategy

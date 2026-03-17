@@ -15,5 +15,4 @@ module.exports = {
     FROM users 
     WHERE email = $1; 
   `
-  
 };
