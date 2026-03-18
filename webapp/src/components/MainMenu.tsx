@@ -58,16 +58,16 @@ const MainMenu: React.FC = () => {
           <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <button className="boton-cerrar-fijo" onClick={() => setShowLogoutConfirm(false)}>&times;</button>
-              <h2 className="modal-title">{t.messages.areYouSure}</h2>
+              <h2 className="modal-title">{t.buttons.logout}</h2>
               <p className="modal-text" style={{ color: 'white', opacity: 0.9 }}>
-                {t.messages.loseWarning}
+                {t.messages.logoutConfirmation}
               </p>
               <div className="modal-grid">
                 <button className="opt-btn btn-danger" onClick={() => navigate('/')}>
-                  {t.buttons.yesExitAndLose}
+                  {t.buttons.confirmLogout}
                 </button>
                 <button className="opt-btn active" onClick={() => setShowLogoutConfirm(false)}>
-                  {t.buttons.backToGame}
+                  {t.buttons.stayHere}
                 </button>
               </div>
             </div>
