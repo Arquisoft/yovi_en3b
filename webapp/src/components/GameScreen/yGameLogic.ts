@@ -29,9 +29,9 @@ export const checkWin = (boardState: Record<string, number>, player: number, siz
         while (head < queue.length) {
             const curr = queue[head++];
 
-            if (curr.x === 0)         sidesInGroup.add('base');      // Bottom line
-            if (curr.y === 0)         sidesInGroup.add('izquierdo'); // Left side
-            if (curr.z === 0)         sidesInGroup.add('derecho');   // Right side
+            if (curr.x === 0)         sidesInGroup.add('base');     // Bottom line
+            if (curr.y === 0)         sidesInGroup.add('left');     // Left side
+            if (curr.z === 0)         sidesInGroup.add('right');    // Right side
 
             // Check neighbors to expand the connected group
             for (const d of dirs) {

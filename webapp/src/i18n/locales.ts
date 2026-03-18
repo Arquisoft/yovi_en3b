@@ -66,6 +66,7 @@ export const translations = {
       easy: 'FÁCIL', 
       medium: 'MEDIO',
       hard: 'DIFÍCIL',
+      typeMessage: 'Escribe un mensaje...',
     },
     messages: {
       loading: 'CARGANDO...',
@@ -169,6 +170,7 @@ export const translations = {
       easy: 'EASY',
       medium: 'MEDIUM',
       hard: 'HARD', 
+      typeMessage: 'Type a message...',
     },
     messages: {
       loading: 'LOADING...',
