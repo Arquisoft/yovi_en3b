@@ -32,6 +32,8 @@ export const translations = {
       loading: 'CARGANDO...',
       playAgain: 'JUGAR DE NUEVO',
       mainMenu: 'MENÚ PRINCIPAL',
+      confirmLogout: 'CERRAR SESIÓN',
+      stayHere: 'QUEDARME',
     },
     labels: {
       displayName: 'NOMBRE A MOSTRAR',
@@ -66,6 +68,7 @@ export const translations = {
       easy: 'FÁCIL', 
       medium: 'MEDIO',
       hard: 'DIFÍCIL',
+      typeMessage: 'Escribe un mensaje...',
     },
     messages: {
       loading: 'CARGANDO...',
@@ -86,6 +89,7 @@ export const translations = {
       nextTime: '¡Buen intento, pero has perdido esta vez!',
       winDetail: 'Has demostrado ser un gran estratega. ¡Sigue así para mantener tu racha ganadora!',
       loseDetail: 'No te desanimes, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
+      logoutConfirmation: '¿Estás seguro de que quieres cerrar sesión?',
     },
     validation: {
       chars8: '8+ caracteres',
@@ -135,6 +139,8 @@ export const translations = {
       loading: 'LOADING...',
       playAgain: 'PLAY AGAIN',
       mainMenu: 'MAIN MENU',
+      confirmLogout: 'LOG OUT',
+      stayHere: 'STAY',
     },
     labels: {
       displayName: 'DISPLAY NAME',
@@ -169,6 +175,7 @@ export const translations = {
       easy: 'EASY',
       medium: 'MEDIUM',
       hard: 'HARD', 
+      typeMessage: 'Type a message...',
     },
     messages: {
       loading: 'LOADING...',
@@ -189,6 +196,7 @@ export const translations = {
       nextTime: 'Good try, but you lost this time!',
       winDetail: 'You have proven to be a great strategist. Keep it up to maintain your winning streak!',
       loseDetail: 'Don\'t be discouraged, every game is an opportunity to learn and improve. Try again!',
+      logoutConfirmation: 'Are you sure you want to log out?',
     },
     validation: {
       chars8: '8+ chars',

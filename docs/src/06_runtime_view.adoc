@@ -5,28 +5,83 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 === User Login
 
-This diagram the action of the user login
+This diagram represents the action of the user login
 
 [plantuml,"Login",png]
 ----
 @startuml
 actor User
 participant WebApp
-participant UsersService
+participant userRoutes
+participant userController
+participant userService
+participant userResponseDTO
+participant userRepository
 database Database
 
 User -> WebApp: Enters credentials (username/password)
-WebApp -> UsersService: Auth Request
-UsersService -> Database: Search for user & validate password hash
-Database --> UsersService: Return user data (or error)
+WebApp -> userRoutes: POST /login
+userRoutes -> userController: loginUser(req, res)
+
+userController -> userService: loginUser(credentials)
+userService -> userRepository: findUserByUsername(username)
+userRepository -> Database: SELECT * FROM users...
+Database --> userRepository: Raw Data
+userRepository --> userService: User Entity
 
 alt valid credentials
-    UsersService --> WebApp: Login Success
+    userService --> userController: user
+    userController -> userResponseDTO: toUserResponseDto(user)
+    userResponseDTO --> userController: userDTO
+    userController --> WebApp: 200 OK (userDTO)
     WebApp --> User: Redirect to Game Dashboard
 else invalid credentials
-    UsersService --> WebApp: Login Failed (401 Unauthorized)
+    userService --> userController: throw Error("Invalid username or password")
+    userController --> WebApp: 401 Unauthorized
     WebApp --> User: Show "Invalid username or password"
 end
+@enduml
+----
+
+=== User Signup
+
+This diagrams represent the action of signing up
+[plantuml,"Signup",png]
+----
+@startuml
+actor User
+participant WebApp
+participant userRoutes
+participant userController
+participant userService
+participant bcrypt
+participant userRepository
+database Database
+
+User -> WebApp: Fills form (nickname, username, email, password, avatarId)
+User -> WebApp: Clicks "SAVE ACCOUNT"
+WebApp -> userRoutes: POST /createuser
+userRoutes -> userController: createUser(req, res)
+
+userController -> userService: createUser(data)
+
+userService -> userService: Validate fields & password length
+userService -> userRepository: findUserByUsername(username)
+userRepository --> userService: null (if available)
+userService -> userRepository: findUserByEmail(email)
+userRepository --> userService: null (if available)
+
+userService -> bcrypt: hash(password, 10)
+bcrypt --> userService: hashed_password
+
+userService -> userRepository: createUser(nickname, username, email, hashed_password, photo: avatarId)
+userRepository -> Database: INSERT INTO users...
+Database --> userRepository: newUser
+userRepository --> userService: newUser
+
+userService --> userController: newUser
+userController --> WebApp: 201 Created ("Welcome username")
+WebApp --> User: navigate('/')
 @enduml
 ----
 

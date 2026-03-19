@@ -14,11 +14,11 @@ const GameScreen: React.FC = () => {
     const navigate = useNavigate(); // Hook to handle navigation between pages
     const location = useLocation(); // Hook to access state passed from the menu
     const { t } = useI18n(); // Translation hook for internationalization
-    
-    const { 
-        size = 5, 
-        time: initialTime = null, 
-        botType = 'robot' 
+
+    const {
+        size = 5,
+        time: initialTime = null,
+        botType = 'robot'
     } = location.state || {}; // Get game settings from navigation state
 
     const [timeLeft, setTimeLeft] = useState<number | null>(initialTime); // State for the countdown timer
@@ -31,6 +31,8 @@ const GameScreen: React.FC = () => {
     const [pendingMove, setPendingMove] = useState<Cell | null>(null); // Temporary selection before confirming
     const [botCooldown, setBotCooldown] = useState(false); // Prevents player interaction during bot's turn
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null); // Stores final game outcome
+    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);  // List of messages sent
+    const [inputValue, setInputValue] = useState(''); // Message being written
 
     // Function to format seconds into M:SS format
     const formatDisplayTime = (seconds: number | null) => {
@@ -38,6 +40,16 @@ const GameScreen: React.FC = () => {
         const mins = Math.floor(seconds / 60); // Calculate whole minutes
         const secs = seconds % 60; // Calculate remaining seconds
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`; // Format as M:SS with leading zero
+    };
+
+    // Logic for sending a message
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return; // Just to stop sending only whitespaces
+
+        // Adds the message with the player
+        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        setInputValue(''); // Clears the writting message textbox
     };
 
     useEffect(() => {
@@ -59,7 +71,7 @@ const GameScreen: React.FC = () => {
     const handleConfirm = () => {
         if (!pendingMove || gameResult) return; // Ensure a move is selected and game is active
         const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`; // Key for the confirmed move
-        
+
         const newBoardState = { ...boardState, [key]: 1 }; // Update board with player 1's move
         setBoardState(newBoardState); // Save new board state
         setPendingMove(null); // Clear the temporary selection
@@ -115,10 +127,10 @@ const GameScreen: React.FC = () => {
                                     const owner = boardState[key]; // Identify if player 1, 2 or none owns the cell
                                     const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z; // UI state for selection
                                     return (
-                                        <Hexagon 
+                                        <Hexagon
                                             key={key} q={cell.q} r={cell.r} s={cell.s}
                                             className={`hex-cell ${owner === 1 ? 'p1-selected' : ''} ${owner === 2 ? 'p2-selected' : ''} ${isSelected ? 'pending-selection' : ''}`}
-                                            onClick={() => handleClick(cell)} 
+                                            onClick={() => handleClick(cell)}
                                         />
                                     );
                                 })}
@@ -143,39 +155,65 @@ const GameScreen: React.FC = () => {
                     <div className="chat-container">
                         <div className="chat-header">
                             <div className="bot-profile-badge">
-                                <div className="bot-avatar-circle">{botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}</div>
-                                <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
+                                <div className="bot-avatar-circle">
+                                    {botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}
+                                </div>
+                                <div className="bot-info-text">
+                                    <span className="bot-name-chat">PLAYER 2</span>
+                                    <span className="bot-status-tag">Online</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="chat-messages"><div className="message received">Good luck!</div></div>
+
+                        {/* Área de mensajes */}
+                        <div className="chat-messages">
+                            {messages.map((msg, index) => (
+                                <div key={index} className="message sent">
+                                    {msg.text}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Formulario para escribir */}
+                        <form className="chat-input-area" onSubmit={handleSendMessage}>
+                            <input
+                                type="text"
+                                placeholder={t.labels.typeMessage || "Escribe..."}
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                            />
+                            <button type="submit" className="send-btn" disabled={!inputValue.trim()}>
+                                <CheckCircle2 size={18} />
+                            </button>
+                        </form>
                     </div>
                 )}
             </aside>
 
-           {/* MODAL FOR GAME OUTCOME (WIN/LOSS) */}
-{gameResult && (
-    <div className="modal-overlay">
-        <div className="modal-content result-modal">
-            <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
-                {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
-            </h2>
-            
-            {/* Añadimos la clase modal-text aquí */}
-            <p className="modal-text">
-                {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
-            </p>
-            
-            <div className="modal-buttons-column">
-                <button className="main-button btn-blue" onClick={restartGame}>
-                    {t.buttons.playAgain}
-                </button>
-                <button className="main-button btn-red-outline" onClick={() => navigate('/menu')}>
-                    {t.buttons.mainMenu}
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+            {/* MODAL FOR GAME OUTCOME (WIN/LOSS) */}
+            {gameResult && (
+                <div className="modal-overlay">
+                    <div className="modal-content result-modal">
+                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
+                            {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
+                        </h2>
+
+                        {/* Añadimos la clase modal-text aquí */}
+                        <p className="modal-text">
+                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+                        </p>
+
+                        <div className="modal-buttons-column">
+                            <button className="main-button btn-blue" onClick={restartGame}>
+                                {t.buttons.playAgain}
+                            </button>
+                            <button className="main-button btn-red-outline" onClick={() => navigate('/menu')}>
+                                {t.buttons.mainMenu}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* EXIT CONFIRMATION MODAL */}
             {showExitConfirmation && (

@@ -212,6 +212,9 @@
   flex: 1;
   padding: 15px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .message.received {
@@ -223,19 +226,58 @@
   align-self: flex-start;
 }
 
-.chat-input-wrapper {
-  padding: 15px;
+/* 1. El contenedor: quitamos un poco de padding para ganar espacio */
+.chat-input-area {
+  padding: 10px; /* Reducido de 15px a 10px */
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px; /* Espacio más pequeño entre input y botón */
+  background: rgba(15, 23, 42, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.chat-input-field {
-  flex: 1;
+/* 2. El input: Nos aseguramos de que use todo el espacio posible */
+.chat-input-area input {
+  flex: 1; /* Esto es clave: empuja al botón a la derecha */
+  min-width: 0; /* Evita que el input empuje el sidebar hacia afuera */
   background: rgba(15, 23, 42, 0.9) !important;
   border: 1px solid #334155 !important;
   border-radius: 8px;
-  padding: 10px;
+  padding: 12px 15px; /* Más cómodo para escribir */
   color: white !important;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem; /* Un pelín más grande */
+}
+
+/* 3. El botón: Lo hacemos un poco más rectangular para que no parezca un cuadrado pequeño */
+.send-btn {
+  background: #2563eb !important;
+  color: white !important;
+  padding: 0 15px; /* Damos ancho con padding en lugar de width fijo */
+  height: 42px; /* Altura que combine con el input */
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* IMPORTANTE: evita que el botón se aplaste */
+}
+
+.chat-input-area input:focus {
+  border-color: #2563eb !important;
+}
+
+
+.send-btn:hover:not(:disabled) {
+  background: #3b82f6 !important;
+  transform: scale(1.05);
+}
+
+.send-btn:disabled {
+  background: #334155 !important;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .send-confirm-btn {
@@ -366,4 +408,27 @@
     background: transparent !important;
     border: 2px solid #f87171 !important;
     color: #f87171 !important;
+}
+
+.message.sent {
+    align-self: flex-end;
+    background-color: #2563eb;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px 12px 0 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
