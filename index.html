@@ -474,8 +474,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#section-runtime-view">6. Runtime View</a>
 <ul class="sectlevel2">
 <li><a href="#_user_login">6.1. User Login</a></li>
-<li><a href="#_user_plays_the_game">6.2. User plays the game</a></li>
-<li><a href="#_asking_for_a_hint">6.3. Asking for a hint</a></li>
+<li><a href="#_user_signup">6.2. User Signup</a></li>
+<li><a href="#_user_plays_the_game">6.3. User plays the game</a></li>
+<li><a href="#_asking_for_a_hint">6.4. Asking for a hint</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -844,6 +845,12 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_business_context">3.1. Business context</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/03_1-business-context.png" alt="03 1 business context">
+</div>
+<div class="title">Figure 1. Business Context Diagram</div>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -894,7 +901,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div></div></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External bot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External bot (Claude)</p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
@@ -905,7 +912,24 @@ These stakeholders determine the extent and the level of detail of your work and
 <td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
 <ul>
 <li>
-<p>Answer with the next movement (in YEN notation)</p>
+<p>Answer with the next movement (in YEN notation), obtained by querying Claude AI</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External bot (Minimax)</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Petitions through play()</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Answer with the next movement (in YEN notation), obtained by applying minimax algorithm</p>
 </li>
 </ul>
 </div></div></td>
@@ -1311,16 +1335,27 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="sect2">
 <h3 id="_user_login">6.1. User Login</h3>
 <div class="paragraph">
-<p>This diagram the action of the user login</p>
+<p>This diagram represents the action of the user login</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Login.png" alt="Login" width="803" height="474">
+<img src="./images/Login.png" alt="Login" width="1257" height="717">
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_user_plays_the_game">6.2. User plays the game</h3>
+<h3 id="_user_signup">6.2. User Signup</h3>
+<div class="paragraph">
+<p>This diagrams represent the action of signing up</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Signup.png" alt="Signup" width="1426" height="773">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_user_plays_the_game">6.3. User plays the game</h3>
 <div class="paragraph">
 <p>This diagram shows the execution of a game</p>
 </div>
@@ -1331,7 +1366,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 </div>
 <div class="sect2">
-<h3 id="_asking_for_a_hint">6.3. Asking for a hint</h3>
+<h3 id="_asking_for_a_hint">6.4. Asking for a hint</h3>
 <div class="paragraph">
 <p>This diagram represents the user asking for a hint</p>
 </div>
