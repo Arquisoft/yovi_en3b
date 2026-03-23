@@ -53,7 +53,7 @@ paths:
         "500":
           description: Database server error
   /findUserByUsername:
-    post:
+    get:
       tags: [Users]
       summary: Searches for a user
       description: Searches for a user with that username and returns it
@@ -138,7 +138,101 @@ paths:
                     example: "photo"
         "400":
           description: Missing fields
-        "404":
+        "401":
           description: Invalid username or password
+        "500":
+          description: Database server error
+  /changePassword:
+    post:
+      tags: [Users]
+      summary: Change the password of a user
+      description: It takes the credentials of the user to check his authorization and changes his password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - newPassword
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "123456"
+                newPassword:
+                  type: string
+                  example: "hola123456"
+      responses:
+        "200":
+          description: Password correctly changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "testuser"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
+        "401":
+          description: Invalid username or password
+        "500":
+          description: Database server error
+  /changeNickname:
+    post:
+      tags: [Users]
+      summary: Change the nickname of a user
+      description: It takes the username
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - nickname
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                nickname:
+                  type: string
+                  example: "paco123"
+      responses:
+        "200":
+          description: nickname correctly changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "paco123"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
+        "401":
+          description: User not found
         "500":
           description: Database server error

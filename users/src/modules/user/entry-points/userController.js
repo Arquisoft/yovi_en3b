@@ -22,7 +22,7 @@ const createUser = async (req, res) => {
     }
 };
 
-// POST /users/findUserByUsername
+// GET /users/findUserByUsername
 //Here the service for finding  a user is called. 
 // STATUS:
     //200: resource successfully read
@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
 // POST /users/changePassword
 //Changes the password of the indicated user
 // STATUS:
-    //200: resource successfully read
+    //200: resource successfully updated
     //401: unauthorized
     //500: server error
 const changePassword = async (req, res) => {
@@ -88,11 +88,30 @@ const changePassword = async (req, res) => {
         return res.status(500).json({ error: "Internal server error"});
     }
 };
+// POST /users/changeNickname
+//Changes the nickname of the indicated user
+// STATUS:
+    //200: resource successfully updated
+    //404: resource not found 
+    //500: server error
+const changeNickname = async (req, res) => {
+    try {
+        const user =await userService.changeNickname(req.body);
+        res.status(200).json(userResponseDto.toUserResponseDto(user));
+    } catch (error) {
+        console.log(error);
+        if (error.message === "User not found") {
+            return res.status(404).json({ error: error.message });
+        }
+        return res.status(500).json({ error: "Internal server error"});
+    }
+};
 
 
 module.exports = {
     createUser,
     findUserByUsername,
     loginUser,
-    changePassword
+    changePassword,
+    changeNickname
 };

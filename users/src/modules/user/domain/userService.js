@@ -95,9 +95,27 @@ const changePassword = async (data) => {
 
     return updatedUser;
 };
+
+// Changes the password of a user
+const changeNickname = async (data) => {
+    // 1. Search the username
+    const user = await userRepository.findUserByUsername(data.username);
+    
+    // 2. Check if the user exists
+    
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    // 3. Save the new nickname in the db
+    const updatedUser = await userRepository.updateUserNickname(data.username, data.nickname);
+
+    return updatedUser;
+};
 module.exports = {
     createUser,
     findUserByUsername,
     loginUser,
-    changePassword
+    changePassword,
+    changeNickname
 };

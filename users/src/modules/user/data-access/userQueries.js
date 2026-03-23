@@ -1,3 +1,5 @@
+const { updateUserNickName } = require("./userRepository");
+
 // File to write the queries required for the users management
 module.exports = {
   createUser: `
@@ -18,6 +20,12 @@ module.exports = {
   updateUserPassword: `
     UPDATE users
     SET password = $1
+    WHERE username = $2 
+    RETURNING username, email, photo, nickname;
+  `,
+  updateUserNickname: `
+    UPDATE users
+    SET nickname = $1
     WHERE username = $2 
     RETURNING username, email, photo, nickname;
   `

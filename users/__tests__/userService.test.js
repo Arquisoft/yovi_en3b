@@ -197,7 +197,7 @@ describe('POST /users/createuser', () => {
 })
 
 ///////////////////////////////////////////////////////////FIND USER BY USER NAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
-describe('POST /users/findUserByUsername', () => {
+describe('GET /users/findUserByUsername', () => {
     afterEach(() => {
         vi.restoreAllMocks()
     })
@@ -209,7 +209,7 @@ describe('POST /users/findUserByUsername', () => {
             rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
         });
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 username: testName,
             })
@@ -226,7 +226,7 @@ describe('POST /users/findUserByUsername', () => {
     // NOT PASSING A USERNAME
     it('returns 400 if no username is provided', async () => {
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 // Enviamos el body vacío o sin el campo username
             })
@@ -242,7 +242,7 @@ describe('POST /users/findUserByUsername', () => {
         });
 
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ username: 'UsuarioFantasma' })
             .set('Accept', 'application/json')
 
@@ -254,7 +254,7 @@ describe('POST /users/findUserByUsername', () => {
         vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 username: 'test',
             })
@@ -438,10 +438,77 @@ describe('POST /users/changePassword', () => {
         vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
-            .post('/users/loginUser')
+            .post('/users/changePassword')
             .send({ 
                 username: 'Fantasma',
                 password: 'password123'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(500)
+        expect(res.body.error).toBe("Internal server error") 
+    })
+})
+
+///////////////////////////////////////////////////////////CHANGE USER NICKNAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
+describe('POST /users/changeNickname', () => {
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+    // POSITIVE TEST
+    it('returns 200 and user data without password if the nickname has been successfully changed', async () => {
+        const testName = 'Pablo'
+        vi.spyOn(db, 'query')
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+            })
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
+            });;
+
+
+        const res = await request(app)
+            .post('/users/changeNickname')
+            .send({ 
+                username: testName,
+                nickname: testName
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(200)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).not.toHaveProperty('password');
+       
+    })
+    // USER NOT EXISTS WITH THAT USERNAME
+    it('returns 404 if the user does not exist', async () => {
+        vi.spyOn(db, 'query').mockResolvedValueOnce({
+            rows: [] 
+        });
+
+        const res = await request(app)
+            .post('/users/changeNickname')
+            .send({ 
+                username: 'Fantasma',
+                nickname: 'Ghost'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(404)
+        expect(res.body.error).toBe("User not found") 
+    })
+    // ABRUPT ERROR
+    it('returns 500 if something breaks abruptly',  async () => {
+        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+
+        const res = await request(app)
+            .post('/users/changeNickname')
+            .send({ 
+                username: 'Fantasma',
+                nickname: 'Ghost'
             })
             .set('Accept', 'application/json')
 
