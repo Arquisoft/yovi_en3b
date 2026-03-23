@@ -108,7 +108,6 @@ const changeNickname = async (req, res) => {
     }
 };
 
-
 module.exports = {
     createUser,
     findUserByUsername,
