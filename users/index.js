@@ -8,6 +8,7 @@ const YAML = require('js-yaml');
 const promBundle = require('express-prom-bundle');
 const userRoutes = require('./src/modules/user/entry-points/userRoutes');
 const matchRoutes = require('./src/modules/match/entry-points/matchRoutes');
+const rankingRoutes = require('./src/modules/ranking/entry-points/rankingRoutes');
 const gamesaveRoutes = require('./src/modules/gamesave/entry-points/gamesaveRoutes');
 
 const metricsMiddleware = promBundle({includeMethod: true});
@@ -32,6 +33,7 @@ app.use(express.json());
 
 app.use('/users', userRoutes);
 app.use('/matches', matchRoutes);
+app.use('/ranking', rankingRoutes);
 app.use('/gamesaves', gamesaveRoutes);
 
 if (require.main === module) {

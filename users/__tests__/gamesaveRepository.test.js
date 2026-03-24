@@ -11,7 +11,7 @@ describe('gamesaveRepository', () => {
   });
 
   it('createGameSave inserts and returns first row', async () => {
-    const fakeRow = { id: '1', move_number: 1 };
+    const fakeRow = { id: '1', move_number: 1, playerLastMove: '1,2,0', botLastMove: null, resultingBoardState: '{"size":4,"turn":"R","players":["B","R"],"layout":"B/.B/RB./B..R"}'};
     const data = {
       matchId: 'm1',
       moveNumber: 1,
