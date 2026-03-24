@@ -1,0 +1,116 @@
+/* HistoryPage.css */
+
+.history-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.icon-btn-back {
+    position: absolute;
+    left: 0;
+    background: none;
+    border: none;
+    color: var(--game-accent);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icon-btn-back:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 8px var(--game-accent));
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 50px;
+}
+
+/* Match Cards */
+.history-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px 30px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 25px;
+    transition: 0.3s ease;
+}
+
+/* Neon & Color States for Cards */
+.history-card.win {
+    border-color: var(--game-accent); /* Blue or Orange */
+}
+
+.history-card.lose {
+    border-color: var(--game-red); /* Red */
+}
+
+.neon-mode .history-card.win {
+    box-shadow: 0 0 15px var(--game-accent);
+}
+
+.history-card:hover {
+    transform: translateX(10px);
+    background: rgba(30, 41, 59, 0.9);
+}
+
+/* Details and Text */
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e1;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+}
+
+.card-stats {
+    text-align: right;
+}
+
+.stat-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: white;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.result-text {
+    font-family: 'Cubic', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+.result-text.win { color: var(--game-accent); }
+.result-text.lose { color: var(--game-red); }
+
+/* Color Blind Adjustments for History */
+.color-blind .icon-win { color: #f59e0b; } /* Orange */
+.color-blind .icon-lose { color: #ffffff; } /* White */
+.color-blind .result-text.lose { color: #ffffff; }

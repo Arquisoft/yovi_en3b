@@ -152,24 +152,26 @@ body {
   z-index: 1010;
 }
 
-.modal-title {
+.modal-title, .modal-content h2 {
   font-family: 'Cubic', sans-serif !important;
-  color: var(--game-blue);
+  color: var(--game-accent) !important; 
   font-size: 2.5rem;
   margin-bottom: 30px;
   text-align: center;
+  text-shadow: var(--text-shadow); 
+  text-transform: uppercase;
 }
 
 /* Visibilidad de Textos */
 .profile-info p, .how-to-step p, .unique-id-text {
-  color: #cbd5e1 !important; 
+  color: #f9fcff !important; 
   font-family: 'Orbitron', sans-serif !important;
   font-size: 1rem;
   line-height: 1.5;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-/* Busca .modal-text en tu App.css y déjalo así */
+
 .modal-text {
   color: #ffffff !important; /* Blanco puro */
   font-family: 'Orbitron', sans-serif !important; /* Fuente Orbitron */
@@ -196,4 +198,119 @@ body {
   background: var(--game-blue-dark) !important;
   border-color: white !important;
   box-shadow: 0 0 15px var(--game-blue);
+}
+
+/* --- Seccion de Ajustes en App.css --- */
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espacio entre cada ajuste */
+  margin-top: 10px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between; /* Texto a la izquierda, control a la derecha */
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Línea divisoria sutil */
+}
+
+.setting-item:last-child {
+  border-bottom: none; /* Quitamos la línea al último elemento */
+}
+
+/* Estilo para el slider de brillo */
+.settings-slider {
+  flex: 1;
+  max-width: 150px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  accent-color: var(--game-blue); /* Color del círculo del slider */
+  cursor: pointer;
+}
+
+/* Ajuste para que los botones ON/OFF no ocupen todo el ancho */
+.setting-item .opt-btn {
+  width: auto !important;
+  min-width: 80px;
+  padding: 8px 15px !important;
+  font-size: 0.8rem !important;
+  margin: 0;
+}
+
+/* App.css - Base Global Actualizado */
+
+:root {
+  --bg-dark: #0f172a;
+  --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
+  --game-accent: #60a5fa; /* Azul por defecto */
+  --game-accent-dark: #2563eb;
+  --game-red: #ef4444;
+  --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+}
+
+/* Modo daltónico global */
+.App.color-blind, .modal-content.color-blind {
+  --game-accent: #f59e0b; /* Naranja */
+  --game-accent-dark: #d97706;
+  --text-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+}
+
+.color-blind {
+  --game-accent: #f59e0b; /* Orange */
+  --game-accent-dark: #d97706;
+}
+
+.neon-mode {
+  --text-shadow: 0 0 15px var(--game-accent), 0 0 30px var(--game-accent);
+}
+
+/* Aplicamos la variable de acento a los elementos clave */
+.icon-btn {
+  color: var(--game-accent); /* Dinámico */
+}
+
+.title-game {
+  font-family: 'Cubic', sans-serif !important;
+  font-size: 8rem;
+  text-align: center;
+  margin: 30px 0 100px 0;
+  color: var(--game-accent);
+  text-shadow: var(--text-shadow);
+}
+
+.boton-cerrar-fijo {
+  color: var(--game-accent) !important; 
+  text-shadow: var(--text-shadow);
+}
+
+/* Estilos de botones */
+.btn-blue {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  border: none;
+}
+
+.btn-orange {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
+  border: none !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
+.opt-btn.active {
+  background: var(--game-accent-dark) !important;
+  border-color: white !important;
+  box-shadow: 0 0 15px var(--game-accent);
+}
+
+.icon-btn:hover {
+  color: #ffffff !important;
+  filter: drop-shadow(0 0 8px var(--game-accent));
+}
+
+/* Slider de ajustes dinámico */
+.settings-slider {
+  accent-color: var(--game-accent);
 }

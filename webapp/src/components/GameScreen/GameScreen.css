@@ -432,3 +432,77 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
+
+.hex-cell {
+    transition: fill 0.3s ease, filter 0.3s ease;
+}
+
+.p1-selected {
+    filter: drop-shadow(0 0 8px var(--glow-color, #60a5fa));
+}
+
+/* --- Variables dinámicas para el juego --- */
+.game-layout {
+    --player1-color: #60a5fa; /* Azul */
+    --player2-color: #f87171; /* Rojo */
+}
+
+/* Colores para modo daltónico */
+.game-layout.color-blind {
+    --player1-color: #f59e0b; /* Naranja */
+    --player2-color: #ffffff; /* Blanco */
+}
+
+.hex-cell.p1-selected {
+    fill: var(--player1-color) !important;
+    stroke: #ffffff !important;
+    stroke-width: 0.4px;
+    filter: drop-shadow(0 0 0px var(--player1-color)); /* El brillo ahora coincide con la ficha */
+    transition: all 0.3s ease;
+}
+
+/* Jugador 2 (Rojo por defecto, Blanco en modo daltónico) */
+.hex-cell.p2-selected {
+    fill: var(--player2-color) !important;
+    stroke: #ffffff !important;
+    stroke-width: 0.4px;
+    filter: drop-shadow(0 0 0px var(--player2-color)); /* Brillo dinámico */
+    transition: all 0.3s ease;
+}
+
+/* --- Ajuste para la selección pendiente --- */
+.hex-cell.pending-selection {
+    fill: var(--player1-color) !important;
+    opacity: 0.5; /* Se ve translúcido antes de confirmar */
+    stroke: #ffffff !important;
+    stroke-width: 0.5px;
+}
+
+/* --- Botón de Confirmar Dinámico --- */
+.btn-confirm-action {
+    background: var(--confirm-btn-color) !important;
+    border: none !important;
+    font-weight: bold;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.btn-confirm-action:hover:not(:disabled) {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+/* --- Timer y Header --- */
+.timer-value {
+    color: var(--player1-color); /* El timer brilla como el P1 */
+}
+
+.game-timer-wrapper {
+    border: 2px solid var(--player1-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Avatar del bot en el chat */
+.bot-avatar-circle {
+    border: 2px solid var(--player1-color);
+    color: var(--player1-color);
+}
