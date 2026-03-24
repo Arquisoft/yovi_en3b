@@ -1,4 +1,4 @@
-const toRankingResponseDto = (user) => {
+const toRankingResponseDto = (ranking) => {
   return {
     username: user.username,
     email: user.email,
@@ -18,6 +18,6 @@ const toUserInputDto = (user) => {
 };
 
 module.exports = { 
-  toUserResponseDto,
+  toRankingResponseDto,
   toUserInputDto 
 };
