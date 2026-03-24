@@ -1,6 +1,8 @@
+// UBICACIÓN: webapp/src/components/LanguageDialog/LanguageDialog.tsx
 import React from 'react';
 import { useI18n } from '../../i18n/useTranslation';
-import '../../App.css';
+import { useSettings } from '../../context/SettingsContext'; // Importamos los ajustes
+import './LanguageDialog.css';
 
 interface LanguageDialogProps {
   open: boolean;
@@ -9,6 +11,7 @@ interface LanguageDialogProps {
 
 export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose }) => {
   const { t, language, setLanguage } = useI18n();
+  const { colorBlindMode } = useSettings(); // Accedemos al estado daltónico
 
   if (!open) return null;
 
@@ -18,19 +21,22 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
-        <h2 className="modal-title">{t.messages.selectLanguage}</h2>
-        <div className="modal-grid">
+    <div className="language-overlay" onClick={onClose}>
+      <div 
+        className={`language-modal ${colorBlindMode ? 'color-blind' : ''}`} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close-x-lang" onClick={onClose}>&times;</button>
+        <h2 className="language-title">{t.messages.selectLanguage}</h2>
+        <div className="language-options">
           <button
-            className={`opt-btn ${language === 'es' ? 'active' : ''}`}
+            className={`btn-lang-white ${language === 'es' ? 'active' : ''}`}
             onClick={() => handleLanguageChange('es')}
           >
             {t.buttons.spanish}
           </button>
           <button
-            className={`opt-btn ${language === 'en' ? 'active' : ''}`}
+            className={`btn-lang-white ${language === 'en' ? 'active' : ''}`}
             onClick={() => handleLanguageChange('en')}
           >
             {t.buttons.english}
