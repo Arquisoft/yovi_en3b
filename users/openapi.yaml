@@ -418,7 +418,7 @@ paths:
                   error:
                     type: string
                     example: "Match ID is required."
-  /:matchId:
+  /:matchId/latest:
     post:
       tags: [GameSave]
       summary: Returns all the movements saved of a match
