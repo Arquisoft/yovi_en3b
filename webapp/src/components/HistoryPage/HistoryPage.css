@@ -2,89 +2,103 @@
 
 .history-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 40px 20px;
+    /* Bajamos el título del borde superior */
+    padding: 100px 20px 40px 20px; 
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
 .history-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    margin-bottom: 50px;
+    /* Título a la izquierda, Flecha a la derecha */
+    justify-content: space-between; 
+    margin-bottom: 60px;
+    width: 100%;
+}
+
+.history-header .title-game {
+    margin: 0;
+    font-size: 4rem; /* Ajustado para que no ocupe toda la pantalla */
+    text-align: left;
 }
 
 .icon-btn-back {
-    position: absolute;
-    left: 0;
     background: none;
     border: none;
     color: var(--game-accent);
     cursor: pointer;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    padding: 10px;
 }
 
 .icon-btn-back:hover {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 8px var(--game-accent));
+    transform: scale(1.2) rotate(-10deg); /* Pequeño giro orgánico al hacer hover */
+    filter: drop-shadow(0 0 10px var(--game-accent));
+    color: #ffffff;
 }
 
 .history-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding-bottom: 50px;
 }
 
 /* Match Cards */
 .history-card {
     background: rgba(15, 23, 42, 0.8);
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 20px 30px;
+    border-radius: 25px;
+    padding: 25px 35px;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 25px;
-    transition: 0.3s ease;
-}
-
-/* Neon & Color States for Cards */
-.history-card.win {
-    border-color: var(--game-accent); /* Blue or Orange */
-}
-
-.history-card.lose {
-    border-color: var(--game-red); /* Red */
-}
-
-.neon-mode .history-card.win {
-    box-shadow: 0 0 15px var(--game-accent);
+    gap: 30px;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .history-card:hover {
-    transform: translateX(10px);
+    transform: translateX(15px);
     background: rgba(30, 41, 59, 0.9);
 }
 
-/* Details and Text */
+.history-card.win {
+    border-color: var(--game-accent);
+}
+
+.history-card.lose {
+    border-color: var(--game-red);
+}
+
+/* Neon Glow Effect */
+.neon-mode .history-card.win {
+    box-shadow: 0 0 20px var(--game-accent);
+}
+
+.neon-mode .history-card.lose {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Content inside cards */
 .card-details {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .detail-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #cbd5e1;
+    gap: 12px;
+    color: #e2e8f0;
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .card-stats {
@@ -92,25 +106,25 @@
 }
 
 .stat-badge {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 4px 12px;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 15px;
+    border-radius: 12px;
     font-size: 0.8rem;
-    color: white;
-    margin-bottom: 8px;
+    color: #94a3b8;
+    margin-bottom: 10px;
     display: inline-block;
 }
 
 .result-text {
     font-family: 'Cubic', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     letter-spacing: 2px;
 }
 
 .result-text.win { color: var(--game-accent); }
 .result-text.lose { color: var(--game-red); }
 
-/* Color Blind Adjustments for History */
-.color-blind .icon-win { color: #f59e0b; } /* Orange */
-.color-blind .icon-lose { color: #ffffff; } /* White */
+/* Color Blind Mode Adjustments */
+.color-blind .icon-win { color: var(--game-accent); } /* Orange in colorblind */
+.color-blind .icon-lose { color: #ffffff; }
 .color-blind .result-text.lose { color: #ffffff; }

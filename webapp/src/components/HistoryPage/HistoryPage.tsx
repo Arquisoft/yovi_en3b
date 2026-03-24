@@ -1,8 +1,8 @@
 import React from 'react'; 
 import { useNavigate } from 'react-router-dom'; 
-import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu } from 'lucide-react'; 
-import { useSettings } from '../../context/SettingsContext'; 
-import { useI18n } from '../../i18n/useTranslation'; 
+import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu } from 'lucide-react'; // Added icons
+import { useSettings } from '../../context/SettingsContext'; // Settings hook
+import { useI18n } from '../../i18n/useTranslation'; // Translation hook
 import './HistoryPage.css'; 
 
 const HistoryPage: React.FC = () => {
@@ -10,7 +10,7 @@ const HistoryPage: React.FC = () => {
     const { t } = useI18n(); 
     const { colorBlindMode, neonMode } = useSettings(); 
 
-    // TEST DATA - In a real app, this would come from an API or local storage
+    // MOCK DATA for visual testing
     const matches = [
         { id: 1, date: '2024-03-20', result: 'win', size: '5x5', opponent: 'Bot Chip' },
         { id: 2, date: '2024-03-19', result: 'lose', size: '7x7', opponent: 'Bot Robot' },
@@ -20,10 +20,13 @@ const HistoryPage: React.FC = () => {
     return (
         <div className={`history-container ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`}>
             <header className="history-header">
+                {/* Title first for left alignment */}
+                <h1 className="title-game">{t.buttons.history}</h1>
+                
+                {/* Back button second for right alignment */}
                 <button className="icon-btn-back" onClick={() => navigate('/menu')}>
-                    <ArrowLeft size={30} /> 
+                    <ArrowLeft size={35} /> 
                 </button>
-                <h1 className="title-game">{t.buttons.history || "HISTORY"}</h1>
             </header>
 
             <main className="history-list">
@@ -41,7 +44,7 @@ const HistoryPage: React.FC = () => {
                                 <Calendar size={16} /> <span>{match.date}</span>
                             </div>
                             <div className="detail-row">
-                                <Cpu size={16} /> <span>VS {match.opponent}</span>
+                                <Cpu size={16} /> <span>{t.labels.vs} {match.opponent}</span>
                             </div>
                         </div>
 
@@ -50,7 +53,7 @@ const HistoryPage: React.FC = () => {
                                 <Hash size={14} /> {match.size}
                             </div>
                             <div className={`result-text ${match.result}`}>
-                                {match.result === 'win' ? 'VICTORY' : 'DEFEAT'}
+                                {match.result === 'win' ? t.buttons.victory : t.buttons.defeat}
                             </div>
                         </div>
                     </div>
