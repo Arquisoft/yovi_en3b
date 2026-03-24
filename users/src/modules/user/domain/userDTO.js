@@ -1,4 +1,4 @@
-const toRankingResponseDto = (user) => {
+const toUserResponseDto = (user) => {
   return {
     username: user.username,
     email: user.email,
