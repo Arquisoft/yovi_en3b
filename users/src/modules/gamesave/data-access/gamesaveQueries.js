@@ -1,7 +1,7 @@
 // File to write the queries required for the game saves management
 module.exports = {
   createGameSave: `
-    INSERT INTO game_saves (match_id, move_number, player_id, move_coordinates, resulting_board_state)
+    INSERT INTO game_saves (match_id, move_number, player_last_move, bot_last_move, resulting_board_state)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *;
   `,
