@@ -1,5 +1,5 @@
 const db = require('../../../db/db.js');
-const queries = require('./gameSavesQueries.js');
+const queries = require('./gamesaveQueries.js');
 
 const createGameSave = async (gameSaveData) => {
     const values = [
