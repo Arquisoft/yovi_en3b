@@ -37,6 +37,8 @@ export const translations = {
       on: 'ACTIVADO',
       off: 'DESACTIVADO', 
       history: 'HISTORIAL',
+      victory: 'VICTORIA',
+      defeat: 'DERROTA',
     },
     labels: {
       displayName: 'NOMBRE A MOSTRAR',
@@ -46,7 +48,7 @@ export const translations = {
       ranking: 'RANKING',
       chooseAvatar: 'ELIGE AVATAR',
       currentLevel: 'NIVEL ACTUAL',
-      vs: 'vs.',
+      vs: 'contra',
       player1: 'JUGADOR 1',
       player2: 'JUGADOR 2',
       boardGoesHere: 'El tablero va aquí',
@@ -148,6 +150,8 @@ export const translations = {
       on: 'ON', 
       off: 'OFF', 
       history: 'HISTORY',
+      victory: 'VICTORY',
+      defeat: 'DEFEAT',
     },
     labels: {
       displayName: 'DISPLAY NAME',
