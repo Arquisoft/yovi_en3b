@@ -1,5 +1,5 @@
 const userService = require('../domain/userService');
-const userResponseDto = require('../domain/userResponseDTO');
+const userResponseDto = require('../domain/userDTO');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 

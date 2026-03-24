@@ -236,7 +236,7 @@ paths:
           description: User not found
         "500":
           description: Database server error
-  /creatematch:
+  /create:
     post:
       tags: [Matches]
       summary: Creates a new entry in the Match table
