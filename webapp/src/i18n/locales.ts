@@ -65,7 +65,7 @@ export const translations = {
       signup: 'REGISTRO',
       dontHaveAccount: '¿NO TIENES CUENTA?',
       enterName: 'Introduce tu nombre',
-      easy: 'FÁCIL', 
+      easy: 'FÁCIL',
       medium: 'MEDIO',
       hard: 'DIFÍCIL',
       typeMessage: 'Escribe un mensaje...',
@@ -90,6 +90,9 @@ export const translations = {
       winDetail: 'Has demostrado ser un gran estratega. ¡Sigue así para mantener tu racha ganadora!',
       loseDetail: 'No te desanimes, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
       logoutConfirmation: '¿Estás seguro de que quieres cerrar sesión?',
+      passwordChangedSuccess: '¡Contraseña actualizada con éxito!',
+      passwordsDoNotMatch: 'Las nuevas contraseñas no coinciden',
+      errorChangingPassword: 'Error al cambiar la contraseña. Verifica la actual.',
     },
     validation: {
       chars8: '8+ caracteres',
@@ -174,8 +177,9 @@ export const translations = {
       enterName: 'Enter your name',
       easy: 'EASY',
       medium: 'MEDIUM',
-      hard: 'HARD', 
+      hard: 'HARD',
       typeMessage: 'Type a message...',
+
     },
     messages: {
       loading: 'LOADING...',
@@ -197,6 +201,9 @@ export const translations = {
       winDetail: 'You have proven to be a great strategist. Keep it up to maintain your winning streak!',
       loseDetail: 'Don\'t be discouraged, every game is an opportunity to learn and improve. Try again!',
       logoutConfirmation: 'Are you sure you want to log out?',
+      passwordChangedSuccess: 'Password updated successfully!',
+      passwordsDoNotMatch: 'New passwords do not match',
+      errorChangingPassword: 'Error changing password. Check the current one.',
     },
     validation: {
       chars8: '8+ chars',

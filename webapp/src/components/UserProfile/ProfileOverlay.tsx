@@ -5,23 +5,38 @@ import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "./useUserProfile";
 import { useI18n } from "../../i18n/useTranslation"; // Hook de traducción
 import "./ProfileOverlay.css";
+import { changePassword } from "./userProfile.api";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
 
 const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
+
 
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
   const { t } = useI18n(); // Acceso a traducciones
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   const [showPassFields, setShowPassFields] = useState(false);
   const [passData, setPassData] = useState({ current: '', next: '', confirm: '' });
 
   const { profile, ranking, loading, error, draftName, setDraftName, draftAvatarId, setDraftAvatarId, dirty, save, resetDraft } = useUserProfile(open);
 
   const isNameEmpty = draftName.trim() === "";
+
+  const passValidations = {
+    length: passData.next.length >= 8,
+    hasUpper: /[A-Z]/.test(passData.next),
+    hasNumber: /[0-9]/.test(passData.next),
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(passData.next)
+  };
+
+  const canConfirmPassword =
+    passData.current &&
+    passData.next &&
+    passData.confirm === passData.next &&
+    Object.values(passValidations).every(Boolean);
 
   useEffect(() => {
     if (!open) {
@@ -36,10 +51,25 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
     }
   };
 
-  const handlePasswordChange = () => {
-    console.log("Changing password to:", passData.next);
-    setShowPassFields(false);
-    setPassData({ current: '', next: '', confirm: '' });
+  const handlePasswordChange = async () => {
+    // 1. Validating the data
+    if (passData.next !== passData.confirm) {
+      alert(t.messages.passwordsDoNotMatch);
+      return;
+    }
+
+    try {
+      // 2. API call
+      await changePassword(passData.current, passData.next);
+
+      // 3. If everything went well
+      alert(t.messages.passwordChangedSuccess);
+      setShowPassFields(false);
+      setPassData({ current: '', next: '', confirm: '' });
+    } catch (err: any) {
+      // 4. If there is an error
+      alert(t.messages.errorChangingPassword);
+    }
   };
 
   if (!open) return null;
@@ -121,29 +151,48 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                   </button>
                 ) : (
                   <div className="password-edit-box">
-                    <input 
-                      type="password" 
-                      placeholder={t.labels.currentPassword} 
+                    <input
+                      type="password"
+                      placeholder={t.labels.currentPassword}
                       className="orbitron-text small-input"
-                      onChange={(e) => setPassData({...passData, current: e.target.value})}
+                      onChange={(e) => setPassData({ ...passData, current: e.target.value })}
                     />
-                    <input 
-                      type="password" 
-                      placeholder={t.labels.newPassword} 
+                    <input
+                      type="password"
+                      placeholder={t.labels.newPassword}
                       className="orbitron-text small-input"
-                      onChange={(e) => setPassData({...passData, next: e.target.value})}
+                      onChange={(e) => setPassData({ ...passData, next: e.target.value })}
                     />
-                    <input 
-                      type="password" 
-                      placeholder={t.labels.confirmNew} 
+                    <input
+                      type="password"
+                      placeholder={t.labels.confirmNew}
                       className="orbitron-text small-input"
-                      onChange={(e) => setPassData({...passData, confirm: e.target.value})}
+                      onChange={(e) => setPassData({ ...passData, confirm: e.target.value })}
                     />
+                    <div className="validation-grid" style={{ marginTop: '10px' }}>
+
+                      <div className={`val-item ${passValidations.length ? 'valid' : ''}`}>
+                        {passValidations.length ? <Check size={12} /> : <X size={12} />} {t.validation.chars8}
+                      </div>
+
+                      <div className={`val-item ${passValidations.hasUpper ? 'valid' : ''}`}>
+                        {passValidations.hasUpper ? <Check size={12} /> : <X size={12} />} {t.validation.uppercase}
+                      </div>
+
+                      <div className={`val-item ${passValidations.hasNumber ? 'valid' : ''}`}>
+                        {passValidations.hasNumber ? <Check size={12} /> : <X size={12} />} {t.validation.number}
+                      </div>
+
+                      <div className={`val-item ${passValidations.hasSpecial ? 'valid' : ''}`}>
+                        {passValidations.hasSpecial ? <Check size={12} /> : <X size={12} />} {t.validation.special}
+                      </div>
+
+                    </div>
                     <div className="pass-actions">
                       <button className="cancel-pass" onClick={() => setShowPassFields(false)}>{t.buttons.cancel}</button>
-                      <button 
-                        className="confirm-pass" 
-                        disabled={!passData.next || passData.next !== passData.confirm}
+                      <button
+                        className="confirm-pass"
+                        disabled={!canConfirmPassword}
                         onClick={handlePasswordChange}
                       >{t.buttons.confirm}</button>
                     </div>
