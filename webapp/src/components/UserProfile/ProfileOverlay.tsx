@@ -6,6 +6,7 @@ import { useUserProfile } from "./useUserProfile";
 import { useI18n } from "../../i18n/useTranslation"; // Hook de traducción
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
+import { toast, Toaster } from "sonner";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
 
@@ -54,7 +55,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   const handlePasswordChange = async () => {
     // 1. Validating the data
     if (passData.next !== passData.confirm) {
-      alert(t.messages.passwordsDoNotMatch);
+      toast.error(t.messages.passwordsDoNotMatch);
       return;
     }
 
@@ -63,12 +64,12 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
       await changePassword(passData.current, passData.next);
 
       // 3. If everything went well
-      alert(t.messages.passwordChangedSuccess);
+      toast.success(t.messages.passwordChangedSuccess);
       setShowPassFields(false);
       setPassData({ current: '', next: '', confirm: '' });
     } catch (err: any) {
       // 4. If there is an error
-      alert(t.messages.errorChangingPassword);
+      toast.error(t.messages.errorChangingPassword);
     }
   };
 
@@ -76,6 +77,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
   return (
     <div className="modal-overlay" onClick={isEditing ? undefined : onClose}>
+      <Toaster position="top-right" richColors closeButton />
       <div className="modal-content profile-modal" onClick={(e) => e.stopPropagation()}>
 
         <button
