@@ -11,8 +11,10 @@ pub mod random;
 pub mod ybot;
 pub mod ybot_registry;
 pub mod easy;
+pub mod medium;
 
 pub use random::*;
 pub use ybot::*;
 pub use ybot_registry::*;
 pub use easy::*;
+pub use medium::*;

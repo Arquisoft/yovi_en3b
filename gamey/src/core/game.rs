@@ -257,6 +257,11 @@ impl GameY {
         self.board_size
     }
 
+    /// Returns the player who occupies a specific coordinate, or None if it's empty (for bots).
+    pub fn player_at(&self, coords: &Coordinates) -> Option<PlayerId> {
+        self.board_map.get(coords).map(|(_, player)| *player)
+    }
+
     /// Returns the neighboring coordinates for a given cell.
     fn get_neighbors(&self, coords: &Coordinates) -> Vec<Coordinates> {
         let mut neighbors = Vec::new();
