@@ -1,9 +1,9 @@
-// UBICACIÓN: webapp/src/components/UserProfile/ProfileOverlay.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { Edit2, Check, Lock, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Navigation hook
 import { useUserProfile } from "./useUserProfile";
-import { useI18n } from "../../i18n/useTranslation"; // Hook de traducción
+import { useI18n } from "../../i18n/useTranslation";
+import { useSettings } from "../../context/SettingsContext"; // Settings context
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
 import { toast, Toaster } from "sonner";
@@ -14,7 +14,8 @@ const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
 
 
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
-  const { t } = useI18n(); // Acceso a traducciones
+  const { t } = useI18n();
+  const { colorBlindMode, neonMode } = useSettings(); // Added neonMode for consistency
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,6 +26,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   const { profile, ranking, loading, error, draftName, setDraftName, draftAvatarId, setDraftAvatarId, dirty, save, resetDraft } = useUserProfile(open);
 
   const isNameEmpty = draftName.trim() === "";
+  const accentColor = colorBlindMode ? "#f59e0b" : "#60a5fa"; // Dynamic color for inline icons
 
   const passValidations = {
     length: passData.next.length >= 8,
@@ -47,9 +49,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   }, [open]);
 
   const handleConfirmName = () => {
-    if (!isNameEmpty) {
-      setIsEditing(false);
-    }
+    if (!isNameEmpty) setIsEditing(false);
   };
 
   const handlePasswordChange = async () => {
@@ -78,7 +78,10 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   return (
     <div className="modal-overlay" onClick={isEditing ? undefined : onClose}>
       <Toaster position="top-right" richColors closeButton />
-      <div className="modal-content profile-modal" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className={`modal-content profile-modal ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} 
+        onClick={(e) => e.stopPropagation()}
+      >
 
         <button
           className="boton-cerrar-fijo"
@@ -86,7 +89,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
           disabled={isEditing}
           style={{ opacity: isEditing ? 0.5 : 1 }}
         >
-          <X size={35} />
+          <X size={35} /> {/* Close icon */}
         </button>
 
         <h2 className="modal-title">{t.labels.userProfile}</h2>
@@ -120,10 +123,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                     }}
                   />
                   {!isEditing ? (
-                    <button
-                      className="edit-btn"
-                      onClick={() => setIsEditing(true)}
-                    >
+                    <button className="edit-btn" onClick={() => setIsEditing(true)}>
                       <Edit2 size={18} color="white" />
                     </button>
                   ) : (
@@ -133,7 +133,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                       disabled={isNameEmpty}
                       title={isNameEmpty ? t.messages.usernameMustBeCompleted : t.buttons.confirm}
                     >
-                      <Check size={18} color={isNameEmpty ? "gray" : "#60a5fa"} />
+                      <Check size={18} color={isNameEmpty ? "gray" : accentColor} />
                     </button>
                   )}
                 </div>
@@ -220,7 +220,6 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                         className={`avatar-opt ${draftAvatarId === id ? "active" : ""}`}
                         onClick={() => setDraftAvatarId(id)}
                         disabled={isEditing}
-                        tabIndex={isEditing ? -1 : 0}
                       >
                         {emoji}
                       </button>
@@ -232,21 +231,15 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
             <div className="profile-actions-section" style={{ position: "relative" }}>
               {isEditing && (
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    zIndex: 10,
-                    cursor: "not-allowed",
-                    borderRadius: "8px",
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                  }}
-                  title={t.messages.confirmTheDisplayNameFirst}
-                />
+                <div className="editing-lock-overlay" title={t.messages.confirmTheDisplayNameFirst} />
               )}
+              {/* This button now redirects correctly to /history */}
               <button
-                className="main-button btn-blue history-btn orbitron-text"
-                onClick={() => navigate("/history")}
+                className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} history-btn orbitron-text`}
+                onClick={() => {
+                  onClose(); // Close the overlay first
+                  navigate("/history"); // Then navigate to history
+                }}
                 disabled={isEditing}
               >
                 {t.buttons.accessGameHistory}
@@ -254,7 +247,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
               <div className="btn-group">
                 <button className="main-button orbitron-text" onClick={resetDraft} disabled={!dirty}>{t.buttons.reset}</button>
-                <button className="main-button btn-blue orbitron-text" onClick={save} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
+                <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} orbitron-text`} onClick={save} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
               </div>
             </div>
           </>

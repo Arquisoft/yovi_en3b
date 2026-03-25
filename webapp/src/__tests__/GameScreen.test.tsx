@@ -1,8 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GameScreen from '../components/GameScreen/GameScreen';
+import { BrowserRouter } from 'react-router-dom';
+import { SettingsProvider } from '../context/SettingsContext';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+        <BrowserRouter>
+            <SettingsProvider>
+                {ui}
+            </SettingsProvider>
+        </BrowserRouter>
+    );
+};
 
 // ============================== MOCKS ==============================
 
@@ -18,11 +30,14 @@ const mockLocation = { state: { size: 3 } };
 // Mock react-router-dom so that when GameScreen calls 
 // useNavigate() it receives mockNavigate
 // useLocation() it receives mockLocation
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => mockNavigate,
-    useLocation: () => mockLocation,
-}));
-
+vi.mock('react-router-dom', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-router-dom')>();
+    return {
+        ...actual, 
+        useNavigate: () => mockNavigate,
+        useLocation: () => mockLocation,
+    };
+});
 // Mock the translation hook to return fixed english texts.
 // Without this, the hook would throw an error because there
 // is no I18n provider in tests.
@@ -129,7 +144,7 @@ describe('GameScreen', () => {
     // TEST 1: Check that the header shows both players names and the
     // "VS" text
     test('renders player cards and VS text', () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         expect(screen.getByText('Player 1')).toBeInTheDocument();
         expect(screen.getByText('Player 2')).toBeInTheDocument();
     });
@@ -140,7 +155,7 @@ describe('GameScreen', () => {
     // - Confirm
     // - Exit
     test('renders footer action buttons', () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /exit/i })).toBeInTheDocument();
@@ -149,7 +164,7 @@ describe('GameScreen', () => {
     // TEST 3: The "confirm" button is disabled when there is 
     // no cell (hexagon) selected
     test('confirm button is disabled when no cell is selected', () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled();
     });
 
@@ -157,7 +172,7 @@ describe('GameScreen', () => {
     // TEST 4:  When clicking a cell (hexagon), the "confirm" 
     // button is enabled.
     test('confirm button enables after clicking a hex cell', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         const cells = screen.getAllByTestId('hex-cell');
@@ -169,7 +184,7 @@ describe('GameScreen', () => {
     // TEST 5: After pressing "confirm", the "confirm" button 
     // should be disabled.
     test('confirm button disables again after confirming a move', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getAllByTestId('hex-cell')[0]);
@@ -180,7 +195,7 @@ describe('GameScreen', () => {
 
     // TEST 6: After confirming, the turn should swap to player2
     test('turn switches from Player 1 to Player 2 after confirming', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
@@ -194,7 +209,7 @@ describe('GameScreen', () => {
     // TEST 7: The "Exit" button should open the "Exit" confirmation
     // window
     test('exit button opens confirmation window', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByRole('button', { name: /exit/i }));
@@ -205,7 +220,7 @@ describe('GameScreen', () => {
     // TEST 8: The "Back to Game" button should close the "Exit" 
     // confirmation window and go back to the game screen.
     test('back to game button closes the exit window', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByRole('button', { name: /exit/i }));
@@ -217,7 +232,7 @@ describe('GameScreen', () => {
     // TEST 9: Confirming the "Exit" confirmation window should call 
     // "navigate" with "/menu"
     test('confirming exit navigates to /menu', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByRole('button', { name: /exit/i }));
@@ -229,7 +244,7 @@ describe('GameScreen', () => {
     // TEST 10: The chat should be visible by default
     // (For now, isChatOpen is set to true, but can be changed)
     test('chat is visible by default', () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         expect(screen.getByText('Online')).toBeInTheDocument();
     });
 
@@ -238,7 +253,7 @@ describe('GameScreen', () => {
     // - Opens the chat if it is closed
     // - Closes the chat if it is open (like the "X" button)
     test('chat toggles with the message icon button', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByTitle('Chat'));
@@ -252,7 +267,7 @@ describe('GameScreen', () => {
     // TEST 13: The "Language" button should open the "Language" window
     // to change the language.
     test('language window opens when language button is clicked', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByTitle('Language'));
@@ -262,13 +277,13 @@ describe('GameScreen', () => {
 
     // TEST 19: Undo button should be present
     test('undo button is present in footer', () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
     });
 
     // TEST 20: Multiple cells should be selectable one after another
     test('can select different cells sequentially', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup({ delay: null });
         const cells = screen.getAllByTestId('hex-cell');
 
@@ -293,7 +308,7 @@ describe('GameScreen', () => {
 
     // TEST 21: Player should alternate after each move
     test('players alternate turns correctly', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         // Initial state - Player 1 active
@@ -312,7 +327,7 @@ describe('GameScreen', () => {
 
     // TEST 24: Language dialog should close when language is selected
     test('language dialog closes when selected', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getByTitle('Language'));
@@ -322,7 +337,7 @@ describe('GameScreen', () => {
 
     // TEST 27: Board state should persist after moves
     test('board maintains state after multiple moves', async () => {
-        render(<GameScreen />);
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getAllByTestId('hex-cell')[0]);
@@ -335,10 +350,10 @@ describe('GameScreen', () => {
     });
 
     test('allows user to type and send a message in chat', async () => {
-    render(<GameScreen />);
+    renderWithProviders(<GameScreen />);
     const user = userEvent.setup();
 
-    const input = screen.getByPlaceholderText(/Escribe.../i);
+    const input = screen.getByRole('textbox');
     const sendButton = screen.getByTestId('chat-send-button');
     await user.click(sendButton);
 
@@ -352,7 +367,7 @@ describe('GameScreen', () => {
 });
 
 test('bot makes a move automatically after player confirmation', async () => {
-    render(<GameScreen />);
+    renderWithProviders(<GameScreen />);
     const user = userEvent.setup();
 
     // 1. Player 1 plays

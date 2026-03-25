@@ -1,7 +1,8 @@
 // UBICACIÓN: webapp/src/components/HowToPlay/HowToPlay.tsx
 import React from 'react';
 import { MousePointer2, Target, Trophy, Youtube } from 'lucide-react';
-import { useI18n } from '../../i18n/useTranslation'; // Importamos el hook
+import { useI18n } from '../../i18n/useTranslation'; 
+import { useSettings } from '../../context/SettingsContext'; // Importamos el hook de ajustes
 import './HowToPlay.css';
 
 interface HowToPlayProps {
@@ -9,11 +10,13 @@ interface HowToPlayProps {
 }
 
 const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
-  const { t } = useI18n(); // Accedemos a las traducciones
+  const { t } = useI18n(); 
+  const { colorBlindMode } = useSettings(); // Accedemos al modo daltónico
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content how-to-play-modal">
+      {/* Añadimos la clase color-blind condicionalmente */}
+      <div className={`modal-content how-to-play-modal ${colorBlindMode ? 'color-blind' : ''}`}>
         <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
         
         <h2 className="modal-title">{t.messages.howToPlay}</h2>
@@ -21,22 +24,21 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         <div className="board-container">
           <div className="triangle-frame">
             <div className="balls-row">
-              <div className="ball red"></div>
+              <div className="ball p2-color"></div> {/* Usamos clases genéricas */}
             </div>
             <div className="balls-row">
-              <div className="ball blue"></div>
-              <div className="ball red"></div>
+              <div className="ball p1-color"></div>
+              <div className="ball p2-color"></div>
             </div>
             <div className="balls-row">
-              <div className="ball red"></div>
-              <div className="ball blue"></div>
-              <div className="ball red"></div>
+              <div className="ball p2-color"></div>
+              <div className="ball p1-color"></div>
+              <div className="ball p2-color"></div>
             </div>
           </div>
         </div>
 
         <div className="instructions-list">
-          {/* Paso 1 */}
           <div className="step-card">
             <div className="step-number">1</div>
             <div className="step-icon"><MousePointer2 size={20} /></div>
@@ -46,7 +48,6 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Paso 2 */}
           <div className="step-card">
             <div className="step-number">2</div>
             <div className="step-icon"><Target size={20} /></div>
@@ -56,7 +57,6 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Paso 3 */}
           <div className="step-card">
             <div className="step-number">3</div>
             <div className="step-icon"><Trophy size={20} /></div>

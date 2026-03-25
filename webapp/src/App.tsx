@@ -1,36 +1,39 @@
 import './App.css'; // Importing global styles
-import { I18nProvider } from './i18n/Provider'; // Envolvente de idiomas
-import { Routes, Route, Navigate } from 'react-router-dom'; // Componentes de rutas
-import MainMenu from './components/MainMenu'; // Menú principal
-import GameScreen from './components/GameScreen/GameScreen'; // Pantalla de juego
-import RegisterForm from './components/Login/RegisterForm'; // Formulario de Login
-import SignUpForm from './components/SignUp/SignUpForm'; // Formulario de registro
-import HistoryPage from './components/HistoryPage/HistoryPage'; // Historial
+import { I18nProvider } from './i18n/Provider'; // Language provider
+import { Routes, Route, Navigate } from 'react-router-dom'; // Routing components
+import MainMenu from './components/MainMenu'; // Main menu screen
+import GameScreen from './components/GameScreen/GameScreen'; // Main game screen
+import RegisterForm from './components/Login/RegisterForm'; // Login form
+import SignUpForm from './components/SignUp/SignUpForm'; // Registration form
+import HistoryPage from './components/HistoryPage/HistoryPage'; // Match history
+import { SettingsProvider, useSettings } from './context/SettingsContext'; // Context and Hook
 
+// 1. We create a separate component for the main app content that will use the settings context. 
+// This way, we can wrap it with the provider in the main App function without issues.
+const AppContent = () => {
+  const { neonMode, colorBlindMode } = useSettings(); // Get global visual states
+
+  return (
+    <div className={`App ${neonMode ? 'neon-mode' : ''} ${colorBlindMode ? 'color-blind' : ''}`}>
+      <Routes>
+        <Route path="/" element={<RegisterForm />} /> 
+        <Route path="/menu" element={<MainMenu />} /> 
+        <Route path="/game" element={<GameScreen />} />
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </div>
+  );
+};
+
+// 2.We wrapped the entire AppContent with both Providers to ensure global state is available
 function App() {
   return (
     <I18nProvider> 
-      
-        <Routes>
-          {/* 1. Entrada de la App: Login */}
-          <Route path="/" element={<RegisterForm />} /> 
-
-          {/* 2. Menú Principal */}
-          <Route path="/menu" element={<MainMenu />} /> 
-
-          {/* 3. Pantalla de Juego */}
-          <Route path="/game" element={<GameScreen />} />
-
-          {/* 4. Registro de nuevos usuarios */}          
-          <Route path="/signup" element={<SignUpForm />} />
-          
-          {/* 5. Página de historial */}          
-          <Route path="/history" element={<HistoryPage />} />
-
-          {/* 6. Redirección por defecto a Login si la ruta no existe */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      
+      <SettingsProvider>
+        <AppContent /> 
+      </SettingsProvider>
     </I18nProvider>
   );
 }
