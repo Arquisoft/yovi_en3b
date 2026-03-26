@@ -31,7 +31,8 @@ pub struct MoveResponse {
 /// Handler for the bot move selection endpoint.
 ///
 /// This endpoint accepts a game state in YEN format and returns the
-/// coordinates of the bot's chosen move.
+/// coordinates of the bot's chosen move. It supports both synchronous
+/// and asynchronous bot implementations.
 ///
 /// # Route
 /// `POST /{api_version}/ybot/choose/{bot_id}`
@@ -73,10 +74,10 @@ pub async fn choose(
             )));
         }
     };
+
     let coords = match bot.choose_move(&game_y) {
         Some(coords) => coords,
         None => {
-            // Handle the case where the bot has no valid moves
             return Err(Json(ErrorResponse::error(
                 "No valid moves available for the bot",
                 Some(params.api_version),
@@ -84,6 +85,7 @@ pub async fn choose(
             )));
         }
     };
+
     let response = MoveResponse {
         api_version: params.api_version,
         bot_id: params.bot_id,
