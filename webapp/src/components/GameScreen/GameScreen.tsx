@@ -168,8 +168,8 @@ const GameScreen: React.FC = () => {
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
-                    <button className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
+                    <button title="Language" className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
+                    <button title="Chat" className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
                 </div>
                 {isChatOpen && (
                     <div className="chat-container">
@@ -196,7 +196,7 @@ const GameScreen: React.FC = () => {
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                             />
-                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }}>
+                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }} data-testid="chat-send-button">
                                 <CheckCircle2 size={18} />
                             </button>
                         </form>

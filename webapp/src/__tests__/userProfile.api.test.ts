@@ -10,7 +10,7 @@ describe('userProfile.api coverage', () => {
 
   it('should cover updateMyProfile and modify the mock', async () => {
     const newName = 'New Player Name';
-    const updated = await updateMyProfile({ displayName: newName }); // Triggers the update logic
+    const updated = await updateMyProfile({ displayName: newName, avatarId: "id" }); // Triggers the update logic
     expect(updated.displayName).toBe(newName); // Verify the change was applied
   });
 
