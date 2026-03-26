@@ -14,5 +14,17 @@ module.exports = {
     SELECT username, nickname, photo, email, password
     FROM users 
     WHERE email = $1; 
+  `,
+  updateUserPassword: `
+    UPDATE users
+    SET password = $1
+    WHERE username = $2 
+    RETURNING username, email, photo, nickname;
+  `,
+  updateUserNickname: `
+    UPDATE users
+    SET nickname = $1
+    WHERE username = $2 
+    RETURNING username, email, photo, nickname;
   `
 };

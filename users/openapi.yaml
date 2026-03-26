@@ -53,7 +53,7 @@ paths:
         "500":
           description: Database server error
   /findUserByUsername:
-    post:
+    get:
       tags: [Users]
       summary: Searches for a user
       description: Searches for a user with that username and returns it
@@ -138,7 +138,322 @@ paths:
                     example: "photo"
         "400":
           description: Missing fields
-        "404":
+        "401":
           description: Invalid username or password
         "500":
           description: Database server error
+  /changePassword:
+    post:
+      tags: [Users]
+      summary: Change the password of a user
+      description: It takes the credentials of the user to check his authorization and changes his password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - newPassword
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                password:
+                  type: string
+                  example: "123456"
+                newPassword:
+                  type: string
+                  example: "hola123456"
+      responses:
+        "200":
+          description: Password correctly changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "testuser"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
+        "401":
+          description: Invalid username or password
+        "500":
+          description: Database server error
+  /changeNickname:
+    post:
+      tags: [Users]
+      summary: Change the nickname of a user
+      description: It takes the username
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - nickname
+              properties:
+                username:
+                  type: string
+                  example: "testuser"
+                nickname:
+                  type: string
+                  example: "paco123"
+      responses:
+        "200":
+          description: nickname correctly changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "testuser"
+                  nickname:
+                    type: string
+                    example: "paco123"
+                  email:
+                    type: string
+                    example: "testuser@testuser"
+                  photo:
+                    type: string
+                    example: "photo"
+        "401":
+          description: User not found
+        "500":
+          description: Database server error
+  /create:
+    post:
+      tags: [Matches]
+      summary: Creates a new entry in the Match table
+      description: Creates a new entry in the Match table that records important information about the match played.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bluePlayerId
+                - redPlayerId
+                - isBot
+                - botDifficulty
+              properties:
+                bluePlayerId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                redPlayerId:
+                  type: string
+                  format: uuid
+                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
+                isBot:
+                  type: boolean
+                  example: true
+                botDifficulty:
+                  type: integer
+                  example: 0
+      responses:
+        "201":
+          description: Match created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Match created successfully"
+        "400":
+          description: Bad Request - Validation failed (missing fields, bot config error, etc.)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "If you play against a BOT, you must select a difficulty."
+  /save:
+    post:
+      tags: [GameSave]
+      summary: Creates a new entry in the Game saves table
+      description: Creates a new entry in the Game saves table that records the state of a match.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - matchId
+                - moveNumber
+                - playerId
+                - moveCoordinates
+                - resultingBoardState
+              properties:
+                matchId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                moveNumber:
+                  type: integer
+                  example: 9
+                playerId:
+                  type: string
+                  format: uuid
+                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
+                moveCoordinates:
+                  type: string
+                  example: "C3"
+                resultingBoardState:
+                  type: string
+                  example: "./../.../...."
+      responses:
+        "201":
+          description: Game save created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Game save created successfully"
+        "400":
+          description: Bad Request - Validation failed (missing fields, wrong typing, etc.)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Player ID is required."
+  /:matchId:
+    post:
+      tags: [GameSave]
+      summary: Returns all the movements saved of a match
+      description: Returns all the movements saved of a match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - matchId
+              properties:
+                matchId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Moves retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Moves retrieved successfully"
+        "400":
+          description: "Match ID is required"
+  /:matchId/moves/:moveNumber:
+    post:
+      tags: [GameSave]
+      summary: Returns a concrete move of a match
+      description: Returns a concrete move of a match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - matchId
+                - moveNumber
+              properties:
+                matchId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                moveNumber:
+                  type: integer
+                  example: 9
+      responses:
+        "200":
+          description: Move retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Move retrieved successfully"
+        "400":
+          description: Bad Request - Validation failed (missing matchId, missing move number, etc.)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Match ID is required."
+  /:matchId/latest:
+    post:
+      tags: [GameSave]
+      summary: Returns all the movements saved of a match
+      description: Returns all the movements saved of a match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - matchId
+              properties:
+                matchId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Latest move retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Latest move retrieved successfully"
+        "400":
+          description: Bad Request - Validation failed (missing matchId or move not found)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Match ID is required."
