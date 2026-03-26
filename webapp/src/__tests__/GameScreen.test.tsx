@@ -109,7 +109,7 @@ describe('GameScreen', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Mock fetch for hint requests
-        global.fetch = vi.fn((url: string) => {
+        global.fetch = vi.fn((url: any) => {
             if (url.includes('/ybot/hint')) {
                 return Promise.resolve({
                     ok: true,

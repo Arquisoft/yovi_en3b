@@ -43,7 +43,7 @@ We are a coordinated team working across different layers of the stack to delive
 | :--- | :--- | :--- | 
 | **Elena Quintes** | Frontend| UO269665@uniovi.es | 
 | **Luis Sánchez de Posada** | Frontend| UO277488@uniovi.es | 
-| **Marcos José Sánchez**| Backend | UO300022@uniovi.es | 
+| **Marcos José Hernández**| Backend | UO300022@uniovi.es | 
 | **David Alonso** | Frontend | UO300569@uniovi.es | 
 | **Ceyda Tolunay** | Backend | UO318869@uniovi.es | 
 | **Lucas Uña García** | Backend | UO302165@uniovi.es | 
