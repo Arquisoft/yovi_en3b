@@ -3,35 +3,131 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-design-decisions]]
 == Architecture Decisions
 
+This section contains the most important architectural decisions made during the design and development of the YOVI system, following the Michael Nygard ADR (Architecture Decision Record) structure.
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Important, expensive, large scale or risky architecture decisions including rationales.
-With "decisions" we mean selecting one alternative based on given criteria.
+=== ADR-001: Database Technology Selection
+**Status:** Accepted
 
-Please use your judgement to decide whether an architectural decision should be documented
-here in this central section or whether you better document it locally
-(e.g. within the white box template of one building block).
+**Context:**
+The GAME Y project requires persistent data storage to support game-related information (users, matches, etc.). At this early stage of the project, a decision about the database technology is needed to guide further architectural and implementation decisions.
 
-Avoid redundancy. 
-Refer to section 4, where you already captured the most important decisions of your architecture.
+**Decision:**
+The team decided to use a SQL-based relational database as the persistence technology for the project.
 
-.Motivation
-Stakeholders of your system should be able to comprehend and retrace your decisions.
+**Consequences:**
+* The data model will follow a strict relational structure.
+* The backend architecture will be designed to interact with a SQL database.
+* This decision may limit flexibility compared to NoSQL alternatives, but it provides strong data consistency and maturity of tooling.
 
-.Form
-Various options:
+=== ADR-002: Backend Structure
+**Status:** Accepted
 
-* ADR (https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions[Documenting Architecture Decisions]) for every important decision
-* List or table, ordered by importance and consequences or:
-* more detailed in form of separate sections per decision
+**Context:**
+After selecting the SQL database, we needed to define how to organize the source code of the backend service (`Users API`).
 
-.Further Information
+**Decision:**
+The system is implemented as a Modular Monolith. This approach was chosen to minimize infrastructure complexity and deployment overhead for the current scope of the project, while the internal modular structure ensures a clear path to microservices if future scalability requires it. The "big picture" of the backend is divided into independent components, and each component is split into 3 layers: entry-points, domain, and data-access.
 
-See https://docs.arc42.org/section-9/[Architecture Decisions] in the arc42 documentation.
-There you will find links and examples about ADR.
+**Consequences:**
+* **High Cohesion:** All code related to a specific feature is located in one folder.
+* **Maintainability:** It is easier to make changes without affecting other parts of the system.
+* **Scalability:** If a component becomes too large or complex, it can be easily extracted/divided since it is already isolated.
 
-****
-endif::arc42help[]
+=== ADR-003: PostgreSQL as DBMS
+**Status:** Accepted
+
+**Context:**
+To develop the database layer, we had to choose a specific Database Management System (DBMS).
+
+**Decision:**
+After analyzing the needs of the application, the team decided to use PostgreSQL as the DBMS because it offers several advantages:
+* It is free and open-source.
+* It supports both relational and non-relational (JSONB) data types, which could be useful in the future if we need to use a hybrid approach.
+
+**Consequences:**
+* Ensures robustness, reliability, and data integrity.
+* Provides excellent performance and concurrency handling.
+
+=== ADR-004: Selection of Mock Database for Testing
+**Status:** Accepted
+
+**Context:**
+With the migration to a Cloud-hosted PostgreSQL database, relying on a live connection for every test introduces latency and risks data pollution during concurrent development. We need a fast, isolated way to validate our 3-layer backend logic.
+
+**Decision:**
+The team decided to implement a Mock Database strategy using in-memory technologies (such as H2, SQLite :memory:, or mocking frameworks) for unit and integration tests.
+
+**Consequences:**
+* **Test Isolation:** Each test runs in a clean environment, preventing interference between team members.
+* **Execution Speed:** In-memory operations are significantly faster than remote Cloud DB calls.
+* **Development Independence:** Components can be tested even without an active internet connection.
+* **Maintenance:** Requires additional effort to keep mock data schemas synchronized with the production PostgreSQL schema.
+
+=== ADR-005: Backend Programming Paradigm
+**Status:** Accepted
+
+**Context:**
+We must choose which paradigm we are going to use to develop the backend to ensure consistency between the different modules.
+
+**Decision:**
+The team decided to adopt the functional programming paradigm for implementing the modules instead of the Object-Oriented Paradigm (OOP). The backend relies heavily on pure functions and immutable data.
+
+**Consequences:**
+* **Easier testing:** Using functions that do not depend on internal state reduces issues when testing the app and ensures predictable behavior.
+* Extinction of unintended side effects.
+* **Easier maintenance:** Since we do not have complex inheritance hierarchies, it is easier to understand what each isolated function does.
+
+=== ADR-006: Separation of Matches and Game Saves
+**Status:** Accepted
+
+**Context:**
+We initially considered tracking game history and board positions directly within the `matches` table. However, updating the database on every single turn would overload the server and create a bottleneck.
+
+**Decision:**
+We will create a dedicated `game_saves` table. The `matches` table will only be queried/updated at the start and end of a game. The active game state will only be stored in `game_saves` when the user explicitly clicks the "Save" button or exits the match.
+
+**Consequences:**
+* Massively reduces database load and network traffic. 
+* Keeps the `matches` table clean and strictly for historical tracking.
+* Introduces slightly more complex logic in the backend to manage two tables instead of one.
+
+=== ADR-007: Polyglot Architecture (TypeScript & Rust)
+**Status:** Accepted
+
+**Context:**
+The project requires a scalable web interface, a user management system, and a highly performant game engine to evaluate moves and execute AI bot strategies. A single programming language might not offer the optimal balance for both web-centric APIs and CPU-bound game logic.
+
+**Decision:**
+The system is implemented using a polyglot approach. The `YOVI Web Client` and `Users API` are developed in **TypeScript** (React and Node.js) to leverage the vast web ecosystem. The `GameY Service` (evaluation and strategy module) is implemented in **Rust** to guarantee memory safety and high calculation speed for the AI.
+
+**Consequences:**
+* Maximizes the performance of the AI engine while keeping web development agile.
+* Increases cognitive load on the development team, as they must maintain codebases and tooling for two entirely different programming ecosystems.
+
+=== ADR-008: Stateless Game Engine Communication (YEN & JSON)
+**Status:** Accepted
+
+**Context:**
+Because the frontend and the game engine are decoupled and written in different languages, they need a standardized, language-agnostic way to exchange complex board layouts and game states.
+
+**Decision:**
+Communication between the Web Client/Bots and the Rust Game Engine is strictly done via stateless **JSON messages** over HTTP, utilizing the standard **YEN (Y-Game Extended Notation)** for board representation. The Rust module acts as a stateless REST service (basic web service interface).
+
+**Consequences:**
+* Ensures perfect decoupling; the Rust engine does not need to store active sessions in its memory.
+* Makes it extremely easy for external third-party bots to integrate with the API.
+* Requires serialization/deserialization overhead for every move.
+
+=== ADR-009: Cloud Infrastructure & CI/CD
+**Status:** Accepted
+
+**Context:**
+To fulfill the requirement of making the application publicly accessible and easily maintainable, we need a reliable deployment strategy that minimizes manual intervention.
+
+**Decision:**
+The system will be deployed to a **public cloud provider** utilizing Docker containerization. Furthermore, all deployments will be handled via automated **CI/CD pipelines** (Continuous Integration and Continuous Deployment).
+
+**Consequences:**
+* Guarantees that the code running in production exactly matches the tested codebase.
+* Allows rapid, zero-downtime updates to the web application and game engine.
+* Requires an initial time investment to write and configure the pipeline scripts (e.g., GitHub Actions).
