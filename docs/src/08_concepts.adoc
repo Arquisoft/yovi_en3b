@@ -48,8 +48,6 @@ A potential (but not mandatory) structure for this section could be:
 Note: it might be difficult to assign individual concepts to one specific topic
 on this list.
 
-iimage::crosscutting-concepts-map.jpg["YOVI Crosscutting Concepts Concept Map"]
-
 .Further Information
 
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
@@ -57,6 +55,8 @@ See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 endif::arc42help[]
 
 This section outlines the principal regulations, patterns, and solution ideas that apply across multiple building blocks of the YOVI system. By establishing these rules, we ensure conceptual integrity and consistency throughout the architecture.
+
+iimage::crosscutting-concepts-map.jpg["YOVI Crosscutting Concepts Concept Map"]
 
 === 8.1 Inter-Component Communication & YEN Notation
 Communication between the decoupled subsystems (YOVI Web Client, Users API, and GameY Service) relies entirely on lightweight, stateless REST APIs exchanging JSON payloads. 
