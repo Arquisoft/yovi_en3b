@@ -12,6 +12,9 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client (DB disconnected)', err.message);
+});
 //exports the service
 module.exports = {
   query: (text, params) => pool.query(text, params),

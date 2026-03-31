@@ -1,6 +1,7 @@
 import { Given, When, Then} from '@cucumber/cucumber'
-import { expect } from '@playwright/test'
+import { expect, request } from '@playwright/test'
 
+/////////////////////////////////////////////////////////////////////// SCENARIO 1 ////////////////////////////////////////////////////////////////////////////////////////////
 Given('the main page opened', async function () {
   const page = this.page
   if (!page) throw new Error('Page not initialized')
@@ -40,3 +41,53 @@ Then('I should see the login page', async function () {
   const botonLogin = this.page.getByRole('button', { name: 'PLAY' }); 
   await expect(botonLogin).toBeVisible();
 })
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////// SCENARIO 2 ////////////////////////////////////////////////////////////////////////////////////////////
+Given('the main page opened and a user already created with username {string} and email {string}', async function (username, email) {
+  const page = this.page;
+  if (!page) throw new Error('Page not initialized');
+
+  // 1. Use the defined API
+  const apiContext = await request.newContext({
+    baseURL: 'http://localhost:3000' 
+  });
+
+  const response = await apiContext.post('/users/createuser', { 
+    data: {
+      username: username,
+      nickname: "BotNickname",
+      email: email,
+      password: "Test@123456",
+      avatarId: "default.png"
+    }
+  });
+ 
+  expect(response.ok()).toBeTruthy();
+
+  await page.goto('http://localhost:5173');
+});
+
+// Here all the "When" defined in the SCENARIO 1 are reused automatically
+
+Then('I should see an error', async function () {
+  const page = this.page;
+  if (!page) throw new Error('Page not initialized');
+
+  // Here the class of the element is used to searching
+  const errorMessage = page.locator('.live-error-text');
+  
+  // We check
+  await expect(errorMessage).toBeVisible();
+})
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////////////////// SCENARIO 3 ////////////////////////////////////////////////////////////////////////////////////////////
+
+// Reuse the SCENARIO 2
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
