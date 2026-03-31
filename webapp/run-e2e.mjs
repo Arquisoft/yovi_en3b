@@ -25,7 +25,7 @@ try {
   console.log('Building Backend, Frontend and executing Playwright/Cucumber...');
   
   execSync(
-    `cross-env DB_HOST=localhost DB_PORT=${dynamicPort} DB_USER=admin DB_PASSWORD=1234 DB_NAME=yovi_test npm run test:e2e:ci`, 
+    `cross-env DB_HOST=localhost DB_PORT=${dynamicPort} DB_USER=test DB_PASSWORD=1234 DB_NAME=yovi_test npm run test:e2e:ci`, 
     { stdio: 'inherit' } // We can see the logs in the console
   );
 
