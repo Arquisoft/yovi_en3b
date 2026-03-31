@@ -1,9 +1,10 @@
+// UBICACIÓN: webapp/src/components/Profile/ProfileOverlay.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { Edit2, Check, Lock, X } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Navigation hook
+import { useNavigate } from "react-router-dom"; 
 import { useUserProfile } from "./useUserProfile";
 import { useI18n } from "../../i18n/useTranslation";
-import { useSettings } from "../../context/SettingsContext"; // Settings context
+import { useSettings } from "../../context/SettingsContext"; 
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
 import { toast, Toaster } from "sonner";
@@ -14,7 +15,7 @@ const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
 
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
   const { t } = useI18n();
-  const { colorBlindMode, neonMode } = useSettings(); // Added neonMode for consistency
+  const { colorBlindMode, neonMode, playSound } = useSettings(); // Added playSound for UI feedback
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +40,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
     passData.confirm === passData.next &&
     Object.values(passValidations).every(Boolean);
 
-  const accentColor = colorBlindMode ? "#f59e0b" : "#60a5fa"; // Dynamic color for inline icons
+  const accentColor = colorBlindMode ? "#f59e0b" : "#60a5fa"; 
 
   useEffect(() => {
     if (!open) {
@@ -49,26 +50,23 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   }, [open]);
 
   const handleConfirmName = () => {
+    playSound('click.mp3'); // Play sound when confirming name edit
     if (!isNameEmpty) setIsEditing(false);
   };
 
   const handlePasswordChange = async () => {
-    // 1. Validating the data
+    playSound('click.mp3'); // Play sound when clicking the main change button
     if (passData.next !== passData.confirm) {
        toast.error(t.messages.passwordsDoNotMatch);
       return;
     }
 
     try {
-      // 2. API call
       await changePassword(passData.current, passData.next);
-
-      // 3. If everything went well
       toast.success(t.messages.passwordChangedSuccess);
       setShowPassFields(false);
       setPassData({ current: '', next: '', confirm: '' });
     } catch (err: any) {
-      // 4. If there is an error
       toast.error(t.messages.errorChangingPassword);
     }
   };
@@ -76,18 +74,22 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={isEditing ? undefined : onClose}>
+    <div className="modal-overlay" onClick={isEditing ? undefined : () => { playSound('click.mp3'); onClose(); }}>
       <Toaster position="top-right" richColors closeButton />
-      {/* Added neon-mode class to the modal content */}
       <div className={`modal-content profile-modal ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()}>
 
         <button
           className="boton-cerrar-fijo"
-          onClick={isEditing ? undefined : onClose}
+          onClick={() => {
+            if (!isEditing) {
+              playSound('click.mp3'); // Play sound when closing modal
+              onClose();
+            }
+          }}
           disabled={isEditing}
           style={{ opacity: isEditing ? 0.5 : 1 }}
         >
-          <X size={35} /> {/* Close icon */}
+          <X size={35} /> 
         </button>
 
         <h2 className="modal-title">{t.labels.userProfile}</h2>
@@ -117,11 +119,14 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                     className="orbitron-text"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleConfirmName();
-                      if (e.key === "Escape") setIsEditing(false);
+                      if (e.key === "Escape") {
+                        playSound('click.mp3'); // Sound on cancel via ESC
+                        setIsEditing(false);
+                      }
                     }}
                   />
                   {!isEditing ? (
-                    <button className="edit-btn" onClick={() => setIsEditing(true)}>
+                    <button className="edit-btn" onClick={() => { playSound('click.mp3'); setIsEditing(true); }}>
                       <Edit2 size={18} color="white" />
                     </button>
                   ) : (
@@ -146,7 +151,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
               <div className="profile-row">
                 <label>{t.labels.security}</label>
                 {!showPassFields ? (
-                  <button className="change-pass-trigger orbitron-text" onClick={() => setShowPassFields(true)}>
+                  <button className="change-pass-trigger orbitron-text" onClick={() => { playSound('click.mp3'); setShowPassFields(true); }}>
                     <Lock size={14} /> {t.buttons.changePassword}
                   </button>
                 ) : (
@@ -170,26 +175,21 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                       onChange={(e) => setPassData({ ...passData, confirm: e.target.value })}
                     />
                     <div className="validation-grid" style={{ marginTop: '10px' }}>
-
                       <div className={`val-item ${passValidations.length ? 'valid' : ''}`}>
                         {passValidations.length ? <Check size={12} /> : <X size={12} />} {t.validation.chars8}
                       </div>
-
                       <div className={`val-item ${passValidations.hasUpper ? 'valid' : ''}`}>
                         {passValidations.hasUpper ? <Check size={12} /> : <X size={12} />} {t.validation.uppercase}
                       </div>
-
                       <div className={`val-item ${passValidations.hasNumber ? 'valid' : ''}`}>
                         {passValidations.hasNumber ? <Check size={12} /> : <X size={12} />} {t.validation.number}
                       </div>
-
                       <div className={`val-item ${passValidations.hasSpecial ? 'valid' : ''}`}>
                         {passValidations.hasSpecial ? <Check size={12} /> : <X size={12} />} {t.validation.special}
                       </div>
-
                     </div>
                     <div className="pass-actions">
-                      <button className="cancel-pass" onClick={() => setShowPassFields(false)}>{t.buttons.cancel}</button>
+                      <button className="cancel-pass" onClick={() => { playSound('click.mp3'); setShowPassFields(false); }}>{t.buttons.cancel}</button>
                       <button
                         className="confirm-pass"
                         disabled={!canConfirmPassword}
@@ -216,7 +216,10 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                       <button
                         key={id}
                         className={`avatar-opt ${draftAvatarId === id ? "active" : ""}`}
-                        onClick={() => setDraftAvatarId(id)}
+                        onClick={() => {
+                          playSound('click.mp3'); // Sound feedback for avatar selection
+                          setDraftAvatarId(id);
+                        }}
                         disabled={isEditing}
                       >
                         {emoji}
@@ -231,12 +234,12 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
               {isEditing && (
                 <div className="editing-lock-overlay" title={t.messages.confirmTheDisplayNameFirst} />
               )}
-              {/* This button now redirects correctly to /history */}
               <button
                 className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} history-btn orbitron-text`}
                 onClick={() => {
-                  onClose(); // Close the overlay first
-                  navigate("/history"); // Then navigate to history
+                  playSound('click.mp3'); // Feedback when going to history
+                  onClose(); 
+                  navigate("/history"); 
                 }}
                 disabled={isEditing}
               >
@@ -244,8 +247,8 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
               </button>
 
               <div className="btn-group">
-                <button className="main-button orbitron-text" onClick={resetDraft} disabled={!dirty}>{t.buttons.reset}</button>
-                <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} orbitron-text`} onClick={save} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
+                <button className="main-button orbitron-text" onClick={() => { playSound('click.mp3'); resetDraft(); }} disabled={!dirty}>{t.buttons.reset}</button>
+                <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} orbitron-text`} onClick={() => { playSound('click.mp3'); save(); }} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
               </div>
             </div>
           </>

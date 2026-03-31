@@ -13,17 +13,14 @@ interface GamePreviewProps {
 
 const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart }) => {
   const { t } = useI18n(); 
-  const { colorBlindMode } = useSettings(); // Obtenemos el estado daltónico
+  const { colorBlindMode, playSound } = useSettings(); 
   const [boardSize, setBoardSize] = useState(5);
   const [difficulty, setDifficulty] = useState(1);
   const [selectedBot, setSelectedBot] = useState(0);
 
   if (!isOpen) return null;
 
-  // El color de acento ahora se maneja principalmente por CSS, 
-  // pero lo usamos aquí para los iconos de Lucide-React.
   const accentColor = colorBlindMode ? "#f59e0b" : "#60a5fa";
-
   const totalCells = (boardSize * (boardSize + 1)) / 2;
   
   const calculateSeconds = () => {
@@ -55,13 +52,12 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      {/* Añadimos la clase color-blind condicionalmente aquí */}
+    <div className="modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
       <div 
         className={`modal-content preview-modal-wide ${colorBlindMode ? 'color-blind' : ''}`} 
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
+        <button className="boton-cerrar-fijo" onClick={() => { playSound('click.mp3'); onClose(); }}>&times;</button>
         <h2 className="modal-title h2-preview-title">{t.labels.preview}</h2>
 
         <div className="preview-layout">
@@ -69,7 +65,7 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
             <p className="p-time-limit-top">{t.labels.timeLimit}: {formatTime(calculateSeconds())}</p>
             
             <div className="visual-preview-area">
-               {renderTriangle()}
+                {renderTriangle()}
             </div>
           </div>
 
@@ -79,13 +75,13 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
               <div className="bot-selector">
                 <button 
                   className={`bot-btn ${selectedBot === 0 ? 'active' : ''}`} 
-                  onClick={() => setSelectedBot(0)}
+                  onClick={() => { playSound('click.mp3'); setSelectedBot(0); }}
                 >
                   <Bot size={48} color={selectedBot === 0 ? accentColor : "#fff"} />
                 </button>
                 <button 
                   className={`bot-btn ${selectedBot === 1 ? 'active' : ''}`} 
-                  onClick={() => setSelectedBot(1)}
+                  onClick={() => { playSound('click.mp3'); setSelectedBot(1); }}
                 >
                   <Cpu size={48} color={selectedBot === 1 ? accentColor : "#fff"} />
                 </button>
@@ -99,7 +95,10 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
                 min="0" 
                 max="2" 
                 value={difficulty} 
-                onChange={(e) => setDifficulty(parseInt(e.target.value))} 
+                onChange={(e) => {
+                  setDifficulty(parseInt(e.target.value));
+                
+                }} 
                 className="neon-slider" 
               />
               <div className="slider-labels-below">
@@ -112,20 +111,23 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
             <div className="setting-control">
               <label className="label-white-bold">{t.labels.boardSize}</label>
               <div className="stepper-horizontal">
-                <button className="step-btn" onClick={() => setBoardSize(Math.max(3, boardSize - 1))}>-</button>
+                <button className="step-btn" onClick={() => { playSound('click.mp3'); setBoardSize(Math.max(3, boardSize - 1)); }}>-</button>
                 <span className="stepper-value">{boardSize}</span>
-                <button className="step-btn" onClick={() => setBoardSize(Math.min(10, boardSize + 1))}>+</button>
+                <button className="step-btn" onClick={() => { playSound('click.mp3'); setBoardSize(Math.min(10, boardSize + 1)); }}>+</button>
               </div>
             </div>
 
             <button 
               className="main-button btn-blue btn-play-now-preview" 
-              onClick={() => onStart({ 
-                size: boardSize, 
-                difficulty, 
-                botType: selectedBot === 0 ? 'robot' : 'chip', 
-                time: calculateSeconds() 
-              })}
+              onClick={() => {
+                playSound('click.mp3');
+                onStart({ 
+                  size: boardSize, 
+                  difficulty, 
+                  botType: selectedBot === 0 ? 'robot' : 'chip', 
+                  time: calculateSeconds() 
+                });
+              }}
             >
               {t.buttons.playNow}
             </button>

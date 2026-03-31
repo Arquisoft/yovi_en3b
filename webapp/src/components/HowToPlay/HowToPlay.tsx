@@ -11,13 +11,21 @@ interface HowToPlayProps {
 
 const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   const { t } = useI18n(); 
-  const { colorBlindMode } = useSettings(); // Accedemos al modo daltónico
+  const { colorBlindMode, playSound } = useSettings(); // Accedemos al modo daltónico y a playSound
 
   return (
     <div className="modal-overlay">
       {/* Añadimos la clase color-blind condicionalmente */}
       <div className={`modal-content how-to-play-modal ${colorBlindMode ? 'color-blind' : ''}`}>
-        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
+        <button 
+          className="boton-cerrar-fijo" 
+          onClick={() => {
+            playSound('click.mp3'); // Sonido al cerrar con la X
+            onClose();
+          }}
+        >
+          &times;
+        </button>
         
         <h2 className="modal-title">{t.messages.howToPlay}</h2>
         
@@ -76,13 +84,21 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             target="_blank" 
             rel="noopener noreferrer"
             className="video-link-btn"
+            onClick={() => playSound('click.mp3')} // Sonido al hacer clic en el enlace de video
           >
             <Youtube size={20} color="#ff0000" />
             <span>{t.buttons.watchVideo}</span>
           </a>
         </div>
 
-        <button className="understood-btn btn-blue" onClick={onClose} style={{ marginTop: '20px' }}>
+        <button 
+          className="understood-btn btn-blue" 
+          onClick={() => {
+            playSound('click.mp3'); // Sonido al confirmar lectura
+            onClose();
+          }} 
+          style={{ marginTop: '20px' }}
+        >
           {t.buttons.understood}
         </button>
       </div>

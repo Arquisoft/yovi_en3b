@@ -1,6 +1,7 @@
+// UBICACIÓN: webapp/src/pages/HistoryPage/HistoryPage.tsx
 import React from 'react'; 
 import { useNavigate } from 'react-router-dom'; 
-import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu, BarChart3, Target } from 'lucide-react'; // Added Chart and Target icons
+import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu, BarChart3, Target } from 'lucide-react'; 
 import { useSettings } from '../../context/SettingsContext'; 
 import { useI18n } from '../../i18n/useTranslation'; 
 import './HistoryPage.css'; 
@@ -8,7 +9,8 @@ import './HistoryPage.css';
 const HistoryPage: React.FC = () => {
     const navigate = useNavigate(); 
     const { t } = useI18n(); 
-    const { colorBlindMode, neonMode } = useSettings(); 
+    // Extraemos playSound para manejar el efecto de sonido al salir
+    const { colorBlindMode, neonMode, playSound } = useSettings(); 
 
     // MOCK DATA
     const matches = [
@@ -18,21 +20,25 @@ const HistoryPage: React.FC = () => {
         { id: 4, date: '2024-03-17', result: 'win', size: '6x6', opponent: 'Bot Tech' },
     ];
 
-    // Lógica de Estadísticas
-    const totalMatches = matches.length; // Cuenta el total de partidas
-    const wins = matches.filter(m => m.result === 'win').length; // Filtra y cuenta victorias
-    const winRate = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0; // Calcula %
+    const totalMatches = matches.length; 
+    const wins = matches.filter(m => m.result === 'win').length; 
+    const winRate = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0; 
 
     return (
         <div className={`history-container ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`}>
             <header className="history-header">
                 <h1 className="title-game">{t.buttons.history}</h1>
-                <button className="icon-btn-back" onClick={() => navigate('/menu')}>
+                <button 
+                    className="icon-btn-back" 
+                    onClick={() => {
+                        playSound('click.mp3'); // Reproduce el sonido antes de navegar
+                        navigate('/menu');
+                    }}
+                >
                     <ArrowLeft size={35} /> 
                 </button>
             </header>
 
-            {/* Nueva Sección de Estadísticas */}
             <section className="history-stats">
                 <div className="stat-card-mini">
                     <BarChart3 size={20} className="stat-icon" />

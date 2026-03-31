@@ -51,8 +51,8 @@
 }
 
 .ranking-exit-btn svg {
-    width: 35px !important;  /* Forzamos ancho en px */
-    height: 35px !important; /* Forzamos alto en px */
+    width: 35px !important;  
+    height: 35px !important; 
     display: block !important;
     opacity: 1 !important;
     color: white !important;

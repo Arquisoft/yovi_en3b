@@ -1,115 +1,125 @@
 // UBICACIÓN: webapp/src/pages/GameScreen.tsx
-import React, { useState, useEffect } from 'react'; // React hooks for state and lifecycle
+import React, { useState, useEffect } from 'react';
 import {
-    Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot
-} from 'lucide-react'; // Icons for UI
-import './GameScreen.css'; // Specific game styles
-import { generateBoard, type Cell } from './gridUtils'; // Utility to generate hex grid
-import { checkWin } from './yGameLogic'; // Game logic for victory condition
-import { useNavigate, useLocation } from 'react-router-dom'; // Navigation hooks
-import { LanguageDialog } from '../LanguageDialog/LanguageDialog'; // Multi-language modal
-import { useI18n } from '../../i18n/useTranslation'; // Translation hook
-import { useSettings } from '../../context/SettingsContext'; // Global settings hook
-import { HexGrid, Layout, Hexagon } from 'react-hexgrid'; // Hexagonal grid components
+    Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
+    Volume2, VolumeX // Added volume icons
+} from 'lucide-react';
+import './GameScreen.css';
+import { generateBoard, type Cell } from './gridUtils';
+import { checkWin } from './yGameLogic';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
+import { useI18n } from '../../i18n/useTranslation';
+import { useSettings } from '../../context/SettingsContext';
+import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 
 const GameScreen: React.FC = () => {
-    const navigate = useNavigate(); // Hook to navigate between routes
-    const location = useLocation(); // Hook to access route state
-    const { t } = useI18n(); // Access translations
-    const { colorBlindMode } = useSettings(); // Access global colorblind setting
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { t } = useI18n();
+    const { colorBlindMode, playSound, isMuted, setIsMuted } = useSettings(); // Added isMuted and setIsMuted
 
-    // Game Configuration from route state
     const {
         size = 5,
         time: initialTime = null,
         botType = 'robot'
     } = location.state || {};
 
-    // Game States
-    const [timeLeft, setTimeLeft] = useState<number | null>(initialTime); // Remaining time
-    const [cells] = useState(generateBoard(size)); // Hexagon data
-    const [isChatOpen, setIsChatOpen] = useState(true); // Chat visibility
-    const [showExitConfirmation, setShowExitConfirmation] = useState(false); // Exit modal toggle
-    const [showLanguageDialog, setShowLanguageDialog] = useState(false); // Language modal toggle
-    const [boardState, setBoardState] = useState<Record<string, number>>({}); // Placed pieces
-    const [currentPlayer, setCurrentPlayer] = useState(1); // Active player (1 or 2)
-    const [pendingMove, setPendingMove] = useState<Cell | null>(null); // Clicked but not confirmed cell
-    const [botCooldown, setBotCooldown] = useState(false); // Prevents player move during bot turn
-    const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null); // Game end status
-    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]); // Chat log
-    const [inputValue, setInputValue] = useState(''); // Current chat input text
+    const [timeLeft, setTimeLeft] = useState<number | null>(initialTime);
+    const [cells] = useState(generateBoard(size));
+    const [isChatOpen, setIsChatOpen] = useState(true);
+    const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+    const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+    const [boardState, setBoardState] = useState<Record<string, number>>({});
+    const [currentPlayer, setCurrentPlayer] = useState(1);
+    const [pendingMove, setPendingMove] = useState<Cell | null>(null);
+    const [botCooldown, setBotCooldown] = useState(false);
+    const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
+    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+    const [inputValue, setInputValue] = useState('');
 
-    // Dynamic colors based on Color Blind Mode
-    const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa'; // Orange (Colorblind) or Blue (Default)
-    const p2Color = colorBlindMode ? '#ffffff' : '#ef4444'; // White (Colorblind) or Red (Default)
+    const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
+    const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
+
+    // Effect to trigger game over sounds
+    useEffect(() => {
+        if (gameResult === 'win') playSound('win.mp3');
+        if (gameResult === 'lose') playSound('gameover.mp3');
+    }, [gameResult, playSound]);
 
     const formatDisplayTime = (seconds: number | null) => {
-        if (seconds === null) return "∞"; // Infinite time display
-        const mins = Math.floor(seconds / 60); // Calculate minutes
-        const secs = seconds % 60; // Calculate seconds
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`; // Format as MM:SS
+        if (seconds === null) return "∞";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
     const handleSendMessage = (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent page refresh
-        if (!inputValue.trim()) return; // Avoid empty messages
-        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]); // Add message to log
-        setInputValue(''); // Clear input
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+        playSound('click.mp3'); 
+        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        setInputValue('');
     };
 
     useEffect(() => {
-        if (timeLeft === null || gameResult) return; // Stop timer if game ended or no limit
+        if (timeLeft === null || gameResult) return;
         if (timeLeft <= 0) {
-            setGameResult('lose'); // End game on timeout
+            setGameResult('lose');
             return;
         }
-        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000); // Decrement time
-        return () => clearInterval(timer); // Clean up on unmount
+        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000);
+        return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
 
     const handleClick = (cell: Cell) => {
-        const key = `${cell.x}-${cell.y}-${cell.z}`; // Unique key for cell
-        if (gameResult || botCooldown || boardState[key]) return; // Block clicks if turn/game finished
-        setPendingMove(cell); // Set as unconfirmed selection
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
+        if (gameResult || botCooldown || boardState[key]) return;
+        playSound('click.mp3'); 
+        setPendingMove(cell);
     };
 
     const handleConfirm = () => {
-        if (!pendingMove || gameResult) return; // Ensure move exists
-        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`; // Get move key
+        if (!pendingMove || gameResult) return;
+        playSound('place-tile.mp3'); 
+        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
 
-        const newBoardState = { ...boardState, [key]: 1 }; // Update board state
-        setBoardState(newBoardState); // Apply changes
-        setPendingMove(null); // Clear pending state
+        const newBoardState = { ...boardState, [key]: 1 };
+        setBoardState(newBoardState);
+        setPendingMove(null);
 
         if (checkWin(newBoardState, 1, size, cells)) {
-            setGameResult('win'); // Check if player won
+            setGameResult('win');
             return;
         }
 
-        setCurrentPlayer(2); // Pass turn to Bot
-        setBotCooldown(true); // Block player interaction
+        setCurrentPlayer(2);
+        setBotCooldown(true);
         setTimeout(() => {
-            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]); // Find free spots
+            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]);
             if (availableCells.length > 0) {
-                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)]; // Random AI move
-                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`; // Bot key
-                const stateAfterBot = { ...newBoardState, [botKey]: 2 }; // Update state for bot
-                setBoardState(stateAfterBot); // Apply bot move
+                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
+                const stateAfterBot = { ...newBoardState, [botKey]: 2 };
+                
+                playSound('place-tile.mp3'); 
+                setBoardState(stateAfterBot);
 
                 if (checkWin(stateAfterBot, 2, size, cells)) {
-                    setGameResult('lose'); // Check if bot won
+                    setGameResult('lose');
                 }
             }
-            setCurrentPlayer(1); // Return turn to player
-            setBotCooldown(false); // Re-enable interaction
-        }, 1200); // Simulated "thinking" delay
+            setCurrentPlayer(1);
+            setBotCooldown(false);
+        }, 1200);
     };
 
     const restartGame = () => {
-        setBoardState({}); // Reset board
-        setGameResult(null); // Reset result
-        setCurrentPlayer(1); // Reset player turn
-        setTimeLeft(initialTime); // Reset clock
+        playSound('click.mp3');
+        setBoardState({});
+        setGameResult(null);
+        setCurrentPlayer(1);
+        setTimeLeft(initialTime);
     };
 
     return (
@@ -135,18 +145,18 @@ const GameScreen: React.FC = () => {
                         <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
                             <Layout size={{ x: 6, y: 6 }} flat={false} spacing={1.08} origin={{ x: size * 4.75, y: (size - 1) * 5 }}>
                                 {cells.map((cell) => {
-                                    const key = `${cell.x}-${cell.y}-${cell.z}`; // Cell key
-                                    const owner = boardState[key]; // Check ownership
-                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z; // Highlight pending
+                                    const key = `${cell.x}-${cell.y}-${cell.z}`;
+                                    const owner = boardState[key];
+                                    const isSelected = pendingMove?.x === cell.x && pendingMove?.y === cell.y && pendingMove?.z === cell.z;
                                     return (
                                         <Hexagon
                                             key={key} q={cell.q} r={cell.r} s={cell.s}
                                             className={`hex-cell ${owner === 1 ? 'p1-selected' : ''} ${owner === 2 ? 'p2-selected' : ''} ${isSelected ? 'pending-selection' : ''}`}
                                             style={{
-                                                fill: owner === 1 ? p1Color : (owner === 2 ? p2Color : ''), // Dynamic fill color
-                                                stroke: isSelected ? p1Color : '' // Stroke for pending move
+                                                fill: owner === 1 ? p1Color : (owner === 2 ? p2Color : ''),
+                                                stroke: isSelected ? p1Color : ''
                                             }}
-                                            onClick={() => handleClick(cell)} // Click handler
+                                            onClick={() => handleClick(cell)}
                                         />
                                     );
                                 })}
@@ -156,11 +166,11 @@ const GameScreen: React.FC = () => {
                 </main>
 
                 <footer className="game-footer">
-                    <button className="game-action-btn"><Undo2 size={18} /> <span>{t.buttons.undo}</span></button>
+                    <button className="game-action-btn" onClick={() => playSound('click.mp3')}><Undo2 size={18} /> <span>{t.buttons.undo}</span></button>
                     <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
                         <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
                     </button>
-                    <button className="game-action-btn btn-exit-footer" onClick={() => setShowExitConfirmation(true)}>
+                    <button className="game-action-btn btn-exit-footer" onClick={() => { playSound('click.mp3'); setShowExitConfirmation(true); }}>
                         <LogOut size={18} /> <span>{t.buttons.exit}</span>
                     </button>
                 </footer>
@@ -168,8 +178,19 @@ const GameScreen: React.FC = () => {
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button title="Language" className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
-                    <button title="Chat" className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
+                    {/* New Mute/Unmute button for background music */}
+                    <button 
+                        title={isMuted ? "Unmute" : "Mute"} 
+                        className="icon-btn-global" 
+                        onClick={() => {
+                            playSound('click.mp3'); // UI feedback still plays
+                            setIsMuted(!isMuted); // Toggle global music mute
+                        }}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+                    <button title="Language" className="icon-btn-global" onClick={() => { playSound('click.mp3'); setShowLanguageDialog(true); }}><Languages size={20} /></button>
+                    <button title="Chat" className="icon-btn-global" onClick={() => { playSound('click.mp3'); setIsChatOpen(!isChatOpen); }}><MessageSquare size={20} /></button>
                 </div>
                 {isChatOpen && (
                     <div className="chat-container">
@@ -196,7 +217,7 @@ const GameScreen: React.FC = () => {
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                             />
-                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }} data-testid="chat-send-button">
+                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }}>
                                 <CheckCircle2 size={18} />
                             </button>
                         </form>
@@ -216,7 +237,7 @@ const GameScreen: React.FC = () => {
                         </p>
                         <div className="modal-buttons-column">
                             <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
-                            <button className="main-button btn-red-outline" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
+                            <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
                         </div>
                     </div>
                 </div>
@@ -228,13 +249,13 @@ const GameScreen: React.FC = () => {
                     <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''}`}>
                         <h2>{t.messages.areYouSure}</h2>
                         <div className="modal-buttons-column">
-                            <button className="main-button btn-red" onClick={() => navigate('/menu')}>{t.buttons.yesExitAndLose}</button>
-                            <button className={`main-button ${colorBlindMode ? 'btn-orange-outline' : 'btn-blue-outline'}`} onClick={() => setShowExitConfirmation(false)}>{t.buttons.backToGame}</button>
+                            <button className="main-button btn-red" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.yesExitAndLose}</button>
+                            <button className={`main-button ${colorBlindMode ? 'btn-orange-outline' : 'btn-blue-outline'}`} onClick={() => { playSound('click.mp3'); setShowExitConfirmation(false); }}>{t.buttons.backToGame}</button>
                         </div>
                     </div>
                 </div>
             )}
-            <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
+            <LanguageDialog open={showLanguageDialog} onClose={() => { playSound('click.mp3'); setShowLanguageDialog(false); }} />
         </div>
     );
 };

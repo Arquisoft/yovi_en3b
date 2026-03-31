@@ -43,6 +43,8 @@ export const translations = {
       defeat: 'DERROTA',
     },
     labels: {
+      volume: 'VOLUMEN',
+      mute: 'MUTE',
       lastGame: 'ÚLTIMA PARTIDA',
       rankingTitle: 'RANKING GLOBAL',
       user: 'USUARIO',
@@ -165,6 +167,8 @@ export const translations = {
       defeat: 'DEFEAT',
     },
     labels: {
+      volume: 'VOLUME',
+      mute: 'MUTE',
       lastGame: 'LAST GAME',
       rankingTitle: 'GLOBAL RANKING',
       user: 'USER',
@@ -246,6 +250,8 @@ export const translations = {
   },
   tr: {
     buttons: {
+      volume: 'VOLUMEN',
+      mute: 'SESSİZ',
       play: 'OYNA',
       howToPlay: 'NASIL OYNANIR',
       save: 'KAYDET',

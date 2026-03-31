@@ -1,6 +1,8 @@
+// UBICACIÓN: webapp/src/components/Ranking/RankingScreen.tsx
 import React from 'react';
 import { useI18n } from '../../i18n/useTranslation';
 import { X, Trophy, Medal, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react'; 
+import { useSettings } from '../../context/SettingsContext'; // Import settings context for audio
 import './RankingScreen.css';
 
 interface RankingUser {
@@ -20,6 +22,7 @@ interface RankingScreenProps {
 
 const RankingScreen: React.FC<RankingScreenProps> = ({ onClose, users }) => {
   const { t } = useI18n();
+  const { playSound } = useSettings(); // Hook to access global playSound function
 
   const renderRankIcon = (index: number) => {
     if (index === 0) return <Trophy className="rank-icon gold" size={24} />;
@@ -31,8 +34,15 @@ const RankingScreen: React.FC<RankingScreenProps> = ({ onClose, users }) => {
   return (
     <div className="ranking-layout">
       <div className="ranking-container">
-        {/* BOTÓN DE SALIDA CON ICONO FORZADO */}
-        <button className="ranking-exit-btn" onClick={onClose} aria-label="Close">
+        {/* EXIT BUTTON WITH INTEGRATED SOUND */}
+        <button 
+          className="ranking-exit-btn" 
+          onClick={() => {
+            playSound('click.mp3'); // Play click sound before closing
+            onClose(); // Trigger the close callback
+          }} 
+          aria-label="Close"
+        >
          <X size={68} color="white" strokeWidth={3} />
         </button>
 

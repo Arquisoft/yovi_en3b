@@ -1,4 +1,4 @@
-
+// UBICACIÓN: webapp/src/pages/MainMenu.tsx
 import React, { useState } from 'react';
 import { Languages, Settings, User, LogOut } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
 import GamePreviewModal from '../components/GamePreviewModal/GamePreviewModal';
 import { LanguageDialog } from '../components/LanguageDialog/LanguageDialog';
 import SettingsModal from '../components/Settings/SettingsModal';
-import RankingScreen from '../components/RankingScreen/RankingScreen'; // 1. Importamos el nuevo componente
+import RankingScreen from '../components/RankingScreen/RankingScreen'; 
 import '../App.css';
 
 // MOCK DATA
@@ -22,31 +22,37 @@ const MOCK_RANKING_DATA = [
 
 const MainMenu: React.FC = () => {
   const { t } = useI18n();
-  const { colorBlindMode } = useSettings(); 
+  const { colorBlindMode, playSound } = useSettings(); // Access playSound from settings context
   const [showPlayOptions, setShowPlayOptions] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
   const [languageOpen, setLanguageOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showRanking, setShowRanking] = useState(false); // 2. Estado para el Ranking
+  const [showRanking, setShowRanking] = useState(false);
 
   const navigate = useNavigate();
+
+  // Helper function to handle clicks and sounds
+  const handleMenuAction = (action: () => void) => {
+    playSound('click.mp3'); // Play feedback sound
+    action(); // Execute the specific state change
+  };
 
   return (
     <div className={`App ${colorBlindMode ? 'color-blind' : ''}`}>
       <div className="menu-container">
         <div className="header-icons">
-          <button className="icon-btn" title={t.buttons.language} onClick={() => setLanguageOpen(true)}>
+          <button className="icon-btn" title={t.buttons.language} onClick={() => handleMenuAction(() => setLanguageOpen(true))}>
             <Languages size={28} />
           </button>
-          <button className="icon-btn" title={t.buttons.settings} onClick={() => setShowSettings(true)}>
+          <button className="icon-btn" title={t.buttons.settings} onClick={() => handleMenuAction(() => setShowSettings(true))}>
             <Settings size={28} />
           </button>
-          <button className="icon-btn" title={t.buttons.profile} onClick={() => setProfileOpen(true)}>
+          <button className="icon-btn" title={t.buttons.profile} onClick={() => handleMenuAction(() => setProfileOpen(true))}>
             <User size={28} />
           </button>
-          <button className="icon-btn" title={t.buttons.logout} onClick={() => setShowLogoutConfirm(true)}>
+          <button className="icon-btn" title={t.buttons.logout} onClick={() => handleMenuAction(() => setShowLogoutConfirm(true))}>
             <LogOut size={28} />
           </button>
         </div>
@@ -56,24 +62,22 @@ const MainMenu: React.FC = () => {
         <div className="grid-buttons">
           <button 
             className={`main-button full-width ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} 
-            onClick={() => setShowPlayOptions(true)}
+            onClick={() => handleMenuAction(() => setShowPlayOptions(true))}
           >
             {t.buttons.play} 
           </button>
           
-          <button className="main-button" onClick={() => setShowHowTo(true)}>
+          <button className="main-button" onClick={() => handleMenuAction(() => setShowHowTo(true))}>
             {t.buttons.howToPlay}
           </button>
           
-          {/* 3. Ranking button */}
-          <button className="main-button" onClick={() => setShowRanking(true)}>
+          <button className="main-button" onClick={() => handleMenuAction(() => setShowRanking(true))}>
             {t.buttons.overallRanking}
           </button>
         </div>
 
         {/* --- MODAL COMPONENTS --- */}
 
-        {/* 4. Oprional rendering of the Ranking component */}
         {showRanking && (
           <div className="modal-overlay"> 
             <RankingScreen 
@@ -86,18 +90,24 @@ const MainMenu: React.FC = () => {
         <LanguageDialog open={languageOpen} onClose={() => setLanguageOpen(false)} />
 
         {showLogoutConfirm && (
-          <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal-overlay" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))}>
             <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''}`} onClick={(e) => e.stopPropagation()}>
-              <button className="boton-cerrar-fijo" onClick={() => setShowLogoutConfirm(false)}>&times;</button>
+              <button className="boton-cerrar-fijo" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))}>&times;</button>
               <h2 className="modal-title">{t.buttons.logout}</h2>
               <p className="modal-text">
                 {t.messages.logoutConfirmation}
               </p>
               <div className="modal-grid">
-                <button className="opt-btn btn-danger" onClick={() => navigate('/')}>
+                <button 
+                  className="opt-btn btn-danger" 
+                  onClick={() => {
+                    playSound('click.mp3'); // Sound feedback on logout
+                    navigate('/');
+                  }}
+                >
                   {t.buttons.confirmLogout}
                 </button>
-                <button className="opt-btn active" onClick={() => setShowLogoutConfirm(false)}>
+                <button className="opt-btn active" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))}>
                   {t.buttons.stayHere}
                 </button>
               </div>
@@ -108,7 +118,11 @@ const MainMenu: React.FC = () => {
         <GamePreviewModal 
           isOpen={showPlayOptions} 
           onClose={() => setShowPlayOptions(false)} 
-          onStart={(settings) => { setShowPlayOptions(false); navigate('/game', { state: settings }); }} 
+          onStart={(settings) => { 
+            playSound('click.mp3'); // Sound when starting a game
+            setShowPlayOptions(false); 
+            navigate('/game', { state: settings }); 
+          }} 
         />
         {showHowTo && <HowToPlay onClose={() => setShowHowTo(false)} />}
         <ProfileOverlay open={profileOpen} onClose={() => setProfileOpen(false)} />
