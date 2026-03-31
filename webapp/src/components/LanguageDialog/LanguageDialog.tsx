@@ -1,4 +1,4 @@
-// UBICACIÓN: webapp/src/components/LanguageDialog/LanguageDialog.tsx
+
 import React from 'react';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext'; // Importamos los ajustes
@@ -15,7 +15,7 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
 
   if (!open) return null;
 
-  const handleLanguageChange = (lang: 'es' | 'en') => {
+  const handleLanguageChange = (lang: 'es' | 'en' | 'tr') => {
     setLanguage(lang);
     onClose();
   };
@@ -40,6 +40,12 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
             onClick={() => handleLanguageChange('en')}
           >
             {t.buttons.english}
+          </button>
+          <button
+            className={`btn-lang-white ${language === 'tr' ? 'active' : ''}`}
+            onClick={() => handleLanguageChange('tr')}
+          >
+            {t.buttons.turkish}
           </button>
         </div>
       </div>
