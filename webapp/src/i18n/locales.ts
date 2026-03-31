@@ -1,3 +1,4 @@
+
 export const translations = {
   es: {
     buttons: {
@@ -42,6 +43,11 @@ export const translations = {
       defeat: 'DERROTA',
     },
     labels: {
+      lastGame: 'ÚLTIMA PARTIDA',
+      rankingTitle: 'RANKING GLOBAL',
+      user: 'USUARIO',
+      position: 'POSICIÓN',
+      winRate: '% DE VICTORIAS',
       displayName: 'NOMBRE A MOSTRAR',
       selectLevel: 'SELECCIONA NIVEL',
       userProfile: 'PERFIL DE USUARIO',
@@ -139,7 +145,7 @@ export const translations = {
       logout: 'LOGOUT',
       spanish: 'SPANISH',
       english: 'ENGLISH',
-      turkish: 'TURKISH', // Añadido para solucionar el error de TypeScript
+      turkish: 'TURKISH', 
       yesExitAndLose: 'YES, EXIT AND LOSE',
       backToGame: 'BACK TO THE GAME',
       playNow: 'PLAY NOW',
@@ -159,6 +165,11 @@ export const translations = {
       defeat: 'DEFEAT',
     },
     labels: {
+      lastGame: 'LAST GAME',
+      rankingTitle: 'GLOBAL RANKING',
+      user: 'USER',
+      position: 'POSITION',
+      winRate: 'WIN %', 
       displayName: 'DISPLAY NAME',
       selectLevel: 'SELECT LEVEL',
       userProfile: 'USER PROFILE',
@@ -276,6 +287,11 @@ export const translations = {
       defeat: 'MAĞLUBİYET',
     },
     labels: {
+      lastGame: 'SON OYUN',
+      rankingTitle: 'GENEL SIRALAMA',
+      user: 'KULLANICI',
+      position: 'POZİSYON',
+      winRate: 'KAZANMA ORANI',
       displayName: 'GÖRÜNÜR AD',
       selectLevel: 'SEVİYE SEÇ',
       userProfile: 'KULLANICI PROFİLİ',
