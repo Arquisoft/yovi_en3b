@@ -250,8 +250,6 @@ export const translations = {
   },
   tr: {
     buttons: {
-      volume: 'VOLUMEN',
-      mute: 'SESSİZ',
       play: 'OYNA',
       howToPlay: 'NASIL OYNANIR',
       save: 'KAYDET',
@@ -293,6 +291,8 @@ export const translations = {
       defeat: 'MAĞLUBİYET',
     },
     labels: {
+      volume: 'VOLUMEN',
+      mute: 'SESSİZ',
       lastGame: 'SON OYUN',
       rankingTitle: 'GENEL SIRALAMA',
       user: 'KULLANICI',
