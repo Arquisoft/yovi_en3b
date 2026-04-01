@@ -51,7 +51,7 @@ Given('the main page opened and a user already created with username {string} an
 
   // 1. Use the defined API
   const apiContext = await request.newContext({
-    baseURL: 'http://localhost:3000' 
+    baseURL: 'http://localhost:3001' //port 3001 just for testing, to deploy the app is port 3000
   });
 
   const response = await apiContext.post('/users/createuser', { 
@@ -60,7 +60,7 @@ Given('the main page opened and a user already created with username {string} an
       nickname: "BotNickname",
       email: email,
       password: "Test@123456",
-      avatarId: "default.png"
+      photo: "default.png",
     }
   });
  
