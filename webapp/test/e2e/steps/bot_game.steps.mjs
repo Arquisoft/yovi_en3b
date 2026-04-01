@@ -13,6 +13,9 @@ When('I enter the login password {string}', async function (password) {
 
 When('I click the main menu play button', async function () {
   const page = this.page;
+  // We wait for React to take us to the menu
+  await page.waitForURL('**/menu', { timeout: 10000 });
+  
   await page.locator('.main-button.full-width').click();
 });
 
