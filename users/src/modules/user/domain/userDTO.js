@@ -10,7 +10,7 @@ const toUserInputDto = (user) => {
   return {
     username: user.username,
     email: user.email,
-    avatarId: user.avatarId,
+    photo: user.avatarId,
     nickname: user.nickname,
     password: user.password,
     newPassword: user.newPassword

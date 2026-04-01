@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 app.disable('x-powered-by')
-const port = 3000;
+const port = process.env.PORT || 3000;
 const swaggerUi = require('swagger-ui-express');
 const fs = require('node:fs');
 const YAML = require('js-yaml');
