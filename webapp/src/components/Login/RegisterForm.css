@@ -4,23 +4,31 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%);
   position: fixed; /* Ensures it stays full screen */
   top: 0;
   left: 0;
+  overflow-y: auto;
+  padding: 40px;
 }
 
 /* The card where the login lives */
 .login-card {
   background: rgba(15, 23, 42, 0.95);
-  padding: 60px 40px;
+  padding: 30px 30px;
   border-radius: 30px;
   border: 2px solid #60a5fa;
   box-shadow: 0 0 40px rgba(96, 165, 250, 0.2);
   width: 100%;
-  max-width: 450px;
+  max-width: 400px;
   text-align: center;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: min-content;
+  max-height: 90vh; 
+  overflow-y: auto; 
 }
 
 .auth-form {
