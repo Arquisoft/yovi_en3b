@@ -31,12 +31,15 @@ const GameScreen: React.FC = () => {
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
     const [showLanguageDialog, setShowLanguageDialog] = useState(false);
     const [boardState, setBoardState] = useState<Record<string, number>>({});
+    const [history, setHistory] = useState<Record<string, number>[]>([]);  // History for "Undo" button
+    const [canUndo, setCanUndo] = useState(false);  // To deactivate the undo button once it is clicked
     const [currentPlayer, setCurrentPlayer] = useState(1);
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
     const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
     const [inputValue, setInputValue] = useState('');
+    
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
@@ -82,6 +85,13 @@ const GameScreen: React.FC = () => {
     const handleConfirm = () => {
         if (!pendingMove || gameResult) return;
         playSound('place-tile.mp3'); 
+
+        // Saves in the history of moves (for the undo)
+        setHistory(prev => [...prev, boardState]);
+
+        // Allows the undo button from being pressed
+        setCanUndo(true);
+
         const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
 
         const newBoardState = { ...boardState, [key]: 1 };
@@ -114,9 +124,31 @@ const GameScreen: React.FC = () => {
         }, 1200);
     };
 
+    const handleUndo = () => {
+        if (history.length === 0 || botCooldown) return;
+
+        playSound('click.mp3');
+
+        // Get the previous save state
+        const previousState = history[history.length - 1];
+
+        // Update the board
+        setBoardState(previousState);
+
+        // Delete from the history that move
+        setHistory(prev => prev.slice(0, -1));
+
+        // Clean any pending move
+        setPendingMove(null);
+
+        // Blocks the button from being clicked on
+        setCanUndo(false);
+    }
+
     const restartGame = () => {
         playSound('click.mp3');
         setBoardState({});
+        setHistory([]);
         setGameResult(null);
         setCurrentPlayer(1);
         setTimeLeft(initialTime);
@@ -166,7 +198,14 @@ const GameScreen: React.FC = () => {
                 </main>
 
                 <footer className="game-footer">
-                    <button className="game-action-btn" onClick={() => playSound('click.mp3')}><Undo2 size={18} /> <span>{t.buttons.undo}</span></button>
+                    <button 
+                        className="game-action-btn" 
+                        onClick={handleUndo}
+                        disabled ={history.length === 0 || botCooldown || !canUndo}
+                        >
+                            <Undo2 size={18} /> 
+                            <span>{t.buttons.undo}</span>
+                    </button>
                     <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
                         <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
                     </button>

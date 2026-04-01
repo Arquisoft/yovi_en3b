@@ -17,10 +17,14 @@
 .how-to-play-modal { 
   position: relative !important;
   width: min(500px, 95vw) !important; 
+  max-height: 85vh; 
+  overflow-y: auto; 
   padding: 40px !important; 
   background: rgba(15, 23, 42, 0.95) !important;
   border: 2px solid var(--accent-ui) !important; /* Borde dinámico */
   border-radius: 30px !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-ui) transparent;
 }
 
 /* Títulos de pasos dinámicos */
