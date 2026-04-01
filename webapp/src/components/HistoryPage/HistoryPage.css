@@ -4,7 +4,6 @@
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    /* Bajamos el título del borde superior */
     padding: 100px 20px 40px 20px; 
     display: flex;
     flex-direction: column;
@@ -15,16 +14,67 @@
 .history-header {
     display: flex;
     align-items: center;
-    /* Título a la izquierda, Flecha a la derecha */
     justify-content: space-between; 
-    margin-bottom: 60px;
+    margin-bottom: 20px; /* Reducido para que las stats estén cerca */
     width: 100%;
 }
 
 .history-header .title-game {
     margin: 0;
-    font-size: 4rem; /* Ajustado para que no ocupe toda la pantalla */
+    font-size: 4rem;
     text-align: left;
+}
+
+/* --- ESTILOS DE ESTADÍSTICAS --- */
+.history-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+}
+
+.stat-card-mini {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 150px;
+    transition: 0.3s;
+}
+
+.stat-card-mini:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    color: var(--game-accent);
+}
+
+.stat-icon.win {
+    color: #ffd700; /* Color oro para el trofeo de victorias */
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
 }
 
 .icon-btn-back {
@@ -39,7 +89,7 @@
 }
 
 .icon-btn-back:hover {
-    transform: scale(1.2) rotate(-10deg); /* Pequeño giro orgánico al hacer hover */
+    transform: scale(1.2) rotate(-10deg);
     filter: drop-shadow(0 0 10px var(--game-accent));
     color: #ffffff;
 }
@@ -50,7 +100,6 @@
     gap: 20px;
 }
 
-/* Match Cards */
 .history-card {
     background: rgba(15, 23, 42, 0.8);
     border: 2px solid rgba(255, 255, 255, 0.1);
@@ -68,63 +117,20 @@
     background: rgba(30, 41, 59, 0.9);
 }
 
-.history-card.win {
-    border-color: var(--game-accent);
-}
+.history-card.win { border-color: var(--game-accent); }
+.history-card.lose { border-color: var(--game-red); }
 
-.history-card.lose {
-    border-color: var(--game-red);
-}
+.neon-mode .history-card.win { box-shadow: 0 0 20px var(--game-accent); }
+.neon-mode .history-card.lose { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
 
-/* Neon Glow Effect */
-.neon-mode .history-card.win {
-    box-shadow: 0 0 20px var(--game-accent);
-}
-
-.neon-mode .history-card.lose {
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-}
-
-/* Content inside cards */
-.card-details {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.detail-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #e2e8f0;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1rem;
-}
-
-.card-stats {
-    text-align: right;
-}
-
-.stat-badge {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 6px 15px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: #94a3b8;
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-.result-text {
-    font-family: 'Cubic', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-}
-
+.card-details { display: flex; flex-direction: column; gap: 10px; }
+.detail-row { display: flex; align-items: center; gap: 12px; color: #e2e8f0; font-family: 'Orbitron', sans-serif; font-size: 1rem; }
+.card-stats { text-align: right; }
+.stat-badge { background: rgba(255, 255, 255, 0.05); padding: 6px 15px; border-radius: 12px; font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; display: inline-block; }
+.result-text { font-family: 'Cubic', sans-serif; font-size: 1.4rem; letter-spacing: 2px; }
 .result-text.win { color: var(--game-accent); }
 .result-text.lose { color: var(--game-red); }
 
-/* Color Blind Mode Adjustments */
-.color-blind .icon-win { color: var(--game-accent); } /* Orange in colorblind */
+.color-blind .icon-win { color: var(--game-accent); }
 .color-blind .icon-lose { color: #ffffff; }
 .color-blind .result-text.lose { color: #ffffff; }

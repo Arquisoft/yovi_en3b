@@ -1,24 +1,36 @@
-import React from 'react'; // React core
-import { useSettings } from '../../context/SettingsContext'; // Global settings hook
-import { useI18n } from '../../i18n/useTranslation'; // Translation hook
-import '../../App.css'; // Global styles
+// UBICACIÓN: webapp/src/components/Settings/SettingsModal.tsx
+import React from 'react'; 
+import { useSettings } from '../../context/SettingsContext'; 
+import { useI18n } from '../../i18n/useTranslation'; 
+import '../../App.css'; 
 
 interface SettingsModalProps {
-  onClose: () => void; // Function to close modal
+  onClose: () => void; 
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
-  const { t } = useI18n(); // Access translations
+  const { t } = useI18n(); 
   const { 
     brightness, setBrightness, 
     colorBlindMode, setColorBlindMode,
-    neonMode, toggleNeonMode 
-  } = useSettings(); // Access all global settings
+    neonMode, toggleNeonMode,
+    volume, setVolume,
+    isMuted, setIsMuted,
+    playSound 
+  } = useSettings(); 
   
+  const handleAction = (action: () => void) => {
+    playSound('click.mp3'); 
+    action(); 
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()}>
-        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
+    <div className="modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
+      <div 
+        className={`modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="boton-cerrar-fijo" onClick={() => { playSound('click.mp3'); onClose(); }}>&times;</button>
         
         <h2 className="modal-title">{t.buttons.settings}</h2>
 
@@ -34,10 +46,33 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           </div>
 
           <div className="setting-item">
+            <label className="modal-text">
+              {t.labels.volume || 'VOLUMEN'}: {isMuted ? 0 : volume}%
+            </label>
+            <input 
+              type="range" min="0" max="100" 
+              value={isMuted ? 0 : volume} 
+              onChange={(e) => setVolume(Number(e.target.value))} 
+              className="settings-slider"
+              disabled={isMuted} 
+            />
+          </div>
+
+          <div className="setting-item">
+            <label className="modal-text">{t.labels.mute || 'SILENCIO'}</label>
+            <button 
+              className={`opt-btn ${isMuted ? 'active' : ''}`}
+              onClick={() => handleAction(() => setIsMuted(!isMuted))}
+            >
+              {isMuted ? t.buttons.on : t.buttons.off}
+            </button>
+          </div>
+
+          <div className="setting-item">
             <label className="modal-text">{t.labels.colorBlindMode}</label>
             <button 
               className={`opt-btn ${colorBlindMode ? 'active' : ''}`}
-              onClick={() => setColorBlindMode(!colorBlindMode)}
+              onClick={() => handleAction(() => setColorBlindMode(!colorBlindMode))}
             >
               {colorBlindMode ? t.buttons.on : t.buttons.off}
             </button>
@@ -46,8 +81,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           <div className="setting-item">
             <label className="modal-text">{t.labels.neonEffects}</label>
             <button 
-              className={`opt-btn ${neonMode ? 'active' : ''}`} // Dynamic active class
-              onClick={toggleNeonMode} // Real toggle function
+              className={`opt-btn ${neonMode ? 'active' : ''}`}
+              onClick={() => handleAction(toggleNeonMode)}
             >
               {neonMode ? t.buttons.on : t.buttons.off} 
             </button>

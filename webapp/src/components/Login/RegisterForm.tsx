@@ -1,54 +1,55 @@
+// UBICACIÓN: webapp/src/components/Register/RegisterForm.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Hook for navigation
-import './RegisterForm.css'; // New specific CSS file
+import { useNavigate } from 'react-router-dom'; 
+import { useSettings } from '../../context/SettingsContext'; // Import settings to use playSound
+import './RegisterForm.css'; 
 
 const RegisterForm: React.FC = () => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState(''); // New state for password
+  const [password, setPassword] = useState(''); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Initialize navigator
+  const navigate = useNavigate(); 
+  const { playSound } = useSettings(); // Access the sound player function
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevents page refresh on submit.
+    event.preventDefault(); // Prevents page refresh on form submission
+    playSound('click.mp3'); // Play click sound when submitting the form
     setError(null);
 
     if (!username.trim() || !password.trim()) {
-      setError('Please fill in all fields.'); // Basic validation before sending data.
+      setError('Please fill in all fields.'); 
       return;
     }
 
-    setLoading(true); // Starts the loading state.
+    setLoading(true); 
     try {
-      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; // Backend endpoint.
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; 
       const res = await fetch(`${API_URL}/users/loginUser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }) // Sending credentials to server.
+        body: JSON.stringify({ username, password }) 
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // Guardar el token (si tu backend lo devuelve)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', username);
-        navigate('/menu');
+        localStorage.setItem('token', data.token); // Save auth token to local storage
+        localStorage.setItem('username', username); // Save username for global reference
+        navigate('/menu'); // Redirect user to the main menu
       } else {
-        // Si el servidor responde con error (ej. usuario no encontrado)
         setError(data.message || 'Error in the login. Please check your credentials.');
       }
     } catch (err) {
-      // Si el backend no responde (Docker apagado o red fallida)
       setError('Cannot connect to the server. Please try again later.');
       console.error("Connection error:", err);
     } finally {
-      setLoading(false); // Ends the loading state.
+      setLoading(false); 
     }
   };
 
   return (
-    <div className="login-container"> {/* Main wrapper for centering */}
+    <div className="login-container"> 
       <div className="login-card">
         <h1 className="title-game cubic-text" style={{ fontSize: '3rem' }}>GAME Y</h1>
         
@@ -60,7 +61,7 @@ const RegisterForm: React.FC = () => {
               name="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)} // Updates username state.
+              onChange={(e) => setUsername(e.target.value)} 
               className="orbitron-text"
               placeholder="Enter your name"
             />
@@ -73,7 +74,7 @@ const RegisterForm: React.FC = () => {
               name="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Updates password state.
+              onChange={(e) => setPassword(e.target.value)} 
               className="orbitron-text"
               placeholder="••••••••"
             />
@@ -82,19 +83,21 @@ const RegisterForm: React.FC = () => {
           {error && <p className="error-text orbitron-text">{error}</p>}
 
           <button type="submit" className="main-button btn-blue play-btn" disabled={loading}>
-            {loading ? 'LOADING...' : 'PLAY'} {/* Button label changes during request. */}
+            {loading ? 'LOADING...' : 'PLAY'} 
           </button>
     
-
-          {/* New Sign Up link styled as a gray text link */}
           <div className="auth-footer">
             <span className="orbitron-text" style={{ color: '#64748b' }}>DON'T HAVE AN ACCOUNT? </span>
-               <button 
-                   type="button" 
-                   className="auth-link" 
-                   onClick={() => navigate('/signup')} // Here we change the screen to signup
-              > SIGN UP
-               </button>
+            <button 
+              type="button" 
+              className="auth-link" 
+              onClick={() => {
+                playSound('click.mp3'); // Play click sound when navigating to signup
+                navigate('/signup');
+              }}
+            > 
+              SIGN UP
+            </button>
           </div>
         
         </form>
