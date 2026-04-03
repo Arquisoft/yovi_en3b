@@ -7,7 +7,7 @@ import { useI18n } from "../../i18n/useTranslation";
 import { useSettings } from "../../context/SettingsContext"; 
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
 
