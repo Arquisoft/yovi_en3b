@@ -2,15 +2,15 @@
 
 .language-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  min-height: 100dvh;
   background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(0.625rem);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: clamp(0.75rem, 3vh, 2rem);
   z-index: 3000;
 }
 
@@ -18,21 +18,23 @@
 .language-modal {
   position: relative;
   background: rgba(15, 23, 42, 0.95); /* matching other modals */
-  padding: 60px 40px 40px 40px;
-  border-radius: 30px;
-  border: 2px solid var(--game-accent); /* Dynamic border color */
-  width: 90%;
-  max-width: 450px;
+  padding: clamp(2.25rem, 5vw, 3.75rem) clamp(1.1rem, 4vw, 2.5rem) clamp(1.1rem, 4vw, 2.5rem) clamp(1.1rem, 4vw, 2.5rem);
+  border-radius: 1.875rem;
+  border: 0.125rem solid var(--game-accent); /* Dynamic border color */
+  width: min(100%, 28.125rem);
+  max-height: min(90dvh, 38rem);
+  overflow-y: auto;
   text-align: center;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1.875rem rgba(0, 0, 0, 0.5);
+  margin: auto;
 }
 
 /* Title using the same style as Main Menu */
 .language-title {
   font-family: 'Cubic', sans-serif !important;
   color: var(--game-accent); /* Dynamic color (Blue or Orange) */
-  font-size: 2.5rem;
-  margin-bottom: 35px;
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  margin-bottom: 2.1875rem;
   text-transform: uppercase;
   text-shadow: var(--text-shadow); /* Glow effect */
 }
@@ -40,7 +42,7 @@
 .language-options {
   display: flex;
   flex-direction: column; /* Better for scannability than a small gap */
-  gap: 15px;
+  gap: 0.9375rem;
   justify-content: center;
 }
 
@@ -48,9 +50,9 @@
 .btn-lang-white {
   background: rgba(255, 255, 255, 0.1) !important; /* Semi-transparent like other buttons */
   color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  padding: 15px 30px !important;
-  border-radius: 15px !important;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.2) !important;
+  padding: 0.9375rem 1.875rem !important;
+  border-radius: 0.9375rem !important;
   font-family: 'Orbitron', sans-serif !important;
   font-weight: 600 !important;
   font-size: 1.1rem !important;
@@ -62,22 +64,22 @@
 .btn-lang-white:hover {
   background: rgba(255, 255, 255, 0.2) !important;
   border-color: var(--game-accent) !important;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-0.1875rem);
+  box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.3);
 }
 
 /* Active state with the neon accent */
 .btn-lang-white.active {
   background: var(--game-accent-dark) !important; /* Dynamic dark background */
   border-color: white !important;
-  box-shadow: 0 0 20px var(--game-accent); /* Dynamic glow */
+  box-shadow: 0 0 1.25rem var(--game-accent); /* Dynamic glow */
   color: white !important;
 }
 
 .close-x-lang {
   position: absolute;
-  top: 15px;
-  right: 20px;
+  top: 0.9375rem;
+  right: 1.25rem;
   background: none;
   border: none;
   color: var(--game-accent); /* Dynamic close button */

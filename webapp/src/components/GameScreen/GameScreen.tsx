@@ -211,7 +211,7 @@ const GameScreen: React.FC = () => {
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>
-                        <p className="modal-text">
+                        <p className="result-modal-text">
                             {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
                         </p>
                         <div className="modal-buttons-column">

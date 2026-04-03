@@ -68,7 +68,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         </div>
 
         <div className="video-resource">
-          <p className="confirm-text" style={{ fontSize: '0.9rem', marginBottom: '10px', color: '#fafafa' }}>
+          <p className="confirm-text" style={{ fontSize: '0.9rem', marginBottom: '0.625rem', color: '#fafafa' }}>
             {t.messages.wantToSeeAction}
           </p>
           <a 
@@ -82,7 +82,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           </a>
         </div>
 
-        <button className="understood-btn btn-blue" onClick={onClose} style={{ marginTop: '20px' }}>
+        <button className="understood-btn btn-blue" onClick={onClose}>
           {t.buttons.understood}
         </button>
       </div>
