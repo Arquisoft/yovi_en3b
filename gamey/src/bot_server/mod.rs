@@ -25,12 +25,15 @@ pub mod error;
 pub mod state;
 pub mod version;
 pub mod hint;
+pub mod chat;
 use axum::response::IntoResponse;
 use std::sync::Arc;
+use tower_http::cors::CorsLayer;
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
 pub use version::*;
 pub use hint::{HintResponse, generate_strategic_hint};
+pub use chat::{ChatMessage, ChatRequest, ChatResponse};
 
 use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
 
@@ -48,6 +51,11 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/hint",
             axum::routing::post(hint::get_hint),
         )
+        .route(
+            "/{api_version}/ybot/chat/{bot_id}",
+            axum::routing::post(chat::chat_with_bot),
+        )
+        .layer(CorsLayer::permissive())
         .with_state(state)
 }
 

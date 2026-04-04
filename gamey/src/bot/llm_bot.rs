@@ -121,6 +121,11 @@ impl AnthropicClient {
         self.call_anthropic_text(&prompt).await
     }
 
+    /// Get a free-form chat response from the LLM using a caller-provided prompt.
+    pub async fn get_chat_response(&self, prompt: &str) -> Result<String, String> {
+        self.call_anthropic_text(prompt).await
+    }
+
     async fn call_anthropic(&self, prompt: &str) -> Result<Option<Coordinates>, String> {
         let response_text = self.call_anthropic_text(prompt).await?;
         

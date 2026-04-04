@@ -12,6 +12,7 @@ import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
+import { requestBotChatReply, type GameChatMessage } from './gameyChat.api';
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -22,7 +23,8 @@ const GameScreen: React.FC = () => {
     const {
         size = 5,
         time: initialTime = null,
-        botType = 'robot'
+        botType = 'robot',
+        difficulty = 1
     } = location.state || {};
 
     const [timeLeft, setTimeLeft] = useState<number | null>(initialTime);
@@ -37,8 +39,9 @@ const GameScreen: React.FC = () => {
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
-    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+    const [messages, setMessages] = useState<GameChatMessage[]>([]);
     const [inputValue, setInputValue] = useState('');
+    const [isBotTyping, setIsBotTyping] = useState(false);
     
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
@@ -57,12 +60,40 @@ const GameScreen: React.FC = () => {
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
-    const handleSendMessage = (e: React.FormEvent) => {
+    const mapDifficulty = (level: number): 'easy' | 'medium' | 'hard' => {
+        if (level <= 0) return 'easy';
+        if (level >= 2) return 'hard';
+        return 'medium';
+    };
+
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
         playSound('click.mp3'); 
-        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        const playerText = inputValue.trim();
+        const nextMessages: GameChatMessage[] = [...messages, { sender: 'player', text: playerText }];
+        setMessages(nextMessages);
         setInputValue('');
+
+        try {
+            setIsBotTyping(true);
+            const reply = await requestBotChatReply({
+                size,
+                currentPlayer,
+                boardState,
+                messages: nextMessages,
+                difficulty: mapDifficulty(difficulty),
+                botId: botType === 'chip' ? 'chip' : 'robot',
+            });
+            setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
+        } catch {
+            setMessages(prev => [
+                ...prev,
+                { sender: 'bot', text: 'I cannot answer right now. Try again in a moment.' },
+            ]);
+        } finally {
+            setIsBotTyping(false);
+        }
     };
 
     useEffect(() => {
@@ -246,8 +277,15 @@ const GameScreen: React.FC = () => {
                         </div>
                         <div className="chat-messages">
                             {messages.map((msg, index) => (
-                                <div key={index} className="message sent" style={{ backgroundColor: p1Color }}>{msg.text}</div>
+                                <div
+                                    key={index}
+                                    className={`message ${msg.sender === 'player' ? 'sent' : 'received'}`}
+                                    style={msg.sender === 'player' ? { backgroundColor: p1Color } : undefined}
+                                >
+                                    {msg.text}
+                                </div>
                             ))}
+                            {isBotTyping && <div className="message received">...</div>}
                         </div>
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
                             <input
@@ -256,7 +294,13 @@ const GameScreen: React.FC = () => {
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                             />
-                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }}>
+                            <button
+                                type="submit"
+                                className="send-btn"
+                                data-testid="chat-send-button"
+                                disabled={!inputValue.trim() || isBotTyping}
+                                style={{ backgroundColor: p1Color }}
+                            >
                                 <CheckCircle2 size={18} />
                             </button>
                         </form>
