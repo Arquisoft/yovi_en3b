@@ -35,16 +35,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         <h2 className="modal-title">{t.buttons.settings}</h2>
 
         <div className="settings-container">
+          {/* CONTROL DE BRILLO */}
           <div className="setting-item">
             <label className="modal-text">{t.labels.brightness}: {brightness}%</label>
             <input 
               type="range" min="50" max="150" 
               value={brightness} 
-              onChange={(e) => setBrightness(Number(e.target.value))} 
+              onChange={(e) => setBrightness(Number(e.target.value))} // Activa el useEffect del Contexto
               className="settings-slider"
             />
           </div>
 
+          {/* CONTROL DE VOLUMEN */}
           <div className="setting-item">
             <label className="modal-text">
               {t.labels.volume || 'VOLUMEN'}: {isMuted ? 0 : volume}%
@@ -58,6 +60,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             />
           </div>
 
+          {/* MUTE */}
           <div className="setting-item">
             <label className="modal-text">{t.labels.mute || 'SILENCIO'}</label>
             <button 
@@ -68,6 +71,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             </button>
           </div>
 
+          {/* COLOR BLIND */}
           <div className="setting-item">
             <label className="modal-text">{t.labels.colorBlindMode}</label>
             <button 
@@ -78,6 +82,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             </button>
           </div>
 
+          {/* NEON */}
           <div className="setting-item">
             <label className="modal-text">{t.labels.neonEffects}</label>
             <button 

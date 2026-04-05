@@ -8,10 +8,10 @@ interface SettingsContextType {
   setColorBlindMode: (v: boolean) => void;
   neonMode: boolean;
   toggleNeonMode: () => void;
-  volume: number; // Porcentaje de volumen (0-100)
-  setVolume: (v: number) => void; // Cambiar volumen
-  isMuted: boolean; // Estado de silencio
-  setIsMuted: (v: boolean) => void; // Alternar silencio
+  volume: number; 
+  setVolume: (v: number) => void; 
+  isMuted: boolean; 
+  setIsMuted: (v: boolean) => void; 
   playSound: (sound: string) => void; 
 }
 
@@ -27,9 +27,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false); 
 
+  // --- EFECTO DE BRILLO ---
+  useEffect(() => {
+    // Aplicamos el filtro directamente al elemento raíz del documento
+    // Esto afectará a toda la webapp
+    document.documentElement.style.filter = `brightness(${brightness}%)`; // Apply brightness filter to the entire app
+  }, [brightness]); // Se ejecuta cada vez que mueves el slider de brillo
+
   // Inicializar música de fondo
   useEffect(() => {
-    const audio = new Audio('/sounds/gameb.mp3'); // Nombre del archivo actualizado
+    const audio = new Audio('/sounds/gameb.mp3'); 
     audio.loop = true;
     bgMusicRef.current = audio;
 
@@ -41,10 +48,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sincronizar volumen y silencio
   useEffect(() => {
     if (bgMusicRef.current) {
-      bgMusicRef.current.volume = volume / 100; // Convertir a escala 0.0 - 1.0
+      bgMusicRef.current.volume = volume / 100;
       bgMusicRef.current.muted = isMuted;
-      
-      // Si el usuario interactuó y no está silenciado, intentar reproducir
       if (hasInteracted && !isMuted && volume > 0) {
         bgMusicRef.current.play().catch(() => {});
       }
@@ -54,12 +59,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const toggleNeonMode = () => setNeonMode(!neonMode);
 
   const playSound = (soundFile: string) => {
-    // La primera interacción del usuario desbloquea el audio del navegador
     if (!hasInteracted) setHasInteracted(true); 
-
     if (isMuted) return;
     const audio = new Audio(`/sounds/${soundFile}`);
-    audio.volume = volume / 100; // Los efectos también respetan el slider
+    audio.volume = volume / 100;
     audio.play().catch(err => console.error("Error en sonido FX:", err));
   };
 
