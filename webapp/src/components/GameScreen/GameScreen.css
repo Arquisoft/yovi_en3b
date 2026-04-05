@@ -1,543 +1,508 @@
-/*
-================================================
-||                MAIN LAYOUT                 ||
-================================================
-*/
+/* GameScreen.css - UNIFIED STYLES */
 
 .game-layout {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: transparent;
-  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%) !important;
+  font-family: 'Orbitron', sans-serif;
   overflow: hidden;
 }
-
-/*
-================================================
-||    GAME PART (Board, players & actions)    ||
-================================================
-*/
 
 .game-main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px;
+  padding: 20px;
 }
 
+/* HEADER & PLAYER CARDS */
 .game-header {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
   margin-bottom: 25px;
 }
 
 .player-card {
-  padding: 10px 30px;
-  background: rgba(30, 41, 59, 0.5);
+  padding: 12px 30px;
+  background: rgba(30, 41, 59, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 15px;
   color: white;
-  font-weight: 600;
+  min-width: 150px;
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
 .player-card.active {
   border-color: #3b82f6;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  background: rgba(37, 99, 235, 0.15);
 }
 
-.vs-text {
-  color: #64748b;
-  font-size: 0.8rem;
+.game-timer-wrapper {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid rgba(96, 165, 250, 0.4);
+  padding: 8px 25px;
+  border-radius: 20px;
+}
+
+.timer-value {
+  font-size: 2rem;
   font-weight: bold;
+  color: #60a5fa;
 }
 
+/* BOARD AREA */
 .board-area {
   flex: 1;
   width: 95%;
-  max-width: 900px;
-  background: rgba(15, 23, 42, 0.3);
-  backdrop-filter: blur(8px);
+  max-width: 1000px;
+  background: rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  border-radius: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  overflow: hidden;
 }
 
+.triangle-board {
+  width: 100%;
+  height: 90%;
+}
+
+.hex-cell {
+  cursor: pointer;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 0.3;
+  fill: #1e293b;
+  transition: all 0.2s;
+}
+
+/* SIDEBAR & CHAT */
+.game-sidebar {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+/* EXIT BUTTON IMPROVED VISIBILITY */
+.exit-sidebar-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  /* Fondo gris claro/blanco translúcido para que destaque */
+  background: rgba(255, 255, 255, 0.15) !important; 
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  /* Icono en blanco puro */
+  color: #ffffff !important; 
+  width: 36px; /* Ligeramente más grande */
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: all 0.3s ease;
+  /* Sombra para separar del fondo */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+}
+
+/* Efecto Hover: Brillo intenso */
+.exit-sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: #ffffff !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Ajuste para los iconos de configuración para que no compitan en brillo */
+.global-settings-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 20px;
+  
+}
+
+.icon-btn-global {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important; /* Gris muy claro pero no blanco puro */
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn-global:hover {
+  background: rgba(51, 65, 85, 0.9) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.chat-container {
+  flex: 1;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+/* CHAT HEADER IMPROVED */
+.chat-header {
+  padding: 15px;
+  background: rgba(96, 165, 250, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.bot-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bot-avatar-circle {
+  width: 40px;
+  height: 40px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #60a5fa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+}
+
+.bot-info-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bot-name-chat {
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.bot-status-tag {
+  font-size: 0.65rem;
+  color: #10b981;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message.received {
+  background: rgba(51, 65, 85, 0.8);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.85rem;
+  align-self: flex-start;
+}
+
+/* 1. El contenedor: quitamos un poco de padding para ganar espacio */
+.chat-input-area {
+  padding: 10px; /* Reducido de 15px a 10px */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio más pequeño entre input y botón */
+  background: rgba(15, 23, 42, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 2. El input: Nos aseguramos de que use todo el espacio posible */
+.chat-input-area input {
+  flex: 1; /* Esto es clave: empuja al botón a la derecha */
+  min-width: 0; /* Evita que el input empuje el sidebar hacia afuera */
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px;
+  padding: 12px 15px; /* Más cómodo para escribir */
+  color: white !important;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem; /* Un pelín más grande */
+}
+
+/* 3. El botón: Lo hacemos un poco más rectangular para que no parezca un cuadrado pequeño */
+.send-btn {
+  background: #2563eb !important;
+  color: white !important;
+  padding: 0 15px; /* Damos ancho con padding en lugar de width fijo */
+  height: 42px; /* Altura que combine con el input */
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* IMPORTANTE: evita que el botón se aplaste */
+}
+
+.chat-input-area input:focus {
+  border-color: #2563eb !important;
+}
+
+
+.send-btn:hover:not(:disabled) {
+  background: #3b82f6 !important;
+  transform: scale(1.05);
+}
+
+.send-btn:disabled {
+  background: #334155 !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.send-confirm-btn {
+  background: #2563eb !important;
+  color: white !important;
+  width: 40px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* FOOTER ACTIONS */
 .game-footer {
   display: flex;
-  gap: 12px;
+  gap: 15px;
 }
 
 .game-action-btn {
   background: #1e293b;
   border: 1px solid #334155;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   color: white;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   cursor: pointer;
 }
 
 .btn-confirm-blue {
   background: #2563eb;
   border: none;
-}
-
-/*
-================================================
-||          SIDEBAR (Settings & Chat)         ||
-================================================
-*/
-
-.game-sidebar {
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  padding: 10px 15px 15px 10px;
-}
-
-.global-settings-bar {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px; 
-  padding: 10px 5px;
-  margin-bottom: 5px;
-}
-
-.icon-btn-global {
-  background: transparent;
-  border: none;
-  color: #60a5fa;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.icon-btn-global:hover {
-  transform: scale(1.1);
-  color: white;
-}
-
-.icon-btn-global.active-link {
-  color: white;
-  filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.6));
-}
-
-/* --- Chat Container --- */
-.chat-container {
-  flex: 1;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.chat-user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.avatar-circle {
-  width: 34px;
-  height: 34px;
-  background: #1e3a8a;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #60a5fa;
   font-weight: bold;
-  font-size: 0.8rem;
-  border: 1px solid #2563eb;
 }
 
-.user-name {
-  color: white;
-  font-weight: 600;
-  font-size: 0.85rem;
+/* GameScreen.css */
+
+/* Hexágono vacío por defecto */
+.hex-cell {
+    fill: rgba(255, 255, 255, 0.05) !important;
+    stroke: rgba(96, 165, 250, 0.3) !important;
+    stroke-width: 0.2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.status-online {
-  color: #4ade80;
-  font-size: 0.7rem;
+/* Hover sobre hexágono vacío */
+.hex-cell:hover {
+    fill: rgba(96, 165, 250, 0.2) !important;
 }
 
-.chat-actions {
-  display: flex;
-  gap: 5px;
+/* Cuando haces click pero no has pulsado CONFIRM (Azul translúcido) */
+.hex-cell.pending-selection {
+    fill: rgba(96, 165, 250, 0.6) !important;
+    stroke: #ffffff !important;
+    stroke-width: 0.4px;
 }
 
-.icon-btn-chat {
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  padding: 5px;
+/* Pieza confirmada del Jugador 1 (Azul Neón) */
+.hex-cell.p1-selected {
+    fill: #60a5fa !important;
+    stroke: #ffffff !important;
+    filter: drop-shadow(0 0 1px #60a5fa);
 }
 
-.icon-btn-chat:hover {
-  color: white;
+/* Pieza confirmada del Bot/Jugador 2 (Rojo/Coral) */
+.hex-cell.p2-selected {
+    fill: #f87171 !important;
+    stroke: #ffffff !important;
+    filter: drop-shadow(0 0 1px #f87171);
 }
 
-.close-x:hover {
-  color: #ef4444;
+/* Animación cuando el tiempo es crítico */
+.timer-low .timer-value {
+    color: #ef4444;
+    animation: blink 1s infinite;
 }
 
-.chat-messages {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px 15px;
-  overflow-y: auto;
+@keyframes blink {
+    50% { opacity: 0.5; }
 }
 
-.message {
-  padding: 10px 14px;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  max-width: 85%;
-  color: white;
+/* GameScreen.css */
+
+.result-modal {
+    text-align: center !important;
+    padding: 50px !important;
+    border: 3px solid #60a5fa !important; /* Borde neón */
 }
 
-.message.received {
-  background: #334155;
-  align-self: flex-start;
-  border-bottom-left-radius: 2px;
+.text-win {
+    color: #60a5fa;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+    margin-bottom: 20px;
 }
 
-.message.sent {
-  background: #2563eb;
-  align-self: flex-end;
-  border-bottom-right-radius: 2px;
+.text-lose {
+    color: #f87171;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(248, 113, 113, 0.8);
+    margin-bottom: 20px;
 }
 
-.chat-input-wrapper {
-  margin: 15px;
-  display: flex;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
-  padding: 5px 5px 5px 15px;
+.modal-buttons-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    margin-top: 30px;
 }
 
-.chat-input-field {
-  background: transparent;
-  border: none;
-  color: white;
-  flex: 1;
-  outline: none;
-  font-size: 0.85rem;
-}
-
-.send-confirm-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/*
-================================================
-||         EXIT CONFIRMATION WINDOW           ||
-================================================
-*/
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.85); 
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal-content {
-  background: #1e293b;
-  padding: 40px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.modal-content h2 {
-  color: white;
-  margin: 15px 0 10px 0;
-  font-size: 1.8rem;
-}
-
-.modal-content p {
-  color: #94a3b8;
-  margin-bottom: 30px;
+.modal-text {
+  color: #ffffff !important;           /* Blanco puro */
+  font-family: 'Orbitron', sans-serif !important; /* Fuente Orbitron */
+  font-size: 1rem;                     /* Tamaño legible */
+  text-align: center;                  /* Centrado */
+  margin-bottom: 25px;                 /* Espacio con los botones */
   line-height: 1.5;
 }
 
-.modal-content strong {
-  color: #ef4444; 
+.btn-blue-outline {
+    background: transparent !important;
+    border: 2px solid #60a5fa !important;
+    color: #60a5fa !important;
 }
 
-.modal-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.btn-red-outline {
+    background: transparent !important;
+    border: 2px solid #f87171 !important;
+    color: #f87171 !important;
 }
 
-.btn-confirm-exit {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
+.message.sent {
+    align-self: flex-end;
+    background-color: #2563eb;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px 12px 0 12px;
+    max-width: 80%;
+    word-wrap: break-word;
 }
 
-.btn-confirm-exit:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
 }
 
-.btn-cancel {
-  background: #334155;
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.btn-cancel:hover {
-  background: #475569;
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.board-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-/* Board hexagons */
 .hex-cell {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  stroke: #d5dbe2; /* Border color */
-  stroke-width: 0.4;
-  fill: #0b1424; 
+    transition: fill 0.3s ease, filter 0.3s ease;
 }
 
-.hex-cell:hover {
-  filter: brightness(1.5);
-  stroke: #ffffff33;
+.p1-selected {
+    filter: drop-shadow(0 0 8px var(--glow-color, #60a5fa));
 }
 
-/* Player hexagons */
+/* --- Variables dinámicas para el juego --- */
+.game-layout {
+    --player1-color: #60a5fa; /* Azul */
+    --player2-color: #f87171; /* Rojo */
+}
+
+/* Colores para modo daltónico */
+.game-layout.color-blind {
+    --player1-color: #f59e0b; /* Naranja */
+    --player2-color: #ffffff; /* Blanco */
+}
+
 .hex-cell.p1-selected {
-  fill: #3b82f6; 
-  stroke: #60a5fa;
+    fill: var(--player1-color) !important;
+    stroke: #ffffff !important;
+    stroke-width: 0.4px;
+    filter: drop-shadow(0 0 0px var(--player1-color)); /* El brillo ahora coincide con la ficha */
+    transition: all 0.3s ease;
 }
 
+/* Jugador 2 (Rojo por defecto, Blanco en modo daltónico) */
 .hex-cell.p2-selected {
-  fill: #ef4444; 
-  stroke: #f87171;
+    fill: var(--player2-color) !important;
+    stroke: #ffffff !important;
+    stroke-width: 0.4px;
+    filter: drop-shadow(0 0 0px var(--player2-color)); /* Brillo dinámico */
+    transition: all 0.3s ease;
 }
 
+/* --- Ajuste para la selección pendiente --- */
 .hex-cell.pending-selection {
-    stroke: #ffffff; /* Border */
-    stroke-width: 2;
-    opacity: 0.7;
+    fill: var(--player1-color) !important;
+    opacity: 0.5; /* Se ve translúcido antes de confirmar */
+    stroke: #ffffff !important;
+    stroke-width: 0.5px;
 }
 
-.hex-cell.suggested-move {
-  fill: #fbbf24;
-  stroke: #f59e0b;
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
+/* --- Botón de Confirmar Dinámico --- */
+.btn-confirm-action {
+    background: var(--confirm-btn-color) !important;
+    border: none !important;
+    font-weight: bold;
+    transition: transform 0.2s, background 0.3s;
 }
 
-/*
-================================================
-||              HINT CONTAINER                ||
-================================================
-*/
-
-.hint-container {
-  flex: 0 0 auto;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 15px;
-  animation: slideDown 0.3s ease-out;
+.btn-confirm-action:hover:not(:disabled) {
+    filter: brightness(1.2);
+    transform: scale(1.05);
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* --- Timer y Header --- */
+.timer-value {
+    color: var(--player1-color); /* El timer brilla como el P1 */
 }
 
-.hint-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  color: #86efac;
-  font-weight: 600;
-  font-size: 0.9rem;
+.game-timer-wrapper {
+    border: 2px solid var(--player1-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.hint-header .close-x {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: #86efac;
-  cursor: pointer;
-  padding: 2px;
-}
-
-.hint-header .close-x:hover {
-  color: #ef4444;
-}
-
-.hint-content {
-  color: #d1fae5;
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-.suggested-move-info {
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(34, 197, 94, 0.2);
-  border-radius: 8px;
-  font-weight: 600;
-  color: #fbbf24;
-}
-
-/*
-================================================
-||           DIFFICULTY DIALOG               ||
-================================================
-*/
-
-.difficulty-modal {
-  max-width: 450px;
-}
-
-.difficulty-modal h2 {
-  margin-bottom: 10px;
-}
-
-.difficulty-modal p {
-  color: #94a3b8;
-  margin-bottom: 25px;
-  font-size: 0.9rem;
-}
-
-.difficulty-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-
-.difficulty-btn {
-  background: rgba(30, 41, 59, 0.8);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 12px;
-  color: white;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.difficulty-btn:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(30, 41, 59, 1);
-}
-
-.difficulty-btn.active {
-  background: #2563eb;
-  border-color: #3b82f6;
-  box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
-}
-
-.difficulty-name {
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.difficulty-desc {
-  font-size: 0.8rem;
-  color: #cbd5e1;
-  font-weight: 400;
-}
-
-.difficulty-btn.active .difficulty-desc {
-  color: #bfdbfe;
-}
-
-/*
-================================================
-||             MODAL ICON                    ||
-================================================
-*/
-
-.modal-icon {
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Avatar del bot en el chat */
+.bot-avatar-circle {
+    border: 2px solid var(--player1-color);
+    color: var(--player1-color);
 }

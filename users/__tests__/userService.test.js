@@ -219,7 +219,7 @@ describe('GET /users/findUserByUsername', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })
@@ -289,7 +289,7 @@ describe('POST /users/loginUser', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })
@@ -390,7 +390,7 @@ describe('POST /users/changePassword', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })
@@ -479,7 +479,7 @@ describe('POST /users/changeNickname', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })

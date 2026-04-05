@@ -5,7 +5,11 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 === Business context
 
+.Business Context Diagram
+image::03_1-business-context.png[]
+
 [cols="1,2a,2a", options="header"]
+
 |===
 | Actor | Input | Output
 
@@ -19,10 +23,13 @@ ifndef::imagesdir[:imagesdir: ../images]
 * Statistics
 * Ranking
 
-| External bot
+| External bot (Claude)
 | * Petitions through play() 
-| * Answer with the next movement (in YEN notation)
+| * Answer with the next movement (in YEN notation), obtained by querying Claude AI
 
+| External bot (Minimax)
+| * Petitions through play() 
+| * Answer with the next movement (in YEN notation), obtained by applying minimax algorithm
 |===
 
 === Technical Context
