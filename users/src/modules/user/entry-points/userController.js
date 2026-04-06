@@ -31,7 +31,8 @@ const createUser = async (req, res) => {
     //500: server error
 const findUserByUsername = async (req, res) => {
     try {
-        const user =await userService.findUserByUsername(req.body);
+        
+        const user =await userService.findUserByUsername(req.query);
         res.status(200).json(userResponseDto.toUserResponseDto(user));
     } catch (error) {
         console.log(error);
