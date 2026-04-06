@@ -218,8 +218,32 @@ Each component has its own set of scripts defined in its `package.json`. Here ar
 - `npm run build`: Generates the documentation
 - `npm run deploy`: Deploys the documentation to GitHub Pages 
 
+---
+
+## 🔧 Setup Issues and Solutions
+
+### Gamey Dockerfile - OpenSSL Dependencies
+
+**Issue:** The Gamey Rust application requires OpenSSL runtime libraries to function properly in the Docker container. Without these dependencies, the container would fail to start with errors like `cannot open shared object file: libssl.so.3: No such file or directory`.
+
+**Solution:** The `gamey/Dockerfile` was modified to include the necessary runtime dependencies in the final stage:
+
+```dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl3 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+**Why this matters:**
+- **libssl3**: Required by OpenSSL-dependent Rust crates (e.g., Anthropic API client)
+- **ca-certificates**: Necessary for HTTPS/TLS connections to external APIs
+- The multi-stage Docker build uses `rust:latest` for compilation, but `debian:bookworm-slim` for the runtime. The slim image doesn't include these dependencies by default.
+
+This ensures the Gamey service can start properly and communicate with external services via HTTPS.
 
 ---
+
 ## 👥 Contributors
 
 We are **Group EN3B**, a team of students at the University of Oviedo.
