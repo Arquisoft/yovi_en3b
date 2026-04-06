@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const gamesaveRepo = require('../src/modules/gamesave/data-access/gamesaveRepository.js');
-const db = require('../src/db/db.js');
+const gamesaveRepo = require('../../src/modules/gamesave/data-access/gamesaveRepository.js');
+const db = require('../../src/db/db.js');
 
 describe('gamesaveRepository', () => {
   afterEach(() => {

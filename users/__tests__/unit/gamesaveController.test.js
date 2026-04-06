@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const gamesaveService = require('../src/modules/gamesave/domain/gamesaveService.js');
-const gamesaveController = require('../src/modules/gamesave/entry-points/gamesaveController.js');
+const gamesaveService = require('../../src/modules/gamesave/domain/gamesaveService.js');
+const gamesaveController = require('../../src/modules/gamesave/entry-points/gamesaveController.js');
 
 const makeRes = () => {
   const res = {};

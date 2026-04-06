@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
-const rankingRepo = require('../src/modules/ranking/data-access/rankingRepository.js');
-const db = require('../src/db/db.js');
+const rankingRepo = require('../../src/modules/ranking/data-access/rankingRepository.js');
+const db = require('../../src/db/db.js');
 
 describe('rankingRepository.upsertRanking', () => {
   afterEach(() => {

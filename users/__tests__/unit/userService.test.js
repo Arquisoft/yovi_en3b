@@ -4,9 +4,9 @@ import { createRequire } from 'node:module';
 import bcrypt from 'bcrypt';
 
 const require = createRequire(import.meta.url);
-import app from '../index.js'
+import app from '../../index.js'
 
-const db = require('../src/db/db.js');
+const db = require('../../src/db/db.js');
 
 ///////////////////////////////////////////////////////////CREATE USER TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/createuser', () => {

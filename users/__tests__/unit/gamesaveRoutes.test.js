@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const router = require('../src/modules/gamesave/entry-points/gamesaveRoutes.js');
+const router = require('../../src/modules/gamesave/entry-points/gamesaveRoutes.js');
 
 const findRoute = (path, method) => {
   return router.stack.some((layer) => {

@@ -2,8 +2,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const rankingService = require('../src/modules/ranking/domain/rankingService.js');
-const rankingController = require('../src/modules/ranking/entry-points/rankingController.js');
+const rankingService = require('../../src/modules/ranking/domain/rankingService.js');
+const rankingController = require('../../src/modules/ranking/entry-points/rankingController.js');
 
 const makeRes = () => {
   const res = {};

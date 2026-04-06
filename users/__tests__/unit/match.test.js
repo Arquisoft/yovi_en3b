@@ -3,8 +3,8 @@ import request from 'supertest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-import app from '../index.js';
-const db = require('../src/db/db.js');
+import app from '../../index.js';
+const db = require('../../src/db/db.js');
 
 describe('POST /matches/create', () => {
     afterEach(() => {

@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "vitest",
+    "test:unit": "vitest run __tests__/unit",
+    "test:integration": "vitest run __tests__/integration",
     "test:coverage": "vitest run --coverage"
   },
   "author": "",
@@ -26,4 +28,5 @@
   },
   "keywords": [],
   "type": "commonjs"
+  
 }

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const router = require('../src/modules/ranking/entry-points/rankingRoutes.js');
+const router = require('../../src/modules/ranking/entry-points/rankingRoutes.js');
 
 const hasRoute = (path, method) => {
   return router.stack.some((layer) => {
