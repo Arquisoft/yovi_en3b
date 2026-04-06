@@ -6,7 +6,7 @@ The building block view shows the static decomposition of the system into buildi
 
 === Whitebox Overall System
 
-image::level-1-overview.png["YOVI Level 1 Overview Diagram"]
+image::level-1-overview.jpg["YOVI Level 1 Overview Diagram"]
 
 Motivation::
 The YOVI system follows the **Separation of Concerns** principle. It uses a modern React frontend for user interaction, a Node.js microservice for user data management, and a high-performance Rust engine for game logic. This hybrid architecture ensures scalability and runtime efficiency.
@@ -15,31 +15,31 @@ Contained Building Blocks::
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| **Webapp** | React-based frontend. Visualizes the game board, manages user registration, and provides a REST API for bot interactions.
-| **Users Service** | Node.js backend managing user profiles, authentication, and game history metrics.
-| **Gamey Engine** | Rust-based engine that validates Game Y rules, checks win conditions, and generates AI moves.
-| **PostgreSQL** | Relational database for persistent storage of user profiles and match statistics.
+| **YOVI Web Client** | React-based frontend. Visualizes the game board, manages user registration, and provides a REST API for bot interactions.
+| **Users API (Node.js)** | Node.js backend managing user profiles, authentication, and game history metrics.
+| **GameY Service (Rust)** | Rust-based engine that validates Game Y rules, checks win conditions, and generates AI moves.
+| **PostgreSQL Database** | Relational database for persistent storage of user profiles and match statistics.
 |===
 
 Important Interfaces::
-* **YEN Notation:** Standard JSON format carrying board states between the Webapp and Gamey Engine.
-* **REST API (Internal):** Endpoints enabling communication between the Webapp and Users Service.
+* **YEN Notation:** Standard JSON format carrying board states between the YOVI Web Client and GameY Service.
+* **REST API (Internal):** Endpoints enabling communication between the YOVI Web Client and Users API.
 
-==== Webapp (Black Box)
+==== YOVI Web Client (Black Box)
 
 Purpose/Responsibility:: Providing the user interface and system access for human players and external bots.
 Interface(s):: Web GUI (HTML/CSS/TS), External Bot REST API (JSON).
 Directory/File Location:: `/webapp`
 Fulfilled Requirements:: Web frontend, Bot interaction API, User registration.
 
-==== Users Service (Black Box)
+==== Users API (Black Box)
 
 Purpose/Responsibility:: Managing user information and game metrics through database communication.
 Interface(s):: Internal REST API (Node.js/Express over Port 3000).
 Directory/File Location:: `/users`
 Fulfilled Requirements:: Registration system, Match history, Win/Loss statistics.
 
-==== Gamey Engine (Black Box)
+==== GameY Service (Black Box)
 
 Purpose/Responsibility:: Execution of Game Y rules and providing AI strategies at multiple difficulty levels.
 Interface(s):: YEN Service Interface (JSON/HTTP over Port 4000).
@@ -51,37 +51,37 @@ Fulfilled Requirements:: Rule validation, Next move suggestions, Multiple AI str
 
 === 5.2 Level 2
 
-==== 5.2.1 White Box Gamey Engine
-Since the Gamey Engine handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.
+==== 5.2.1 White Box GameY Service
+Since the GameY Service handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.
 
-image::level-2-gamey.png["Gamey Engine White Box Diagram"]
+image::level-2-gamey.jpg["GameY Service White Box Diagram"]
 
 **Contained Building Blocks (Black Boxes):**
 
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| **Web Interface** | The REST controller that receives YEN-encoded requests from the Webapp.
-| **Core Logic** | The engine's core that validates Game Y rules and determines game outcomes.
-| **Strategy Registry** | Manages various AI difficulty levels and provides next-move suggestions.
+| **REST API Controller** | The HTTP listener that receives YEN-encoded requests from the Webapp via Port 4000.
+| **Game Engine Core** | The engine's core that validates Game Y rules and determines game outcomes.
+| **Bot Logic/AI** | Manages various AI difficulty levels and provides next-move suggestions.
 | **YEN Parser** | Translates between JSON-based YEN notation and internal Rust data structures.
 |===
 
-==== 5.2.2 White Box Webapp
-The Webapp is the primary interface for users. Its internal architecture separates visual components from communication logic.
+==== 5.2.2 White Box Web Client
+The Web Client is the primary interface for users. Its internal architecture separates visual components from communication logic.
 
-image::level-2-webapp.png["Webapp White Box Diagram"]
+image::level-2-webapp.jpg["Web Client White Box Diagram"]
 
 **Contained Building Blocks (Black Boxes):**
 
 [cols="1,2" options="header"]
 |===
 | **Name** | **Responsibility**
-| **UI Components** | React views including the Game Board, Register Form, and Statistics dashboard.
-| **State Management** | Centralized client-side store maintaining the current game state and user session.
-| **API Client** | Orchestrates asynchronous HTTP communication with Users Service and Gamey Engine.
+| **React Components** | React views including the Game Board, Register Form, and Statistics dashboard.
+| **Client State** | Centralized client-side store maintaining the current game state and user session.
+| **REST Services Client** | Orchestrates asynchronous HTTP communication with Users API and GameY Service.
 |===
 
 Important Interfaces::
 * **External Bot API:** A direct endpoint in the API Client that allows bot actors to interact with the system without using the GUI.
-* **Service Connectors:** Outbound connections from the API Client to external microservices (Users/Gamey).
+* **Service Connectors:** Outbound connections from the API Client to external microservices (Users/GameY).
