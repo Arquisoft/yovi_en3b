@@ -23,10 +23,10 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
+    "pg-mem": "^3.0.14",
     "supertest": "^7.1.4",
     "vitest": "^4.0.15"
   },
   "keywords": [],
   "type": "commonjs"
-  
 }
