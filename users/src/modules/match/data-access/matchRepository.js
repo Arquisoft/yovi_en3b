@@ -1,6 +1,11 @@
 const db = require('../../../db/db.js');
 const queries = require('./matchQueries.js');
 
+async function findMatchesByPlayerId(playerId) {
+    const result = await db.query(queries.selectWherePlayerId, [playerId]);
+    return result.rows;
+}
+
 const createMatch = async (matchData) => {
     const query = `
         INSERT INTO matches (blue_player_id, red_player_id, is_bot, bot_difficulty, status)
@@ -18,4 +23,4 @@ const createMatch = async (matchData) => {
     return rows[0];
 };
 
-module.exports = { createMatch };
+module.exports = { findMatchesByPlayerId, createMatch };

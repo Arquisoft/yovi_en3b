@@ -79,32 +79,42 @@ describe('POST /matches/create', () => {
         expect(res.status).toBe(201);
         expect(res.body.match.is_bot).toBe(false);
     });
+});
 
-    it('Creates a match with two real players', async () => {
-        const fakeBlueUserId = '123e4567-e89b-12d3-a456-426614174000';
-        const fakeRedUserId = '223e4567-e89b-12d3-a456-426614174001';
+describe('GET /matches/user/:playerId', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
 
+    it('Returns a list of matches for a given player ID', async () => {
+        const fakeUserId = '123e4567-e89b-12d3-a456-426614174000';
+        
         vi.spyOn(db, 'query').mockResolvedValue({
-            rows: [{ 
-                id: '333e4567-e89b-12d3-a456-426614174333', 
-                blue_player_id: fakeBlueUserId,
-                red_player_id: fakeRedUserId,
-                is_bot: false, 
-                bot_difficulty: 0,
-                status: 'in_progress'
-            }]
+            rows: [
+                { id: 'match_1', blue_player_id: fakeUserId, is_bot: true, status: 'in_progress' },
+                { id: 'match_2', red_player_id: fakeUserId, is_bot: false, status: 'finished' }
+            ]
         });
 
-        const res = await request(app)
-            .post('/matches/create')
-            .send({ 
-                bluePlayerId: fakeBlueUserId,
-                redPlayerId: fakeRedUserId,
-                isBot: false
-            })
-            .set('Accept', 'application/json');
+        const res = await request(app).get(`/matches/user/${fakeUserId}`);
 
-        expect(res.status).toBe(201);
-        expect(res.body.match.is_bot).toBe(false);
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body.length).toBe(2);
+        expect(res.body[0].id).toBe('match_1');
+    });
+
+    it('Returns an empty array if the player has no matches', async () => {
+        const fakeUserId = 'user-with-no-matches';
+        
+        vi.spyOn(db, 'query').mockResolvedValue({
+            rows: []
+        });
+
+        const res = await request(app).get(`/matches/user/${fakeUserId}`);
+
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body.length).toBe(0);
     });
 });

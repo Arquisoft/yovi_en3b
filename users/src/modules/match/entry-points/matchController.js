@@ -12,4 +12,16 @@ const createMatch = async (req, res) => {
     }
 };
 
-module.exports = { createMatch };
+async function getPlayerMatches(req, res) {
+    try {
+        const playerId = req.params.playerId; 
+        
+        const matches = await matchService.getMatchesForPlayer(playerId);
+        
+        res.status(200).json(matches);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+module.exports = { getPlayerMatches, createMatch };
