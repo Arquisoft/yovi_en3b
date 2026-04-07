@@ -3,9 +3,40 @@ import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import SignUpForm from '../components/SignUp/SignUpForm';
+import { SettingsProvider } from '../context/SettingsContext';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+        <SettingsProvider>
+            <MemoryRouter>
+                {ui}
+            </MemoryRouter>
+        </SettingsProvider>
+    );
+};
 
 // Mock de fetch global
 global.fetch = vi.fn();
+
+/**
+ * Global mock for the Web Audio API.
+ * JSDOM (the test environment) does not support audio playback. 
+ * This stub replaces the native 'Audio' constructor with a fake object 
+ * to prevent "TypeError: Audio is not a constructor" or ".play() is undefined" errors.
+ */
+vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
+    return {
+        play: vi.fn().mockResolvedValue(undefined),
+        pause: vi.fn(),
+        catch: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        load: vi.fn(),
+        loop: false,
+        volume: 1,
+        muted: false
+    };
+}));
 
 describe('SignUpForm Component', () => {
     beforeEach(() => {
@@ -13,7 +44,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('1. Renders all input fields and avatars', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         expect(screen.getByLabelText(/NICKNAME/i)).toBeDefined(); // Verify nickname label
         expect(screen.getByLabelText(/USERNAME/i)).toBeDefined(); // Verify username label
@@ -27,7 +58,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('2. Toggles password visibility', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         const passInput = screen.getByLabelText(/PASSWORD/i) as HTMLInputElement;
         const toggleBtn = screen.getByRole('button', { name: '' }); // El botón del ojo
 
@@ -41,7 +72,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('3. Updates validation UI as user types password', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         const passInput = screen.getByLabelText(/PASSWORD/i);
 
         // Type a password that only meets length and number
@@ -55,7 +86,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('4. Selects an avatar from the grid', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         const avatars = screen.getAllByRole('button').filter(btn => btn.textContent === "🚀");
         
         fireEvent.click(avatars[0]);
@@ -71,7 +102,7 @@ describe('SignUpForm Component', () => {
             json: async () => ({ message: 'User created' }),
         });
 
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
 
         // Fill form
         fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'John' } });
@@ -95,7 +126,7 @@ describe('SignUpForm Component', () => {
             json: async () => ({ message: 'Email already exists' }),
         });
 
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         // Rellenar lo mínimo para habilitar el botón
         fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'a' } });
@@ -112,7 +143,7 @@ describe('SignUpForm Component', () => {
     test('7. Handles server connection error (catch block)', async () => {
         (global.fetch as any).mockRejectedValueOnce(new Error('Network Error'));
 
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'a' } });
         fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'b' } });
@@ -126,7 +157,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('8. Disables submit button when password is invalid', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'John' } });
         fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'jdoe' } });
@@ -140,7 +171,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('9. Resets avatar selection correctly', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         const rocketAvatar = screen.getAllByRole('button').filter(btn => btn.textContent === "🚀")[0];
         
@@ -158,7 +189,7 @@ describe('SignUpForm Component', () => {
     });
 
     test('10. Updates all form fields on change', () => {
-        render(<MemoryRouter><SignUpForm /></MemoryRouter>);
+        renderWithProviders(<SignUpForm />);
         
         const nicknameInput = screen.getByLabelText(/NICKNAME/i) as HTMLInputElement;
         const usernameInput = screen.getByLabelText(/USERNAME/i) as HTMLInputElement;
