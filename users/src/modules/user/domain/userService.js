@@ -7,7 +7,7 @@ const userRepository = require('../data-access/userRepository');
 
 const createUser = async (data) => {
     
-    if (!data.username || !data.email || !data.password || !data.nickname) {
+    if (!data.username || !data.email || !data.password || !data.nickname || !data.photo) {
         throw new Error("Missing fields");
     }
     //1. Check password constraints
@@ -37,7 +37,7 @@ const createUser = async (data) => {
         username: data.username,
         email: data.email, //data.email
         password: hash, //securePassword
-        photo: data.avatarId, 
+        photo: data.photo, 
         nickname:data.nickname,
     });
     

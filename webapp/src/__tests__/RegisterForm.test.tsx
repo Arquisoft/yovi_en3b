@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { SettingsProvider } from '../context/SettingsContext';

@@ -1,5 +1,5 @@
 const userService = require('../domain/userService');
-const userResponseDto = require('../domain/userResponseDTO');
+const userDto = require('../domain/userDTO');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
@@ -32,7 +32,7 @@ const createUser = async (req, res) => {
 const findUserByUsername = async (req, res) => {
     try {
         const user =await userService.findUserByUsername(req.query);
-        res.status(200).json(userResponseDto.toUserResponseDto(user));
+        res.status(200).json(userDto.toUserResponseDto(user));
     } catch (error) {
         console.log(error);
         if (error.message === "The username is required") {
@@ -56,7 +56,7 @@ const findUserByUsername = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const user =await userService.loginUser(req.body);
-        res.status(200).json(userResponseDto.toUserResponseDto(user));
+        res.status(200).json(userDto.toUserResponseDto(user));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields") {
@@ -79,7 +79,7 @@ const loginUser = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const user =await userService.changePassword(req.body);
-        res.status(200).json(userResponseDto.toUserResponseDto(user));
+        res.status(200).json(userDto.toUserResponseDto(user));
     } catch (error) {
         console.log(error);
         if (error.message === "Invalid username or password") {
@@ -97,7 +97,7 @@ const changePassword = async (req, res) => {
 const changeNickname = async (req, res) => {
     try {
         const user =await userService.changeNickname(req.body);
-        res.status(200).json(userResponseDto.toUserResponseDto(user));
+        res.status(200).json(userDto.toUserResponseDto(user));
     } catch (error) {
         console.log(error);
         if (error.message === "User not found") {

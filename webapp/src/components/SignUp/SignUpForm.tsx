@@ -53,7 +53,7 @@ const SignUpForm: React.FC = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password,
-          avatarId: formData.avatarId
+          photo: formData.avatarId
         }),
       });
 

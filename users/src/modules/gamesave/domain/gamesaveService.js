@@ -13,19 +13,34 @@ const validateGameSaveData = (data) => {
         throw new Error("Move number must be a positive integer.");
     }
 
-    if (!data.playerId) {
-        throw new Error("Player ID is required.");
+    // Regex kuralımız: Sadece sayılar ve aralarında virgül olabilir
+    const barycentricRegex = /^\d+,\d+,\d+$/;
+
+    // playerLastMove gönderilmişse formatını kontrol et
+    if (data.playerLastMove !== undefined && data.playerLastMove !== null) {
+        if (typeof data.playerLastMove !== 'string') {
+            throw new Error("Player last move must be a string.");
+        }
+        if (!barycentricRegex.test(data.playerLastMove)) {
+            throw new Error("Invalid coordinate format. Must be Barycentric (e.g., '1,2,0').");
+        }
     }
 
-    if (!data.moveCoordinates || typeof data.moveCoordinates !== 'string') {
-        throw new Error("Move coordinates must be a non-empty string.");
+    // botLastMove gönderilmişse formatını kontrol et
+    if (data.botLastMove !== undefined && data.botLastMove !== null) {
+        if (typeof data.botLastMove !== 'string') {
+            throw new Error("Bot last move must be a string.");
+        }
+        if (!barycentricRegex.test(data.botLastMove)) {
+            throw new Error("Invalid coordinate format. Must be Barycentric (e.g., '1,2,0').");
+        }
     }
 
     if (!data.resultingBoardState || typeof data.resultingBoardState !== 'string') {
         throw new Error("Board state must be a non-empty JSON string.");
     }
 
-    // Try to parse JSON to validate it's valid
+    // JSON formatı geçerli mi diye kontrol et
     try {
         JSON.parse(data.resultingBoardState);
     } catch (e) {
@@ -39,8 +54,8 @@ const saveMove = async (data) => {
     const newGameSave = await gamesaveRepository.createGameSave({
         matchId: data.matchId,
         moveNumber: data.moveNumber,
-        playerId: data.playerId,
-        moveCoordinates: data.moveCoordinates,
+        playerLastMove: data.playerLastMove,
+        botLastMove: data.botLastMove,
         resultingBoardState: data.resultingBoardState
     });
 
