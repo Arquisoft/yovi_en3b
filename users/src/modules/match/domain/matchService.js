@@ -25,4 +25,18 @@ const createMatch = async (data) => {
     return newMatch;
 };
 
-module.exports = { createMatch };
+async function getMatchesForPlayer(playerId) {
+    if (!playerId) {
+        throw new Error("You must select a player ID");
+    }
+
+    const matches = await matchRepository.findMatchesByPlayerId(playerId);
+    
+    if (matches.length === 0) {
+        return [];
+    }
+
+    return matches;
+}
+
+module.exports = { getMatchesForPlayer, createMatch };
