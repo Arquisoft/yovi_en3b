@@ -1,5 +1,5 @@
 // UBICACIÓN: webapp/src/pages/HistoryPage/HistoryPage.tsx
-import React from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu, BarChart3, Target } from 'lucide-react'; 
 import { useSettings } from '../../context/SettingsContext'; 
@@ -12,13 +12,43 @@ const HistoryPage: React.FC = () => {
     // Extraemos playSound para manejar el efecto de sonido al salir
     const { colorBlindMode, neonMode, playSound } = useSettings(); 
 
-    // MOCK DATA
-    const matches = [
-        { id: 1, date: '2024-03-20', result: 'win', size: '5x5', opponent: 'Bot Chip' },
-        { id: 2, date: '2024-03-19', result: 'lose', size: '7x7', opponent: 'Bot Robot' },
-        { id: 3, date: '2024-03-18', result: 'win', size: '5x5', opponent: 'Bot Chip' },
-        { id: 4, date: '2024-03-17', result: 'win', size: '6x6', opponent: 'Bot Tech' },
-    ];
+    // REAL (Data Base) DATA
+    const [matches, setMatches] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+                const currentUser = localStorage.getItem('username'); // Get the current user
+                
+                if (!currentUser) return;
+
+                // Connect to the database
+                const res = await fetch(`${API_URL}/matches/user/${currentUser}`);
+                const data = await res.json();
+
+                if (res.ok) {
+                    // TRANSLATOR: Fit the DTO data to the format the html needs
+                    const formattedMatches = data.map((m: any, index: number) => {
+                        return {
+                            id: m.id || index,
+                            date: m.ended_at ? new Date(m.ended_at).toISOString().split('T')[0] : '2024-04-08',
+                            result: m.winner_id === currentUser ? 'win' : 'lose',
+                            size: '11x11', // Como el backend no guarda el tamaño, ponemos el estándar
+                            opponent: m.isBot ? `Bot ${m.botDifficulty === 2 ? 'Hard' : 'Easy'}` : (m.bluePlayerId === currentUser ? m.redPlayerId : m.bluePlayerId)
+                        };
+                    });
+                    
+                    setMatches(formattedMatches); // We save the matches with the new format
+                }
+            } catch (err) {
+                console.error("Error de conexión:", err);
+            }
+        };
+
+        fetchHistory();
+    }, []);
+
 
     const totalMatches = matches.length; 
     const wins = matches.filter(m => m.result === 'win').length; 

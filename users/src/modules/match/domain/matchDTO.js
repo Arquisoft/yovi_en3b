@@ -1,5 +1,6 @@
 const toMatchResponseDto = (match) => {
     return {
+      id: match.id,
       bluePlayerId: match.bluePlayerId,
       redPlayerId: match.redPlayerId,
       isBot: match.isBot,
