@@ -12,8 +12,6 @@ import SettingsModal from '../components/Settings/SettingsModal'; // Settings mo
 import RankingScreen from '../components/RankingScreen/RankingScreen'; // Ranking screen
 import '../App.css'; // Global styles
 
-<<<<<<< HEAD
-=======
 const MOCK_RANKING_DATA = [
   { id: '1', username: 'NeonKnight', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', points: 2500, winRate: 85, gamesPlayed: 100, lastGameWon: true },
   { id: '2', username: 'CyberGhost', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', points: 2100, winRate: 72, gamesPlayed: 90, lastGameWon: false },
@@ -21,7 +19,6 @@ const MOCK_RANKING_DATA = [
   { id: '4', username: 'User_404', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4', points: 1200, winRate: 45, gamesPlayed: 50, lastGameWon: false },
 ];
 
->>>>>>> 66aeb62 (fixed navigation to menu with config open on game restart)
 const MainMenu: React.FC = () => {
   const { t } = useI18n(); // Translation function
   const { colorBlindMode, playSound } = useSettings(); // Settings state
