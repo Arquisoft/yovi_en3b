@@ -1,557 +1,382 @@
 .profile-modal,
-
 .profile-modal label,
-
 .profile-modal input,
-
 .profile-modal .value,
-
-.profile-modal .loading-text,
-
-.profile-modal .error,
-
-.profile-modal .history-btn,
-
-.profile-modal .btn-group .main-button {
-
+.profile-modal .profile-loading-text,
+.profile-modal .profile-error,
+.profile-modal .profile-history-btn,
+.profile-modal .profile-btn-group .profile-action-btn {
   font-family: 'Orbitron', sans-serif !important;
-
-  letter-spacing: 1.7px;
-
+  letter-spacing: 0.1062rem;
 }
 
-
-
-/* Specific Cubic title style */
-
-.modal-title {
-
-  font-family: 'Cubic', sans-serif !important;
-
-  color: #60a5fa;
-
-  font-size: 2.5rem;
-
-  margin-bottom: 25px;
-
+/* ===== Overlay ===== */
+.profile-overlay-backdrop {
+  --profile-overlay-pad: clamp(0.75rem, 3vh, 2rem);
+  position: fixed;
+  inset: 0;
+  min-height: 100dvh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(0.5rem);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: var(--profile-overlay-pad);
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
-
-
-/* --- Modal Layout & Dimensions --- */
-
+/* ===== Modal ===== */
 .profile-modal {
+  --profile-accent: var(--game-accent, #60a5fa);
+  --profile-accent-dark: var(--game-accent-dark, #2563eb);
+  --profile-glow: rgba(96, 165, 250, 0.3);
 
   position: relative !important;
-
-  width: min(480px, calc(100vw - 32px)) !important;
-
-  padding: 40px !important;
-
+  width: min(30rem, calc(100% - 2rem)) !important;
+  background: rgba(15, 23, 42, 0.95);
+  border: 0.125rem solid var(--profile-accent);
+  border-radius: 1.875rem;
+  padding: clamp(0.85rem, 2.2vw, 1.5rem) !important;
   text-align: center;
-
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-}
-
-/* --- Avatar Bubble --- */
-
-.avatar-display-section {
-
-  display: flex;
-
-  justify-content: center;
-
-  margin-bottom: 20px;
-
-}
-
-
-
-.avatar-bubble {
-
-  width: 90px;
-
-  height: 90px;
-
-  border-radius: 50%;
-
-  background: rgba(15, 20, 30, 0.6);
-
-  display: grid;
-
-  place-items: center;
-
-  font-size: 48px; /* Bigger emoji for main display */
-
-  border: 3px solid #60a5fa;
-
-  box-shadow: 0 0 25px rgba(96, 165, 250, 0.3);
-
-  user-select: none;
-
-  -webkit-user-select: none;
-
-}
-
-
-
-/* --- Profile Fields Layout --- */
-
-.profile-fields {
-
-  text-align: left;
-
-  margin-bottom: 20px; /* Base margin before buttons */
-
-}
-
-
-
-.profile-row {
-
-  background: rgba(255, 255, 255, 0.05);
-
-  padding: 15px;
-
-  border-radius: 12px;
-
-  margin-bottom: 12px;
-
-  border: 1px solid rgba(96, 165, 250, 0.2);
-
-  transition: border-color 0.2s ease;
-
-}
-
-
-
-.profile-row:focus-within {
-
-  border-color: rgba(96, 165, 250, 0.5);
-
-}
-
-
-
-
-
-.profile-row label {
-
-  display: block;
-
-  color: #60a5fa;
-
-  font-size: 0.7rem;
-
-  font-weight: 600;
-
-  margin-bottom: 8px;
-
-  text-transform: uppercase;
-
-}
-
-
-
-/* --- Input & Value Styling --- */
-
-.input-row {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 10px;
-
-}
-
-
-
-.profile-row input,
-
-.profile-row .value {
-
-  color: white;
-
-  font-size: 1.3rem;
-
-  background: transparent;
-
-  border: none;
-
-  width: 100%;
-
-  outline: none;
-
-}
-
-
-
-.profile-row input:disabled {
-
-  opacity: 1; /* Ensure text remains bright when disabled */
-
-  color: #e2e8f0;
-
-}
-
-
-
-/* --- Edit Button Bubble --- */
-
-.edit-btn {
-
-  background: rgba(255, 255, 255, 0.1);
-
-  border: none;
-
-  border-radius: 50%;
-
-  padding: 8px;
-
-  cursor: pointer;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  transition: background-color 0.2s ease;
-
-}
-
-
-
-.edit-btn:hover {
-
-  background: rgba(96, 165, 250, 0.2);
-
-}
-
-
-
-/* --- Avatar Grid Layout --- */
-
-.avatar-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(6, 1fr);
-
-  gap: 10px;
-
-  margin-top: 10px;
-
-  justify-items: center;
-
-}
-
-
-
-.avatar-opt {
-
-  background: rgba(255, 255, 255, 0.1);
-
-  border: 2px solid transparent;
-
-  border-radius: 50%;
-
-  width: 45px;
-
-  height: 45px;
-
-  cursor: pointer;
-
-  font-size: 1.3rem;
-
-  transition: all 0.2s ease;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  padding: 0;
-
-}
-
-
-
-.avatar-opt:hover:not(.active) {
-
-  background: rgba(255, 255, 255, 0.2);
-
-}
-
-
-
-.avatar-opt.active {
-
-  border-color: #60a5fa;
-
-  background: rgba(96, 165, 250, 0.2);
-
-  transform: scale(1.1);
-
-}
-
-
-
-/* --- Buttons Section & Alignment --- */
-
-.profile-actions-section {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 10px; /* Space between History and the bottom group */
-
-  margin-top: 0px !important; /* Forces the section to be close to fields */
-
-}
-
-
-
-/* --- THE FIX: Vertical centering and removing huge margins --- */
-
-/* We apply this to History and Reset/Save buttons */
-
-.history-btn,
-
-.btn-group .main-button {
-
-  /* 1. Eliminate app-level margin */
-
-  margin: 0 !important;
-
- 
-
-  /* 2. Control total height exactly */
-
-  height: 55px !important;
-
- 
-
-  /* 3. Perfect vertical and horizontal centering using Flexbox */
-
-  display: flex !important;
-
-  align-items: center !important; /* Vertical center */
-
-  justify-content: center !important; /* Horizontal center */
-
- 
-
-  /* 4. Increase font size and remove excessive vertical padding */
-
-  font-size: 1.15rem !important; /* Slightly larger for presence */
-
-  padding: 0 20px !important; /* Remove top/bottom padding, keep only side padding */
-
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-}
-
-
-
-/* Bottom buttons row */
-
-.btn-group {
-
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 10px;
-
-}
-
-
-
-/* Overriding App.css full-width for the history button if needed */
-
-.history-btn {
-
-  width: 100%;
-
-}
-
-
-
-/* --- Status Texts --- */
-
-.loading-text,
-
-.muted {
-
-  color: #94a3b8;
-
-  font-size: 0.9rem;
-
-}
-
-
-
-.error {
-
-  color: #ef4444;
-
-  font-weight: bold;
-
-  margin-bottom: 20px;
-
-}
-
-
-
-/* Estilo para el mensaje de error */
-
-.error-text {
-
-  font-size: 0.75rem;
-
-  margin-top: 8px;
-
-  font-family: 'Orbitron', sans-serif;
-
-  letter-spacing: 0.5px;
-
-}
-
-
-
-/* Estado visual para botones deshabilitados */
-
-.main-button:disabled {
-
-  opacity: 0.5;
-
-  cursor: not-allowed;
-
-  filter: grayscale(0.5);
-
-}
-
-
-
-/* Password section inside profile */
-
-.change-pass-trigger {
-
-  background: rgba(255, 255, 255, 0.05);
-
-  border: 1px solid rgba(96, 165, 250, 0.3);
-
-  color: #94a3b8;
-
-  padding: 8px 15px;
-
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-  font-size: 0.7rem;
-
-  transition: 0.3s;
-
-}
-
-
-
-.change-pass-trigger:hover {
-
-  color: var(--game-blue);
-
-  border-color: var(--game-blue);
-
-}
-
-
-
-.password-edit-box {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-
-  margin-top: 10px;
-
-}
-
-
-
-.small-input {
-
-  background: rgba(0, 0, 0, 0.2) !important;
-
-  font-size: 0.75rem !important;
-
-  padding: 8px !important;
-
-}
-
-
-
-.pass-actions {
-
-  display: flex;
-
-  gap: 10px;
-
-  margin-top: 5px;
-
-}
-
-
-
-.pass-actions button {
-
-  flex: 1;
-
-  font-family: 'Orbitron', sans-serif;
-
-  font-size: 0.6rem;
-
-  padding: 5px;
-
-  cursor: pointer;
-
-  border-radius: 4px;
-
-  border: none;
-
+  box-shadow:
+    0 0 1.25rem var(--profile-glow),
+    0 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.7);
+  max-height: none;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .profile-modal.color-blind {
-    --profile-accent: #f59e0b; /* Naranja daltónico */
-    --profile-glow: rgba(245, 158, 11, 0.3);
+  --profile-accent: #f59e0b;
+  --profile-accent-dark: #d97706;
+  --profile-glow: rgba(245, 158, 11, 0.3);
 }
 
-.btn-orange {
-    background-color: #f59e0b !important;
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4) !important;
+/* ===== Close button ===== */
+.profile-close-btn {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  color: var(--profile-accent);
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 2;
+  padding: 0.15rem;
 }
 
-.confirm-pass { background: var(--game-blue); color: white; }
+.profile-close-btn:hover:not(:disabled) {
+  color: #ffffff;
+}
 
-.confirm-pass:disabled { opacity: 0.5; cursor: not-allowed; }
+.profile-close-btn:focus-visible {
+  outline: 0.125rem solid var(--profile-accent);
+  outline-offset: 0.25rem;
+  border-radius: 0.25rem;
+}
 
-.cancel-pass { background: transparent; color: #64748b; border: 1px solid #64748b !important; }
+/* ===== Title ===== */
+.profile-modal-title {
+  font-family: 'Cubic', sans-serif !important;
+  color: var(--profile-accent);
+  font-size: 1.9rem;
+  line-height: 1.05;
+  margin: 0.2rem 0 0.65rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ===== Avatar ===== */
+.profile-avatar-display {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.65rem;
+}
+
+.profile-avatar-bubble {
+  width: clamp(3.6rem, 8vw, 4.4rem);
+  height: clamp(3.6rem, 8vw, 4.4rem);
+  border-radius: 50%;
+  background: rgba(15, 20, 30, 0.6);
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  border: 0.1875rem solid var(--profile-accent);
+  box-shadow: 0 0 1.2rem var(--profile-glow);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ===== Fields ===== */
+.profile-fields {
+  text-align: left;
+  margin-bottom: 0.8rem;
+}
+
+.profile-row {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.72rem 0.85rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.55rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--profile-accent) 28%, transparent);
+  transition: border-color 0.2s ease;
+}
+
+.profile-row:focus-within {
+  border-color: color-mix(in srgb, var(--profile-accent) 55%, transparent);
+}
+
+.profile-row label {
+  display: block;
+  color: var(--profile-accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.28rem;
+  text-transform: uppercase;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.profile-row input,
+.profile-row .value {
+  color: white;
+  font-size: 1.12rem;
+  line-height: 1.15;
+  background: transparent;
+  border: none;
+  width: 100%;
+  outline: none;
+}
+
+.profile-row input:disabled {
+  opacity: 1;
+  color: #e2e8f0;
+}
+
+/* ===== Edit button ===== */
+.edit-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  padding: 0.45rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: color-mix(in srgb, var(--profile-accent) 25%, transparent);
+}
+
+/* ===== Avatar selector ===== */
+.profile-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+  justify-items: center;
+}
+
+.profile-avatar-opt {
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.125rem solid transparent;
+  border-radius: 50%;
+  width: clamp(1.9rem, 6vw, 2.35rem);
+  height: clamp(1.9rem, 6vw, 2.35rem);
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.profile-avatar-opt:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-avatar-opt.active {
+  border-color: var(--profile-accent);
+  background: color-mix(in srgb, var(--profile-accent) 22%, transparent);
+  transform: scale(1.1);
+}
+
+/* ===== Password section ===== */
+.change-pass-trigger {
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.0625rem solid color-mix(in srgb, var(--profile-accent) 40%, transparent);
+  color: #94a3b8;
+  padding: 0.38rem 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  transition: 0.3s;
+}
+
+.change-pass-trigger:hover {
+  color: var(--profile-accent);
+  border-color: var(--profile-accent);
+}
+
+.password-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.small-input {
+  background: rgba(0, 0, 0, 0.2) !important;
+  font-size: 0.75rem !important;
+  padding: 0.5rem !important;
+}
+
+.pass-actions {
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.pass-actions button {
+  flex: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  padding: 0.5rem 0.625rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  border: none;
+}
+
+.confirm-pass {
+  background: var(--profile-accent-dark);
+  color: white;
+}
+
+.confirm-pass:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-pass {
+  background: transparent;
+  color: #64748b;
+  border: 0.0625rem solid #64748b !important;
+}
+
+/* ===== Actions ===== */
+.profile-actions-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 0 !important;
+  padding-bottom: 0.5rem;
+}
+
+.profile-history-btn,
+.profile-btn-group .profile-action-btn {
+  margin: 0 !important;
+  min-height: 2.6rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1rem !important;
+  padding: 0 1rem !important;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-history-btn {
+  width: 100%;
+}
+
+.profile-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.profile-action-btn {
+  border-radius: 0.9375rem;
+  border: 0.125rem solid rgba(255, 255, 255, 0.12);
+  min-height: 2.6rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+  color: #ffffff;
+}
+
+.profile-action-btn--secondary {
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.profile-action-btn--primary {
+  background: linear-gradient(to right, var(--profile-accent-dark), var(--profile-accent));
+  border: none;
+}
+
+.profile-action-btn:hover:not(:disabled) {
+  transform: translateY(-0.125rem);
+  filter: brightness(1.08);
+}
+
+.profile-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* ===== Status texts ===== */
+.profile-loading-text,
+.profile-muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.profile-error {
+  color: #ef4444;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.profile-inline-error {
+  font-size: 0.75rem;
+  margin-top: 0.4rem;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.0312rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 40rem) {
+  .profile-modal {
+    width: min(28rem, calc(100% - 1rem)) !important;
+    padding: 0.85rem !important;
+  }
+
+  .profile-modal-title {
+    font-size: 1.65rem;
+    white-space: normal;
+  }
+
+  .profile-avatar-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .profile-btn-group {
+    grid-template-columns: 1fr;
+  }
+}

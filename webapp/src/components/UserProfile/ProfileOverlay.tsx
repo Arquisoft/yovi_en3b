@@ -7,7 +7,7 @@ import { useI18n } from "../../i18n/useTranslation";
 import { useSettings } from "../../context/SettingsContext"; 
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
 
@@ -74,12 +74,12 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={isEditing ? undefined : () => { playSound('click.mp3'); onClose(); }}>
-      <Toaster position="top-right" richColors closeButton />
-      <div className={`modal-content profile-modal ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()}>
+    <div className="profile-overlay-backdrop" onClick={isEditing ? undefined : () => { playSound('click.mp3'); onClose(); }}>
+      {/* Added neon-mode class to the modal content */}
+      <div className={`profile-overlay-card profile-modal modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()}>
 
         <button
-          className="boton-cerrar-fijo"
+          className="profile-close-btn"
           onClick={() => {
             if (!isEditing) {
               playSound('click.mp3'); // Play sound when closing modal
@@ -92,16 +92,16 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
           <X size={35} /> 
         </button>
 
-        <h2 className="modal-title">{t.labels.userProfile}</h2>
+        <h2 className="profile-modal-title">{t.labels.userProfile}</h2>
 
         {loading ? (
-          <div className="loading-text">{t.messages.loading}</div>
+          <div className="profile-loading-text">{t.messages.loading}</div>
         ) : error ? (
-          <div className="error">{error}</div>
+          <div className="profile-error">{error}</div>
         ) : profile && (
           <>
-            <div className="avatar-display-section">
-              <div className="avatar-bubble">
+            <div className="profile-avatar-display">
+              <div className="profile-avatar-bubble">
                 {draftAvatarId ? AVATARS[parseInt(draftAvatarId.slice(-2)) - 1] : "👤"}
               </div>
             </div>
@@ -140,7 +140,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                     </button>
                   )}
                 </div>
-                {isNameEmpty && <p className="error-text">{t.messages.usernameMustBeCompleted}</p>}
+                {isNameEmpty && <p className="profile-inline-error">{t.messages.usernameMustBeCompleted}</p>}
               </div>
 
               <div className="profile-row readonly">
@@ -209,13 +209,13 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
               <div className="profile-row">
                 <label>{t.labels.chooseAvatar}</label>
-                <div className="avatar-grid">
+                <div className="profile-avatar-grid">
                   {AVATARS.map((emoji, i) => {
                     const id = `avatar_0${i + 1}`;
                     return (
                       <button
                         key={id}
-                        className={`avatar-opt ${draftAvatarId === id ? "active" : ""}`}
+                        className={`profile-avatar-opt avatar-opt ${draftAvatarId === id ? "active" : ""}`}
                         onClick={() => {
                           playSound('click.mp3'); // Sound feedback for avatar selection
                           setDraftAvatarId(id);
@@ -235,7 +235,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                 <div className="editing-lock-overlay" title={t.messages.confirmTheDisplayNameFirst} />
               )}
               <button
-                className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} history-btn orbitron-text`}
+                className="profile-action-btn profile-action-btn--primary profile-history-btn orbitron-text"
                 onClick={() => {
                   playSound('click.mp3'); // Feedback when going to history
                   onClose(); 
@@ -246,7 +246,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
                 {t.buttons.accessGameHistory}
               </button>
 
-              <div className="btn-group">
+              <div className="btn-group profile-btn-group">
                 <button className="main-button orbitron-text" onClick={() => { playSound('click.mp3'); resetDraft(); }} disabled={!dirty}>{t.buttons.reset}</button>
                 <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'} orbitron-text`} onClick={() => { playSound('click.mp3'); save(); }} disabled={!dirty || isNameEmpty}>{t.buttons.save}</button>
               </div>

@@ -6,13 +6,13 @@
   --game-blue: #60a5fa;
   --game-blue-dark: #2563eb;
   --game-red: #ef4444;
-  --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+  --text-shadow: 0 0 1.5625rem rgba(96, 165, 250, 0.5);
 }
 
 body {
   margin: 0;
   background: var(--bg-gradient);
-  min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Orbitron', sans-serif;
 }
 
@@ -25,17 +25,17 @@ body {
 
 .App {
   background: var(--bg-gradient);
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100dvh;
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .menu-container {
   width: 100%;
-  max-width: 1200px;
-  height: 100vh;
-  padding: 30px;
+  max-width: 75rem;
+  min-height: 100dvh;
+  padding: clamp(1rem, 3vw, 1.875rem);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -44,10 +44,10 @@ body {
 
 .header-icons {
   position: absolute; 
-  top: 40px; 
-  right: 40px; 
+  top: clamp(1rem, 3vw, 2.5rem); 
+  right: clamp(1rem, 3vw, 2.5rem); 
   display: flex;
-  gap: 20px;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
   z-index: 100;
 }
 
@@ -61,15 +61,15 @@ body {
 
 .icon-btn:hover {
   color: #ffffff !important;
-  filter: drop-shadow(0 0 8px #60a5fa);
+  filter: drop-shadow(0 0 0.5rem #60a5fa);
   transform: scale(1.1);
 }
 
 .title-game {
   font-family: 'Cubic', sans-serif !important;
-  font-size: 8rem;
+  font-size: clamp(3.25rem, 12vw, 8rem);
   text-align: center;
-  margin: 30px 0 100px 0;
+  margin: clamp(1rem, 3vh, 1.875rem) 0 clamp(2rem, 8vh, 6.25rem) 0;
   color: var(--game-blue);
   text-shadow: var(--text-shadow);
   text-transform: uppercase;
@@ -77,8 +77,8 @@ body {
 
 .grid-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 420px);
-  gap: 25px;
+  grid-template-columns: repeat(2, minmax(0, clamp(15rem, 30vw, 26.25rem)));
+  gap: clamp(0.875rem, 2vw, 1.5625rem);
   justify-content: center;
 }
 
@@ -93,20 +93,20 @@ body {
 
 .main-button {
   background: rgba(15, 23, 42, 0.7);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 45px;
-  border-radius: 25px;
+  border: 0.125rem solid rgba(255, 255, 255, 0.1);
+  padding: clamp(1.1rem, 3.5vw, 2.8125rem);
+  border-radius: 1.5625rem;
   color: white;
-  font-size: 1.6rem;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
   cursor: pointer;
   transition: 0.3s;
-  letter-spacing: 3px;
+  letter-spacing: 0.1875rem;
 }
 
 .main-button:hover {
-  transform: translateY(-8px);
+  transform: translateY(-0.5rem);
   border-color: var(--game-blue);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0.9375rem 2.1875rem rgba(0, 0, 0, 0.4);
 }
 
 .btn-blue {
@@ -117,32 +117,33 @@ body {
 /* Modales Base */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5rem);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: clamp(0.75rem, 3vh, 2rem);
   z-index: 1000;
 }
 
 .modal-content {
   position: relative !important;
   background: rgba(15, 23, 42, 0.95);
-  padding: 60px 40px 40px 40px;
-  border-radius: 30px;
-  border: 2px solid var(--game-blue);
-  width: 90%;
-  max-width: 500px;
+  padding: clamp(2.25rem, 5vw, 3.75rem) clamp(1.1rem, 4vw, 2.5rem) clamp(1.1rem, 4vw, 2.5rem) clamp(1.1rem, 4vw, 2.5rem);
+  border-radius: 1.875rem;
+  border: 0.125rem solid var(--game-blue);
+  width: min(100%, 31.25rem);
+  max-height: min(90dvh, 40rem);
+  overflow-y: auto;
+  margin: auto;
 }
 
 .boton-cerrar-fijo {
   position: absolute !important;
-  top: 15px !important;
-  right: 20px !important;
+  top: 0.9375rem !important;
+  right: 1.25rem !important;
   background: none !important;
   border: none !important;
   color: var(--game-blue) !important;
@@ -155,8 +156,8 @@ body {
 .modal-title, .modal-content h2 {
   font-family: 'Cubic', sans-serif !important;
   color: var(--game-accent) !important; 
-  font-size: 2.5rem;
-  margin-bottom: 30px;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  margin-bottom: 1.875rem;
   text-align: center;
   text-shadow: var(--text-shadow); 
   text-transform: uppercase;
@@ -168,7 +169,7 @@ body {
   font-family: 'Orbitron', sans-serif !important;
   font-size: 1rem;
   line-height: 1.5;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.5);
 }
 
 
@@ -178,16 +179,16 @@ body {
   font-size: 0.9rem; /* Tamaño adecuado */
   line-height: 1.6;
   text-align: center;
-  margin-top: 10px;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Un ligero brillo blanco */
+  margin-top: 0.625rem;
+  text-shadow: 0 0 0.625rem rgba(255, 255, 255, 0.2); /* Un ligero brillo blanco */
 }
 
 .opt-btn {
   font-family: 'Orbitron', sans-serif !important;
   background: rgba(15, 23, 42, 0.7);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 15px;
+  border: 0.125rem solid rgba(255, 255, 255, 0.1);
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  border-radius: 0.9375rem;
   color: white;
   transition: 0.3s;
   text-transform: uppercase;
@@ -197,7 +198,7 @@ body {
 .opt-btn.active {
   background: var(--game-blue-dark) !important;
   border-color: white !important;
-  box-shadow: 0 0 15px var(--game-blue);
+  box-shadow: 0 0 0.9375rem var(--game-blue);
 }
 
 /* --- Seccion de Ajustes en App.css --- */
@@ -205,16 +206,16 @@ body {
 .settings-container {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Espacio entre cada ajuste */
-  margin-top: 10px;
+  gap: 1.25rem; /* Espacio entre cada ajuste */
+  margin-top: 0.625rem;
 }
 
 .setting-item {
   display: flex;
   justify-content: space-between; /* Texto a la izquierda, control a la derecha */
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Línea divisoria sutil */
+  padding: 0.625rem 0;
+  border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.05); /* Línea divisoria sutil */
 }
 
 .setting-item:last-child {
@@ -224,10 +225,10 @@ body {
 /* Estilo para el slider de brillo */
 .settings-slider {
   flex: 1;
-  max-width: 150px;
-  height: 6px;
+  max-width: clamp(7rem, 18vw, 9.375rem);
+  height: 0.375rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
+  border-radius: 0.3125rem;
   accent-color: var(--game-blue); /* Color del círculo del slider */
   cursor: pointer;
 }
@@ -235,8 +236,8 @@ body {
 /* Ajuste para que los botones ON/OFF no ocupen todo el ancho */
 .setting-item .opt-btn {
   width: auto !important;
-  min-width: 80px;
-  padding: 8px 15px !important;
+  min-width: 5rem;
+  padding: 0.5rem 0.9375rem !important;
   font-size: 0.8rem !important;
   margin: 0;
 }
@@ -249,14 +250,14 @@ body {
   --game-accent: #60a5fa; /* Azul por defecto */
   --game-accent-dark: #2563eb;
   --game-red: #ef4444;
-  --text-shadow: 0 0 25px rgba(96, 165, 250, 0.5);
+  --text-shadow: 0 0 1.5625rem rgba(96, 165, 250, 0.5);
 }
 
 /* Modo daltónico global */
 .App.color-blind, .modal-content.color-blind {
   --game-accent: #f59e0b; /* Naranja */
   --game-accent-dark: #d97706;
-  --text-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+  --text-shadow: 0 0 1.5625rem rgba(245, 158, 11, 0.5);
 }
 
 .color-blind {
@@ -265,7 +266,7 @@ body {
 }
 
 .neon-mode {
-  --text-shadow: 0 0 15px var(--game-accent), 0 0 30px var(--game-accent);
+  --text-shadow: 0 0 0.9375rem var(--game-accent), 0 0 1.875rem var(--game-accent);
 }
 
 /* Aplicamos la variable de acento a los elementos clave */
@@ -275,9 +276,9 @@ body {
 
 .title-game {
   font-family: 'Cubic', sans-serif !important;
-  font-size: 8rem;
+  font-size: clamp(3.25rem, 12vw, 8rem);
   text-align: center;
-  margin: 30px 0 100px 0;
+  margin: clamp(1rem, 3vh, 1.875rem) 0 clamp(2rem, 8vh, 6.25rem) 0;
   color: var(--game-accent);
   text-shadow: var(--text-shadow);
 }
@@ -296,21 +297,50 @@ body {
 .btn-orange {
   background: linear-gradient(to right, #f59e0b, #d97706) !important;
   border: none !important;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 0.9375rem rgba(245, 158, 11, 0.4);
 }
 
 .opt-btn.active {
   background: var(--game-accent-dark) !important;
   border-color: white !important;
-  box-shadow: 0 0 15px var(--game-accent);
+  box-shadow: 0 0 0.9375rem var(--game-accent);
 }
 
 .icon-btn:hover {
   color: #ffffff !important;
-  filter: drop-shadow(0 0 8px var(--game-accent));
+  filter: drop-shadow(0 0 0.5rem var(--game-accent));
 }
 
 /* Slider de ajustes dinámico */
 .settings-slider {
   accent-color: var(--game-accent);
+}
+
+@media (max-width: 64rem) {
+  .menu-container {
+    justify-content: flex-start;
+    padding-top: clamp(4.5rem, 8vh, 6rem);
+    padding-bottom: clamp(1rem, 4vh, 2rem);
+  }
+
+  .grid-buttons {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100%, 32rem);
+    margin: 0 auto;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 40rem) {
+  .boton-cerrar-fijo {
+    font-size: 2.25rem !important;
+  }
+
+  .header-icons {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
 }
