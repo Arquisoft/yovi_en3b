@@ -85,11 +85,17 @@ const GameScreen: React.FC = () => {
                 difficulty: mapDifficulty(difficulty),
                 botId: botType === 'chip' ? 'chip' : 'robot',
             });
-            setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
-        } catch {
+            const replyText = typeof reply === 'string' && reply.trim().length > 0
+                ? reply.trim()
+                : 'I cannot answer right now. Try again in a moment.';
+            setMessages(prev => [...prev, { sender: 'bot', text: replyText }]);
+        } catch (error) {
+            const fallbackMessage = 'I cannot answer right now. Try again in a moment.';
+            const errorMessage = error instanceof Error ? error.message.trim() : '';
+
             setMessages(prev => [
                 ...prev,
-                { sender: 'bot', text: 'I cannot answer right now. Try again in a moment.' },
+                { sender: 'bot', text: errorMessage || fallbackMessage },
             ]);
         } finally {
             setIsBotTyping(false);
@@ -185,6 +191,16 @@ const GameScreen: React.FC = () => {
         setTimeLeft(initialTime);
     };
 
+    // Keep the board visible for all configured board sizes (3..10)
+    // by scaling the SVG viewBox and hex size with `size`.
+    const gridViewSize = Math.max(100, size * 24);
+    const gridViewStart = -gridViewSize / 2;
+    const hexSize = Math.max(3, Math.min(6, 30 / size));
+    const gridOrigin = {
+        x: size * 4.75 * (hexSize / 6),
+        y: (size - 1) * 5 * (hexSize / 6),
+    };
+
     return (
         <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}> 
             <div className="game-main-content">
@@ -205,8 +221,12 @@ const GameScreen: React.FC = () => {
 
                 <main className="board-area">
                     <div className="triangle-board">
-                        <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
-                            <Layout size={{ x: 6, y: 6 }} flat={false} spacing={1.08} origin={{ x: size * 4.75, y: (size - 1) * 5 }}>
+                        <HexGrid
+                            width="100%"
+                            height="100%"
+                            viewBox={`${gridViewStart} ${gridViewStart} ${gridViewSize} ${gridViewSize}`}
+                        >
+                            <Layout size={{ x: hexSize, y: hexSize }} flat={false} spacing={1.08} origin={gridOrigin}>
                                 {cells.map((cell) => {
                                     const key = `${cell.x}-${cell.y}-${cell.z}`;
                                     const owner = boardState[key];

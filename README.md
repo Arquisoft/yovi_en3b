@@ -134,6 +134,8 @@ This command will build the Docker images for both the `webapp` and `users` serv
 - User service API: [http://localhost:3000](http://localhost:3000)
 - Gamey API: [http://localhost:4000](http://localhost:4000)
 
+Chat with the bot requires `ANTHROPIC_API_KEY` to be defined before starting Docker Compose so the `gamey` service can answer chat requests.
+
 ### Without Docker
 
 To run the project locally without Docker, you will need to run each component in a separate terminal.
@@ -189,6 +191,8 @@ The web application will be available at `http://localhost:5173`.
 #### 3. Running the GameY application
 
 At this moment the GameY application is not needed but once it is needed you should also start it from the command line.
+
+If you want the in-game chat to work locally, `gamey` must be running and `ANTHROPIC_API_KEY` must be exported in the shell before starting it. The frontend expects Gamey on `http://localhost:4000` unless `VITE_GAMEY_URL` is overridden.
 
 ## Available Scripts
 

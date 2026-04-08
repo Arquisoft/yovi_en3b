@@ -3,6 +3,13 @@ export type GameChatMessage = {
   text: string;
 };
 
+type LegacyGameChatMessage = {
+  role?: string;
+  content?: string;
+  sender?: 'player' | 'bot';
+  text?: string;
+};
+
 type YENPayload = {
   size: number;
   turn: number;
@@ -21,6 +28,30 @@ type GameyChatResponse = {
   difficulty: string;
   reply: string;
 };
+
+function normalizeChatHistory(
+  messages: Array<GameChatMessage | LegacyGameChatMessage>,
+): Array<{ role: string; content: string }> {
+  return messages
+    .map((message) => {
+      const legacyContent =
+        'content' in message && typeof message.content === 'string'
+          ? message.content.trim()
+          : '';
+      const legacyRole =
+        'role' in message && typeof message.role === 'string' ? message.role : 'player';
+
+      const content = typeof message.text === 'string' ? message.text.trim() : legacyContent;
+
+      const roleSource = typeof message.sender === 'string' ? message.sender : legacyRole;
+
+      const role =
+        roleSource === 'bot' || roleSource === 'assistant' ? 'assistant' : 'player';
+
+      return { role, content };
+    })
+    .filter((message) => message.content.length > 0);
+}
 
 /**
  * Converts a 3D game board state into a compact YEN notation string.
@@ -102,8 +133,9 @@ export async function requestBotChatReply(params: {
   difficulty: 'easy' | 'medium' | 'hard';
   botId?: string;
 }): Promise<string> {
-  const GAMEY_URL = import.meta.env.VITE_GAMEY_URL ?? 'http://localhost:3001';
+  const GAMEY_URL = import.meta.env.VITE_GAMEY_URL ?? 'http://localhost:4000';
   const botId = params.botId ?? 'llm_bot';
+  const normalizedMessages = normalizeChatHistory(params.messages);
 
   const body: GameyChatRequest = {
     yen: {
@@ -112,27 +144,36 @@ export async function requestBotChatReply(params: {
       players: ['B', 'R'],
       layout: buildYenLayout(params.size, params.boardState),
     },
-    messages: params.messages.map((m) => ({
-      role: m.sender === 'player' ? 'player' : 'assistant',
-      content: m.text,
-    })),
+    messages: normalizedMessages,
   };
 
-  const response = await fetch(
-    `${GAMEY_URL}/v1/ybot/chat/${botId}?difficulty=${params.difficulty}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      `${GAMEY_URL}/v1/ybot/chat/${botId}?difficulty=${params.difficulty}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      },
+    );
+  } catch {
+    throw new Error(
+      `Cannot reach Gamey service at ${GAMEY_URL}. Make sure the gamey server/container is running.`,
+    );
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(errorText || `Gamey chat request failed (${response.status})`);
+
+    try {
+      const parsed = JSON.parse(errorText) as { message?: string };
+      throw new Error(parsed.message || `Gamey chat request failed (${response.status})`);
+    } catch {
+      throw new Error(errorText || `Gamey chat request failed (${response.status})`);
+    }
   }
 
   const data = (await response.json()) as GameyChatResponse;
   return data.reply;
 }
-

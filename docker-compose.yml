@@ -44,6 +44,7 @@ services:
       - "80:80"
     depends_on:
       - users
+      - gamey
     networks:
       - monitor-net
 
@@ -53,6 +54,8 @@ services:
     image: ghcr.io/arquisoft/yovi_en3b-gamey:latest
     ports:
       - "4000:4000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     networks:
       - monitor-net
 
