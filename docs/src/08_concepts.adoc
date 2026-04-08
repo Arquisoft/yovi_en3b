@@ -3,72 +3,33 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-concepts]]
 == Cross-cutting Concepts
 
+This section outlines the principal regulations, patterns, and solution ideas that apply across multiple building blocks of the YOVI system. By establishing these rules, we ensure conceptual integrity and consistency throughout the architecture.
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Content
-This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as
+image::crosscutting-concepts-map.jpg["YOVI Crosscutting Concepts Concept Map"]
 
-* models, especially domain models
-* architecture or design patterns
-* rules for using specific technology
-* principal, often technical decisions of an overarching (= cross-cutting) nature
-* implementation rules
+=== 8.1 Inter-Component Communication & YEN Notation
+Communication between the decoupled subsystems (YOVI Web Client, Users API, and GameY Service) relies entirely on lightweight, stateless REST APIs exchanging JSON payloads. 
 
+A core crosscutting domain concept is the **YEN (Y-Game Extended Notation)**. It is the standardized format for representing the game board, turn state, and player layout. 
 
-.Motivation
-Concepts form the basis for _conceptual integrity_ (consistency, homogeneity) of the architecture. 
-Thus, they are an important contribution to achieve inner qualities of your system.
+* **Impact:** The React frontend must serialize board states into YEN, the external bots must read/write YEN, and the Rust engine's `YEN Parser` must deserialize it to evaluate the core logic. Having a single source of truth for game notation ensures consistency across the TypeScript and Rust boundaries.
 
-Some of these concepts cannot be assigned to individual building blocks, e.g. security or safety. 
+=== 8.2 Microservices & Containerization Pattern
+The system strictly follows a microservices architectural style to separate the high-performance CPU-bound tasks (GameY Service) from I/O-bound tasks (Users API).
 
+* **Impact:** To maintain consistency in deployment and operation, all core components are packaged into isolated Docker containers (WebApp, Users API, GameY Service, and PostgreSQL). This containerization concept simplifies deployment to the Docker Host Server and ensures uniform environment configurations across development, testing, and production.
 
-.Form
-The form can be varied:
+=== 8.3 Security & Authentication
+Security is managed uniformly at the entry points of the system to protect user profiles and ensure fair play in the leaderboards.
 
-* concept papers with any kind of structure
-* cross-cutting model excerpts or scenarios using notations of the architecture views
-* sample implementations, especially for technical concepts
-* reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)
+* **Human Players:** The `YOVI Web Client` communicates with the `Users API` to authenticate players (e.g., via JSON Web Tokens - JWT). This token is required for all state-altering requests, such as updating match history.
 
-.Structure
-A potential (but not mandatory) structure for this section could be:
-
-* Domain concepts
-* User Experience concepts (UX)
-* Safety and security concepts
-* Architecture and design patterns
-* "Under-the-hood"
-* development concepts
-* operational concepts
-
-Note: it might be difficult to assign individual concepts to one specific topic
-on this list.
-
-image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
+* **External Bots:** External scripts/applications interacting with the `External Bot API` must use bot-specific identifiers or API keys. This prevents system abuse and accurately tracks bot performance metrics.
 
 
-.Further Information
+=== 8.4 User Experience (UX) & Internationalization (i18n)
+To fulfill the optional system requirements, the presentation layer follows specific UX and localization patterns.
 
-See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
-****
-endif::arc42help[]
+* **Responsive Design:** The Web Client components are styled using responsive paradigms to support seamless gameplay on both PC and mobile devices.
 
-=== _<Concept 1>_
-
-_<explanation>_
-
-
-
-=== _<Concept 2>_
-
-_<explanation>_
-
-...
-
-=== _<Concept n>_
-
-_<explanation>_
+* **Localization:** UI components are structured to support internationalization (i18n), strictly separating hardcoded text from the views to allow dynamic switching between different languages.
