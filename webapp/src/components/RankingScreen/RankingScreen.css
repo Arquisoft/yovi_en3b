@@ -121,6 +121,24 @@
     height: 45px;
     border-radius: 50%;
     border: 2px solid var(--game-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    background: rgba(15, 23, 42, 0.8);
+    color: #ffffff;
+}
+
+.ranking-user-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.ranking-handle {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .col-stats-container {
@@ -159,6 +177,17 @@
     flex: 1;
     overflow-y: auto;
     padding-right: 10px;
+}
+
+.ranking-feedback {
+    color: #e2e8f0;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.ranking-feedback-error {
+    color: #f87171;
 }
 
 .ranking-list::-webkit-scrollbar { width: 6px; }

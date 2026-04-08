@@ -23,10 +23,10 @@ describe('userProfile API service', () => {
             localStorage.setItem('username', mockUsername);
 
             const mockResponse = {
-                _id: '123',
+                id: '123',
                 username: mockUsername,
                 nickname: 'TestPlayer',
-                photo: 'avatar_05'
+                avatarId: 'avatar_05'
             };
 
             // Setup successful fetch mock
@@ -37,7 +37,6 @@ describe('userProfile API service', () => {
 
             const result = await getMyProfile();
 
-            // Verify mapping from backend fields (nickname, photo) to frontend fields (displayName, avatarId)
             expect(result).toEqual({
                 id: '123',
                 username: mockUsername,
@@ -65,9 +64,9 @@ describe('userProfile API service', () => {
             const patch = { displayName: 'NewNickname', avatarId: 'avatar_02' };
 
             const mockResponse = {
-                _id: '123',
+                id: '123',
                 nickname: 'NewNickname',
-                photo: 'avatar_02'
+                avatarId: 'avatar_02'
             };
 
             (fetch as any).mockResolvedValue({
@@ -77,7 +76,6 @@ describe('userProfile API service', () => {
 
             const result = await updateMyProfile(patch);
 
-            // Verify the payload matches the backend requirements (username and nickname)
             expect(fetch).toHaveBeenCalledWith(
                 `${API_URL}/users/changeNickname`,
                 expect.objectContaining({
@@ -85,7 +83,8 @@ describe('userProfile API service', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         username: mockUsername,
-                        nickname: patch.displayName
+                        nickname: patch.displayName,
+                        photo: patch.avatarId
                     })
                 })
             );
@@ -101,13 +100,25 @@ describe('userProfile API service', () => {
     });
 
     describe('getMyRanking', () => {
-        it('should return the mock ranking data after a short delay', async () => {
-            // Testing the current hardcoded implementation in the original class
-            const result = await getMyRanking();
-            
-            expect(result).toHaveProperty('position');
-            expect(result).toHaveProperty('totalPlayers');
-            expect(typeof result.position).toBe('number');
+        it('should fetch ranking using the provided userId', async () => {
+            (fetch as any).mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ position: 7, totalPlayers: 42 }),
+            });
+
+            const result = await getMyRanking('user-7');
+
+            expect(fetch).toHaveBeenCalledWith(
+                `${API_URL}/ranking/me?userId=user-7`,
+                { method: 'GET', credentials: 'include' }
+            );
+            expect(result).toEqual({ position: 7, totalPlayers: 42 });
+        });
+
+        it('should throw if ranking cannot be loaded', async () => {
+            (fetch as any).mockResolvedValue({ ok: false, statusText: 'Not Found' });
+
+            await expect(getMyRanking('missing-user')).rejects.toThrow('Could not load the ranking');
         });
     });
 

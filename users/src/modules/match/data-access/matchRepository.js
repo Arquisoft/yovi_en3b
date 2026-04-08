@@ -6,6 +6,11 @@ async function findMatchesByPlayerId(playerId) {
     return result.rows;
 }
 
+async function findMatchHistoryByPlayerId(playerId) {
+    const result = await db.query(queries.selectHistoryWherePlayerId, [playerId]);
+    return result.rows;
+}
+
 const createMatch = async (matchData) => {
     const values = [
         matchData.bluePlayerId, 
@@ -18,4 +23,9 @@ const createMatch = async (matchData) => {
     return rows[0];
 };
 
-module.exports = { findMatchesByPlayerId, createMatch };
+const finishMatch = async (matchId, winnerId) => {
+    const { rows } = await db.query(queries.finishMatch, [winnerId, matchId]);
+    return rows[0];
+};
+
+module.exports = { findMatchesByPlayerId, findMatchHistoryByPlayerId, createMatch, finishMatch };

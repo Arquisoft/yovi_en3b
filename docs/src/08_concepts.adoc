@@ -57,18 +57,178 @@ See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== _<Concept 1>_
+=== Ranking System Concept
 
-_<explanation>_
+==== Overview
 
+The Game Y ranking system provides competitive leaderboard functionality that automatically tracks player performance across all matches. It uses a score-based ranking model where players are positioned based on their win-loss records.
 
+==== Architecture
 
-=== _<Concept 2>_
+The ranking system is implemented across three components:
 
-_<explanation>_
+. **Backend Database Layer**: Stores ranking statistics (total_matches, win_matches, score)
+. **Business Logic Layer**: Calculates rankings, manages match completion, and updates player statistics
+. **Frontend Presentation Layer**: Displays ranking position in user profile and global leaderboard
 
-...
+==== Score Calculation Formula
 
-=== _<Concept n>_
+```
+score = 50 * (2 * wins - total_matches)
+```
 
-_<explanation>_
+This formula ensures:
+- Victory is rewarded (+2 points per win)
+- Matches are always counted (-1 point per match)
+- High win rates result in positive scores
+- Loss-heavy records result in negative scores
+
+.Example Calculations:
+- 10 wins, 0 losses: score = 50 * (2*10 - 10) = 500
+- 9 wins, 1 loss: score = 50 * (2*9 - 10) = 400
+- 5 wins, 5 losses: score = 50 * (2*5 - 10) = 0
+- 0 wins, 10 losses: score = 50 * (2*0 - 10) = -500
+
+==== Data Flow: Match Completion
+
+```
+┌─────────────────┐
+│  Game Ends      │
+│  (Winner Known) │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────┐
+│ Frontend: POST /matches/finish  │
+│ {matchId, winnerId}             │
+└────────┬────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────┐
+│  Backend Receives Match End  │
+│  • Record winner             │
+│  • Set status to 'finished'  │
+└────────┬─────────────────────┘
+         │
+         ▼
+┌────────────────────────────────┐
+│  Check Player Rankings         │
+│  • Does winner have ranking?   │
+│  • Does loser have ranking?    │
+└────────┬───────────────────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+┌───────┐ ┌──────────────┐
+│ New   │ │ Existing     │
+│Player │ │ Player       │
+└───┬───┘ └──────┬───────┘
+    │            │
+    ▼            ▼
+┌──────────────┐ ┌──────────────────┐
+│Initialize:  │ │Update:           │
+│• total: 1   │ │• total += 1      │
+│• wins: 1    │ │• wins += (0 or 1)│
+│• score: 50  │ │• recalc score    │
+└──────────────┘ └──────────────────┘
+    │                    │
+    └────────┬───────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Update Database    │
+    │ Persist Rankings   │
+    └────────┬───────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Return Success     │
+    │ with Match Data    │
+    └────────────────────┘
+```
+
+==== Integration Points
+
+===== Match Service
+
+The match completion flow is integrated into the `matchService.finishMatch()` function:
+
+[source,javascript]
+----
+const finishMatch = async (matchId, winnerId) => {
+  try {
+    // 1. Update match as finished
+    const match = await matchRepository.finishMatch(matchId, winnerId);
+    
+    // 2. Update both players' rankings
+    const winnerRanking = await rankingService
+      .updateOrInitializeRanking(winnerId, 1, 1);
+    
+    const loserRanking = await rankingService
+      .updateOrInitializeRanking(loserId, 1, 0);
+    
+    return match;
+  } catch (error) {
+    throw new Error(`Failed to finish match: ${error.message}`);
+  }
+};
+----
+
+===== Frontend Integration
+
+The ranking is automatically fetched and displayed when users open their profile:
+
+[source,typescript]
+----
+// hooks/useUserProfile.ts
+const { profile, ranking, ... } = useUserProfile(open);
+
+// The ranking is fetched via: GET /ranking/me?userId={userId}
+// And displayed in the ProfileOverlay component
+----
+
+==== API Endpoints
+
+**Get User's Ranking Position**
+[source]
+----
+GET /ranking/me?userId={userId}
+Response: { position: 5, totalPlayers: 127 }
+----
+
+**Get Global Rankings**
+[source]
+----
+GET /ranking/global
+Response: Array of all players ranked by score
+----
+
+**Finish Match and Update Rankings**
+[source]
+----
+POST /matches/finish
+Request: { matchId: uuid, winnerId: uuid }
+Response: Updated match with winner information
+----
+
+==== Performance Considerations
+
+. **Ranking Calculation**: Position is determined by O(n) query sorting all rankings by score
+. **Update Frequency**: Rankings are updated immediately upon match completion
+. **Caching**: Consider caching global rankings for frequently accessed data
+. **Index Strategy**: Database indexes on score and user_id columns optimize queries
+
+==== Error Handling
+
+. **New Players**: Automatically initialize ranking on first match
+. **Network Failures**: Frontend gracefully falls back to mock data
+. **Database Issues**: API returns appropriate error codes (400, 404, 500)
+. **Concurrent Updates**: Database constraints ensure data integrity
+
+==== Future Enhancements
+
+. **Seasonal Leaderboards**: Reset rankings at season boundaries
+. **ELO-Style Rating**: Adjust points based on opponent strength
+. **Achievements**: Award badges for ranking milestones
+. **Real-time Updates**: WebSocket notifications for leaderboard changes
+. **Statistics Tracking**: Detailed player statistics and analytics
