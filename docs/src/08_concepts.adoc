@@ -62,7 +62,6 @@ image::08-concepts-EN.drawio.png["Possible topics for crosscutting concepts"]
 
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
-endif::arc42help[]
 
 === Ranking System Concept
 
