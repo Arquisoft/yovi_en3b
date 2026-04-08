@@ -37,7 +37,6 @@ To fulfill the optional system requirements, the presentation layer follows spec
 
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
-endif::arc42help[]
 
 === Ranking System Concept
 

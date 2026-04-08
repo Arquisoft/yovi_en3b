@@ -3,14 +3,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-glossary]]
 == Glossary
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-The most important domain and technical terms that your stakeholders use when discussing the system.
-****
-endif::arc42help[]
-
 [cols="e,2e" options="header"]
 |===
 |Term |Definition
