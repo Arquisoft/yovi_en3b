@@ -1,4 +1,3 @@
-// UBICACIÓN: webapp/src/components/Settings/SettingsModal.tsx
 import React from 'react'; 
 import { useSettings } from '../../context/SettingsContext'; 
 import { useI18n } from '../../i18n/useTranslation'; 
@@ -46,7 +45,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             />
           </div>
 
-          {/* CONTROL DE VOLUMEN */}
+          {/* VOLUME CONTROL */}
           <div className="setting-item">
             <label className="modal-text">
               {t.labels.volume || 'VOLUMEN'}: {isMuted ? 0 : volume}%
