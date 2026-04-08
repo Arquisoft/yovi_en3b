@@ -210,7 +210,7 @@ describe('GET /users/findUserByUsername', () => {
         });
         const res = await request(app)
             .get('/users/findUserByUsername')
-            .send({ 
+            .query({ 
                 username: testName,
             })
             .set('Accept', 'application/json')
@@ -227,7 +227,7 @@ describe('GET /users/findUserByUsername', () => {
     it('returns 400 if no username is provided', async () => {
         const res = await request(app)
             .get('/users/findUserByUsername')
-            .send({ 
+            .query({ 
                 // Enviamos el body vacío o sin el campo username
             })
             .set('Accept', 'application/json')
@@ -243,7 +243,7 @@ describe('GET /users/findUserByUsername', () => {
 
         const res = await request(app)
             .get('/users/findUserByUsername')
-            .send({ username: 'UsuarioFantasma' })
+            .query({ username: 'UsuarioFantasma' })
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(404)
@@ -255,7 +255,7 @@ describe('GET /users/findUserByUsername', () => {
 
         const res = await request(app)
             .get('/users/findUserByUsername')
-            .send({ 
+            .query({ 
                 username: 'test',
             })
             .set('Accept', 'application/json')

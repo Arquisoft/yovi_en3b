@@ -13,6 +13,7 @@ import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 import { requestBotChatReply, type GameChatMessage } from './gameyChat.api';
+import { createMatch, finishMatch } from './game.api';
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -42,16 +43,67 @@ const GameScreen: React.FC = () => {
     const [messages, setMessages] = useState<GameChatMessage[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isBotTyping, setIsBotTyping] = useState(false);
+    const [matchId, setMatchId] = useState<string | null>(null);
+    const [isMatchCreating, setIsMatchCreating] = useState(false);
+    const [matchError, setMatchError] = useState<string | null>(null);
     
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
-    // Effect to trigger game over sounds
+    // Effect to create match on component mount
+    useEffect(() => {
+        if (isMatchCreating || matchId) return;
+        
+        const createGameMatch = async () => {
+            setIsMatchCreating(true);
+            try {
+                const match = await createMatch(
+                    true, // isBot=true (playing against bot)
+                    difficulty || 1 // use the actual difficulty (1=easy, 2=medium, 3=hard)
+                );
+                setMatchId(match.id);
+                setMatchError(null);
+            } catch (error) {
+                const msg = error instanceof Error ? error.message : 'Failed to create match';
+                console.error('Match creation error:', msg);
+                setMatchError(msg);
+            } finally {
+                setIsMatchCreating(false);
+            }
+        };
+        
+        createGameMatch();
+    }, [difficulty]);
+
+    // Effect to trigger game over sounds and finish match
     useEffect(() => {
         if (gameResult === 'win') playSound('win.mp3');
         if (gameResult === 'lose') playSound('gameover.mp3');
-    }, [gameResult, playSound]);
+        
+        // Finish the match when game ends
+        if (gameResult && matchId) {
+            const finishGameMatch = async () => {
+                try {
+                    const userId = localStorage.getItem('userId');
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+                    
+                    const winnerId = gameResult === 'win' ? userId : 'bot';
+                    await finishMatch(matchId, winnerId);
+                    console.log(`Match finished with result: ${gameResult}`);
+                } catch (error) {
+                    const msg = error instanceof Error ? error.message : 'Failed to finish match';
+                    console.error('Match finish error:', msg);
+                    setMatchError(msg);
+                }
+            };
+            
+            finishGameMatch();
+        }
+    }, [gameResult, matchId, playSound]);
 
     const formatDisplayTime = (seconds: number | null) => {
         if (seconds === null) return "∞";
@@ -189,6 +241,7 @@ const GameScreen: React.FC = () => {
         setGameResult(null);
         setCurrentPlayer(1);
         setTimeLeft(initialTime);
+        setMatchId(null); // Reset match ID for new game
     };
 
     // Keep the board visible for all configured board sizes (3..10)
@@ -338,6 +391,11 @@ const GameScreen: React.FC = () => {
                         <p className="result-modal-text">
                             {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
                         </p>
+                        {matchError && (
+                            <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
+                                {matchError}
+                            </p>
+                        )}
                         <div className="modal-buttons-column">
                             <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
                             <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
