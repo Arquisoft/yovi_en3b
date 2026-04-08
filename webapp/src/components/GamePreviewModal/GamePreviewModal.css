@@ -1,0 +1,451 @@
+/* GamePreviewModal.css */
+
+/* 1. ANIMACIONES (Pop suave y Fade del fondo) */
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalPopUp {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 2. OVERLAY TRANSLÚCIDO (Igual que el How to Play) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45); 
+  backdrop-filter: blur(10px); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.4s ease-out;
+}
+
+/* 3. CONTENIDO DEL MODAL (Actualizado con el borde del How to Play) */
+.modal-content {
+  position: relative !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%) !important;
+  padding: 60px 40px 40px 40px;
+  border-radius: 30px;
+  
+  /* EL BORDE AZUL QUE PEDISTE */
+  border: 2px solid #60a5fa !important; 
+  
+  width: 90%;
+  max-width: 500px;
+  
+  /* Sombra sutil pero con un toque azul para el brillo exterior */
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.7); 
+  
+  animation: modalPopUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- El resto del CSS se mantiene igual para no romper el tablero ni los controles --- */
+
+.preview-modal-wide {
+  max-width: 950px !important;
+  width: 90% !important;
+  padding: 50px !important;
+}
+
+.preview-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 60px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+/* --- COLUMNA IZQUIERDA (Tablero) - TU CÓDIGO INTACTO --- */
+
+.preview-left-column {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  border-radius: 25px;
+
+  padding: 30px;
+
+  border: 1px solid rgba(96, 165, 250, 0.1);
+
+}
+
+
+
+.p-time-limit-top {
+
+  color: #ffffff;
+
+  font-family: 'Orbitron', sans-serif;
+
+  font-size: 1.1rem;
+
+  font-weight: bold;
+
+  margin-bottom: 30px;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+
+  text-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+
+  min-height: 1.5rem;
+
+}
+
+
+
+.p-board-size-display {
+
+  color: var(--game-blue) !important;
+
+  font-family: 'Orbitron', sans-serif;
+
+  font-weight: bold;
+
+  font-size: 1.5rem;
+
+  margin-top: 30px;
+
+  letter-spacing: 2px;
+
+}
+
+
+
+/* --- COLUMNA DERECHA (Opciones) - TU CÓDIGO INTACTO --- */
+
+.preview-right-column {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 35px;
+
+}
+
+
+
+.setting-control {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center; /* Centra el label y el stepper */
+
+  gap: 15px;
+
+  width: 100%;
+
+}
+
+
+
+.label-white-bold {
+
+  color: white !important;
+
+  font-family: 'Orbitron', sans-serif;
+
+  font-size: 0.9rem;
+
+  font-weight: bold;
+
+  letter-spacing: 2px;
+
+  text-align: center;
+
+}
+
+
+
+/* Botones Bots */
+
+.bot-selector {
+
+  display: flex;
+
+  gap: 30px;
+
+}
+
+
+
+.bot-btn {
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 2px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 15px;
+
+  padding: 12px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+
+}
+
+
+
+.bot-btn.active {
+
+  border-color: var(--game-blue);
+
+  background: rgba(96, 165, 250, 0.2);
+
+  box-shadow: 0 0 15px var(--game-blue);
+
+}
+
+
+
+/* Stepper: - 5 + - TU CÓDIGO INTACTO */
+
+.stepper-horizontal {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center; /* Centra los elementos internamente */
+
+  gap: 40px; /* Más espacio entre botones y número */
+
+  width: 100%;
+
+}
+
+
+
+.stepper-value {
+
+  color: white !important;
+
+  font-family: 'Orbitron', sans-serif;
+
+  font-size: 3.5rem; /* Número más grande */
+
+  font-weight: bold;
+
+  min-width: 80px;
+
+  text-align: center;
+
+}
+
+
+
+.step-btn {
+
+  background: transparent;
+
+  color: white;
+
+  border: none; /* Eliminamos el borde */
+
+  width: 60px; /* Botones más grandes */
+
+  height: 60px;
+
+  font-size: 2.5rem; /* El símbolo + o - más grande */
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  opacity: 0.8;
+
+}
+
+
+
+.step-btn:hover {
+
+  background: transparent; /* Mantenemos el fondo limpio */
+
+  color: var(--game-blue); /* Brillo al pasar el ratón */
+
+  transform: scale(1.2); /* Efecto de aumento */
+
+  opacity: 1;
+
+}
+
+
+
+/* Slider Dificultad - TU CÓDIGO INTACTO */
+
+.difficulty-slider-container {
+
+  width: 100%;
+
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+}
+
+
+
+.neon-slider {
+
+  -webkit-appearance: none;
+
+  appearance: none;
+
+  width: 100% !important;
+
+  height: 6px;
+
+  background: rgba(96, 165, 250, 0.2);
+
+  border-radius: 3px;
+
+  outline: none;
+
+  margin: 20px 0;
+
+  cursor: pointer;
+
+}
+
+
+
+.slider-labels-below {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  width: 100%;
+
+  padding: 0 5px;
+
+  margin-top: 5px;
+
+}
+
+
+
+.slider-labels-below span {
+
+  flex: 1;
+
+  color: #ffffff !important;
+
+  font-family: 'Orbitron', sans-serif;
+
+  font-size: 0.75rem;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+
+  transition: all 0.3s ease;
+
+  opacity: 0.6;
+
+}
+
+
+
+.slider-labels-below span.active {
+
+  opacity: 1;
+
+  font-weight: bold;
+
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(96, 165, 250, 0.3);
+
+}
+
+
+
+.slider-labels-below span:first-child { text-align: left; }
+
+.slider-labels-below span:nth-child(2) { text-align: center; }
+
+.slider-labels-below span:last-child { text-align: right; }
+
+
+
+.btn-play-now-preview {
+
+  margin-top: 10px;
+
+  padding: 22px !important;
+
+  font-size: 1.4rem !important;
+
+}
+
+.visual-preview-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Espacio para que el tablero no se aplaste */
+    width: 100%;
+}
+
+.triangle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px; /* Espacio entre filas */
+}
+
+.triangle-row {
+    display: flex;
+    gap: 5px; /* Espacio entre puntos */
+}
+
+.triangle-cell {
+    width: 24px;  /* Ajusta el tamaño según prefieras */
+    height: 28px; /* Un poco más alto que ancho para que el hexágono se vea natural */
+    background: rgba(96, 165, 250, 0.3); 
+    
+   
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    
+    /* Efectos visuales */
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.4); /* Nota: clip-path puede cortar sombras exteriores */
+    border: none; /* clip-path no se lleva bien con los bordes estándar */
+}
+
+/* Para que parezca que tienen borde, podemos usar un filtro de drop-shadow o un pseudo-elemento */
+.triangle-cell:hover {
+    background: rgba(96, 165, 250, 0.6);
+    transform: scale(1.1);
+}
+
+/* Opcional: Si quieres que brillen un poco más */
+.triangle-wrapper {
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px; /* Ajusta el espacio para que encajen los hexágonos */
+}

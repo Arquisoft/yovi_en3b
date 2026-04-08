@@ -1,0 +1,93 @@
+/* LanguageDialog.css - Unified with Global Theme */
+
+.language-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+/* Modal box - Using global accent variable */
+.language-modal {
+  position: relative;
+  background: rgba(15, 23, 42, 0.95); /* matching other modals */
+  padding: 60px 40px 40px 40px;
+  border-radius: 30px;
+  border: 2px solid var(--game-accent); /* Dynamic border color */
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Title using the same style as Main Menu */
+.language-title {
+  font-family: 'Cubic', sans-serif !important;
+  color: var(--game-accent); /* Dynamic color (Blue or Orange) */
+  font-size: 2.5rem;
+  margin-bottom: 35px;
+  text-transform: uppercase;
+  text-shadow: var(--text-shadow); /* Glow effect */
+}
+
+.language-options {
+  display: flex;
+  flex-direction: column; /* Better for scannability than a small gap */
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Updated Button to match the game style */
+.btn-lang-white {
+  background: rgba(255, 255, 255, 0.1) !important; /* Semi-transparent like other buttons */
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 15px 30px !important;
+  border-radius: 15px !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-lang-white:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: var(--game-accent) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Active state with the neon accent */
+.btn-lang-white.active {
+  background: var(--game-accent-dark) !important; /* Dynamic dark background */
+  border-color: white !important;
+  box-shadow: 0 0 20px var(--game-accent); /* Dynamic glow */
+  color: white !important;
+}
+
+.close-x-lang {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--game-accent); /* Dynamic close button */
+  font-size: 3rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: 0.3s;
+}
+
+.close-x-lang:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}

@@ -1,6 +1,11 @@
 const db = require('../../../db/db.js');
 const queries = require('./matchQueries.js');
 
+async function findMatchesByPlayerId(playerId) {
+    const result = await db.query(queries.selectWherePlayerId, [playerId]);
+    return result.rows;
+}
+
 const createMatch = async (matchData) => {
     const values = [
         matchData.bluePlayerId, 
@@ -13,4 +18,4 @@ const createMatch = async (matchData) => {
     return rows[0];
 };
 
-module.exports = { createMatch };
+module.exports = { findMatchesByPlayerId, createMatch };
