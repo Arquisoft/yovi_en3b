@@ -15,7 +15,7 @@ endif::arc42help[]
 
 The following quality tree provides a high-level overview of the quality attributes that are most important for the **GAME Y** system, broken down into specific evaluation areas and prioritized to guide architectural decisions.
 
-* **Quality**
+* **Quality (Root)**
     * **Usability**
         * Accessibility (Colorblind support) -> See [US-1]
         * Internationalization (Multi-language) -> See [US-2]
@@ -39,7 +39,7 @@ The following tables describe specific scenarios that concretize the quality req
 | ID | Quality Attribute | Scenario Description
 | **US-1** | Accessibility | **Stimulus:** A colorblind user accesses the settings menu and toggles the "Colorblind mode". + 
 **Response:** The system immediately updates the color palette across the entire UI (e.g., changing player colors to Orange and White/Blue) without requiring a page reload.
-| **US-2** | Internationalization | **Stimulus:** A user selects a different language (e.g., Turkish or English) from the language dialog. + 
+| **US-2** | Internationalization | **Stimulus:** A user selects a different language (e.g., Turkish or Asturian) from the language dialog. + 
 **Response:** The system applies the selected i18n translation strings instantaneously to all text elements in the interface using the Translation Provider.
 |===
 
@@ -47,8 +47,8 @@ The following tables describe specific scenarios that concretize the quality req
 [cols="1,2,4", options="header"]
 |===
 | ID | Quality Attribute | Scenario Description
-| **PE-1** | AI Response Time | **Stimulus:** A player confirms their move in a match against the bot. + 
-**Response:** The AI algorithm calculates the counter-move and updates the board state in under 3 seconds to keep the gameplay fluid and engaging.
+| **PE-1** | AI Response Time | **Stimulus:** A player confirms their move in a match against the "Hard" bot. + 
+**Response:** The AI algorithm calculates the counter-move and updates the board state in under 2 seconds to keep the gameplay fluid and engaging.
 | **PE-2** | UI Responsiveness | **Stimulus:** A user navigates from the Main Menu to the Profile Overlay or Game Preview. + 
 **Response:** The modal opens smoothly and renders the hexagonal grid or user data within 500 milliseconds.
 |===
