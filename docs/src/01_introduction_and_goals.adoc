@@ -14,7 +14,7 @@ endif::arc42help[]
 
 **YOVI** is a gaming suite developed for **Micrati** based on "Game Y". The system allows users to play hexagonal board games against the computer and provides an interface for external bots.
 
-Key functional requirements include:
+Key functional requirements include:/
 
 * **Core Gameplay:** Implementation of classic Game Y with variable board sizes.
 * **AI Strategies:** Support for multiple machine strategies and selectable difficulty levels.
@@ -46,31 +46,31 @@ A table with quality goals and concrete scenarios, ordered by priorities
 ****
 endif::arc42help[]
 
-The following table presents the top five quality goals for the YOVI architecture, ordered by priority. These goals have been identified based on stakeholder expectations and the ISO 25010 quality model. They represent the most critical quality attributes that will guide architectural decisions throughout the project and serve as the primary criteria for evaluating the success of the system.
+The following table presents the top five quality goals for the YOVI architecture, ordered by priority. These goals have been identified based on stakeholder expectations and represent the most critical attributes that guide our architectural decisions.
 
 [options="header",cols="1,2,3"]
 |===
 |Priority|Quality Goal|Concrete Scenario
 
 |1
-|**Performance Efficiency**
-|The Rust engine must respond to move validation and AI suggestions in under 200ms, ensuring a smooth gameplay experience even during peak usage.
+|**Interoperability (Compatibility)**
+|The system must decouple the game engine from the frontend by exposing a standardized REST API using **YEN notation** (JSON). This architectural decision allows external bots and third-party clients to connect and play seamlessly.
 
 |2
-|**Compatibility (Interoperability)**
-|The system must allow external bots to connect via a well-documented JSON API (YEN notation), enabling third-party developers to create their own game clients.
+|**Security**
+|The architecture must guarantee user data privacy and authorization by design. All passwords must be hashed using `bcrypt` at the Data Access layer, and secure endpoints must be protected using JWT (JSON Web Tokens) to prevent unauthorized actions.
 
 |3
-|**Functional Suitability**
-|The Rust engine must accurately implement all "Game Y" rules, and the web frontend must cover all user stories including registration, gameplay, and statistics.
+|**Usability (Accessibility & i18n)**
+|The frontend UI must be designed to support immediate state changes for inclusivity. Users must be able to toggle "Colorblind Mode" or switch languages (i18n) instantly without page reloads or loss of the current game state.
 
 |4
-|**Maintainability**
-|The architecture must keep Rust logic independent from the TypeScript layer, with clear ADRs and >80% code coverage, allowing evaluators and future developers to understand and modify the system.
+|**Performance Efficiency**
+|The integration between the backend and the Rust AI engine must handle complex pathfinding (Dijkstra) and decision-making (Minimax) asynchronously. The architecture guarantees that the React UI remains fully responsive and fluid while the bot is "thinking".
 
 |5
-|**Transferability**
-|The complete system must be deployable with a single Docker command, ensuring evaluators can easily install and test the application on any modern environment.
+|**Testability (Maintainability)**
+|To achieve the mandatory 80% code coverage, the backend must strictly enforce a layered architecture (Controllers, Services, Repositories) in orther to be able do Unit Testing and isolated End-to-End testing using dynamic Docker containers.
 
 |===
 
