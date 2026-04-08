@@ -37,8 +37,11 @@ describe('POST /users/createuser', () => {
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(201)
-        expect(res.body).toHaveProperty('message')
-        expect(res.body.message).toMatch(/Welcome Pablo/i)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
+        expect(res.body).not.toHaveProperty('password');
        
     })
     // USERNAME IS MISSING
