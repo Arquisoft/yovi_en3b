@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const userRepository = require('../data-access/userRepository');
+const rankingService = require('../../ranking/domain/rankingService');
 
 //Service of the creation of a user.
 //It checks that all the fields have been written, the email is not used yet for another user and the password fullfills the requirements.
@@ -40,6 +41,14 @@ const createUser = async (data) => {
         photo: data.photo, 
         nickname:data.nickname,
     });
+
+    // 5. Initialize ranking for the new user
+    try {
+        await rankingService.addStats(newUser.id, { totalMatches: 0, winMatches: 0 });
+    } catch (rankingError) {
+        console.error('Failed to initialize ranking for new user:', rankingError);
+        // Don't fail user creation if ranking initialization fails
+    }
     
     return newUser;
 };
