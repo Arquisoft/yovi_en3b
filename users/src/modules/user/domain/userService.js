@@ -96,7 +96,7 @@ const changePassword = async (data) => {
     return updatedUser;
 };
 
-// Changes the password of a user
+// Changes the nickname of a user
 const changeNickname = async (data) => {
     // 1. Search the username
     const user = await userRepository.findUserByUsername(data.username);
@@ -112,10 +112,28 @@ const changeNickname = async (data) => {
 
     return updatedUser;
 };
+
+// Changes the photo of a user
+const changePhoto = async (data) => {
+    // 1. Search the username
+    const user = await userRepository.findUserByUsername(data.username);
+    
+    // 2. Check if the user exists
+    
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    // 3. Save the new nickname in the db
+    const updatedUser = await userRepository.updateUserPhoto(data.username, data.photo);
+
+    return updatedUser;
+};
 module.exports = {
     createUser,
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname
+    changeNickname,
+    changePhoto
 };

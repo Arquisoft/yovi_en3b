@@ -516,3 +516,70 @@ describe('POST /users/changeNickname', () => {
         expect(res.body.error).toBe("Internal server error") 
     })
 })
+
+///////////////////////////////////////////////////////////CHANGE USER PHOTO TESTS//////////////////////////////////////////////////////////////////////////////////////////////
+describe('POST /users/changePhoto', () => {
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+    // POSITIVE TEST
+    it('returns 200 and user data without password if the photo has been successfully changed', async () => {
+        const testName = 'Pablo'
+        vi.spyOn(db, 'query')
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+            })
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, photo: "photo2", email: 'pablo@test.com' }]
+            });;
+
+
+        const res = await request(app)
+            .post('/users/changePhoto')
+            .send({ 
+                username: testName,
+                photo: "photo2"
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(200)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('avatarId', 'photo2');
+        expect(res.body).not.toHaveProperty('password');
+       
+    })
+    // USER NOT EXISTS WITH THAT USERNAME
+    it('returns 404 if the user does not exist', async () => {
+        vi.spyOn(db, 'query').mockResolvedValueOnce({
+            rows: [] 
+        });
+
+        const res = await request(app)
+            .post('/users/changePhoto')
+            .send({ 
+                username: 'Fantasma',
+                photo: 'Ghost'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(404)
+        expect(res.body.error).toBe("User not found") 
+    })
+    // ABRUPT ERROR
+    it('returns 500 if something breaks abruptly',  async () => {
+        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+
+        const res = await request(app)
+            .post('/users/changePhoto')
+            .send({ 
+                username: 'Fantasma',
+                photo: 'Ghost'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(500)
+        expect(res.body.error).toBe("Internal server error") 
+    })
+})

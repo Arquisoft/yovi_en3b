@@ -106,12 +106,30 @@ const changeNickname = async (req, res) => {
         return res.status(500).json({ error: "Internal server error"});
     }
 };
-
+// POST /users/changePhoto
+//Changes the photo of the indicated user
+// STATUS:
+    //200: resource successfully updated
+    //404: resource not found 
+    //500: server error
+const changePhoto = async (req, res) => {
+    try {
+        const user =await userService.changePhoto(req.body);
+        res.status(200).json(userDto.toUserResponseDto(user));
+    } catch (error) {
+        console.log(error);
+        if (error.message === "User not found") {
+            return res.status(404).json({ error: error.message });
+        }
+        return res.status(500).json({ error: "Internal server error"});
+    }
+};
 
 module.exports = {
     createUser,
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname
+    changeNickname,
+    changePhoto
 };

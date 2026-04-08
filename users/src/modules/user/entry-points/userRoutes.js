@@ -8,5 +8,6 @@ router.get('/findUserByUsername', userController.findUserByUsername);
 router.post('/loginUser', userController.loginUser);
 router.post('/changePassword', userController.changePassword);
 router.post('/changeNickname', userController.changeNickname);
+router.post('/changePhoto', userController.changePhoto);
 
 module.exports = router;
