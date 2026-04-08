@@ -15,7 +15,7 @@ endif::arc42help[]
 
 The following quality tree provides a high-level overview of the quality attributes that are most important for the **GAME Y** system, broken down into specific evaluation areas and prioritized to guide architectural decisions.
 
-* **Quality (Root)**
+* **Quality**
     * **Usability**
         * Accessibility (Colorblind support) -> See [US-1]
         * Internationalization (Multi-language) -> See [US-2]
@@ -39,7 +39,7 @@ The following tables describe specific scenarios that concretize the quality req
 | ID | Quality Attribute | Scenario Description
 | **US-1** | Accessibility | **Stimulus:** A colorblind user accesses the settings menu and toggles the "Colorblind mode". + 
 **Response:** The system immediately updates the color palette across the entire UI (e.g., changing player colors to Orange and White/Blue) without requiring a page reload.
-| **US-2** | Internationalization | **Stimulus:** A user selects a different language (e.g., Turkish or Asturian) from the language dialog. + 
+| **US-2** | Internationalization | **Stimulus:** A user selects a different language (e.g., Turkish or English) from the language dialog. + 
 **Response:** The system applies the selected i18n translation strings instantaneously to all text elements in the interface using the Translation Provider.
 |===
 
