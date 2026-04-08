@@ -1,7 +1,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UserProfile, UserRanking } from "./userProfile.type";
-import { getMyProfile, getMyRanking, updateMyProfile } from "./userProfile.api";
+import {
+  FALLBACK_RANKING,
+  getMyProfile,
+  getMyRanking,
+  updateMyProfile,
+} from "./userProfile.api";
 
 export function useUserProfile(open: boolean) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -24,16 +29,27 @@ export function useUserProfile(open: boolean) {
 
     setLoading(true);
     setError(null);
+    setRanking(null);
 
-    Promise.all([getMyProfile(), getMyRanking()])
-      .then(([p, r]) => {
+    (async () => {
+      try {
+        const p = await getMyProfile();
         setProfile(p);
-        setRanking(r);
         setDraftName(p.displayName);
         setDraftAvatarId(p.avatarId);
-      })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : "Unknown error"))
-      .finally(() => setLoading(false));
+
+        try {
+          const r = await getMyRanking(p.id);
+          setRanking(r);
+        } catch {
+          setRanking(structuredClone(FALLBACK_RANKING));
+        }
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [open]);
 
   const save = useCallback(async () => {

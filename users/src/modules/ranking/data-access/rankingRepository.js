@@ -27,4 +27,19 @@ const getRankingByUser = async (userId) => {
   return rows[0];
 };
 
-module.exports = { addToRanking, updateRanking, getRankingByUser };
+const getAllRankings = async () => {
+  const { rows } = await db.query(queries.getAllRankings);
+  return rows;
+};
+
+const getGlobalRankings = async () => {
+  const { rows } = await db.query(queries.getGlobalRankings);
+  return rows;
+};
+
+const getTotalRankingsCount = async () => {
+  const { rows } = await db.query(queries.getTotalRankingsCount);
+  return rows[0].total;
+};
+
+module.exports = { addToRanking, updateRanking, getRankingByUser, getAllRankings, getGlobalRankings, getTotalRankingsCount };

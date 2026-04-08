@@ -12,6 +12,15 @@ vi.mock('react-router-dom', async () => {
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
+vi.mock('../components/RankingScreen/RankingScreen', () => ({
+    default: ({ onClose }: { onClose: () => void }) => (
+        <div data-testid="ranking-screen">
+            <button onClick={onClose}>Close Ranking</button>
+            OVERALL RANKING
+        </div>
+    ),
+}));
+
 // Mock de i18n usando TUS CLAVES REALES (basado en el objeto que pasaste)
 vi.mock('../i18n/useTranslation', () => ({
     useI18n: () => ({
@@ -119,7 +128,6 @@ describe('MainMenu Component con Traducciones Reales', () => {
     test('4. Navegación al ranking', () => {
         renderMainMenu();
         fireEvent.click(screen.getByText('OVERALL RANKING'));
-        // Verificamos que el modal de ranking aparece (el RankingScreen usa este texto)
-        expect(screen.getByText('OVERALL RANKING')).toBeDefined();
+        expect(screen.getByTestId('ranking-screen')).toBeDefined();
     });
 });

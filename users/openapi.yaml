@@ -418,6 +418,171 @@ paths:
                   error:
                     type: string
                     example: "Match ID is required."
+  /finish:
+    post:
+      tags: [Matches]
+      summary: Finish a match and update player rankings
+      description: Records the match winner, updates match status to finished, and updates both players' ranking statistics. If players don't have rankings yet, they are automatically initialized.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - matchId
+                - winnerId
+              properties:
+                matchId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                winnerId:
+                  type: string
+                  format: uuid
+                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
+      responses:
+        "200":
+          description: Match finished successfully and rankings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Match finished successfully"
+                  match:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      winner_id:
+                        type: string
+                        format: uuid
+                      status:
+                        type: string
+                        example: "finished"
+                      ended_at:
+                        type: string
+                        format: date-time
+        "400":
+          description: Bad Request - Validation failed (missing fields, invalid IDs, etc.)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "matchId and winnerId are required"
+  /ranking/me:
+    get:
+      tags: [Ranking]
+      summary: Get current user's ranking position
+      description: Returns the user's current ranking position and total number of players in the ranking system. Rankings are calculated based on match wins and total matches played.
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
+          description: The UUID of the user
+      responses:
+        "200":
+          description: User ranking retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  position:
+                    type: integer
+                    example: 5
+                  totalPlayers:
+                    type: integer
+                    example: 127
+        "400":
+          description: Bad Request - userId parameter is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "userId is required"
+        "404":
+          description: User not found in rankings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found in rankings"
+  /ranking/global:
+    get:
+      tags: [Ranking]
+      summary: Get global leaderboard
+      description: Returns all players ranked by their scores in descending order. Score is calculated as 50 * (2 * wins - total_matches). Includes player statistics and win rate.
+      responses:
+        "200":
+          description: Global rankings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ranking:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        position:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: string
+                          format: uuid
+                        username:
+                          type: string
+                          example: "champion_player"
+                        nickname:
+                          type: string
+                          example: "Champion"
+                        photo:
+                          type: string
+                          example: "avatar_01"
+                        score:
+                          type: integer
+                          example: 450
+                        total_matches:
+                          type: integer
+                          example: 10
+                        win_matches:
+                          type: integer
+                          example: 9
+                        win_rate:
+                          type: integer
+                          description: Win rate percentage
+                          example: 90
+                        last_game_won:
+                          type: boolean
+                          example: true
+        "400":
+          description: Server error retrieving rankings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /:matchId/latest:
     post:
       tags: [GameSave]
