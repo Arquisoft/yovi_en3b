@@ -1,7 +1,16 @@
 const matchRepository = require('../data-access/matchRepository');
 const rankingService = require('../../ranking/domain/rankingService');
 
-const createMatch = async (data) => {
+const createMatch = async (dataOrBluePlayerId, redPlayerId, isBot, botDifficulty) => {
+    const data = typeof dataOrBluePlayerId === 'object' && dataOrBluePlayerId !== null
+        ? dataOrBluePlayerId
+        : {
+            bluePlayerId: dataOrBluePlayerId,
+            redPlayerId,
+            isBot,
+            botDifficulty,
+        };
+
     // 1. Validaciones lógicas
     if (!data.bluePlayerId) {
         throw new Error("You need a Blue Player ID.");
@@ -73,31 +82,28 @@ async function getMatchHistoryForPlayer(playerId) {
 }
 
 const finishMatch = async (matchId, winnerId) => {
-    try {
-        // 1. Update match with winner
-        const match = await matchRepository.finishMatch(matchId, winnerId);
-        
-        // 2. Update rankings for all players involved
-        const bluePlayerId = match.blue_player_id;
-        const redPlayerId = match.red_player_id;
-        
-        // Determine winner and loser
-        const isBlueWinner = winnerId === bluePlayerId;
-        const loser = isBlueWinner ? redPlayerId : bluePlayerId;
+    const match = await matchRepository.finishMatch(matchId, winnerId);
 
-        // 3. Initialize rankings if they don't exist and update stats
-        // Winner: 1 match total, 1 win
-        await rankingService.updateOrInitializeRanking(winnerId, 1, 1);
-        
-        // Loser: 1 match total, 0 wins
-        if (loser) {
-            await rankingService.updateOrInitializeRanking(loser, 1, 0);
-        }
-
-        return match;
-    } catch (error) {
-        throw new Error(`Failed to finish match: ${error.message}`);
+    if (!match) {
+        throw new Error('Match not found');
     }
+
+    if (winnerId !== match.blue_player_id && winnerId !== match.red_player_id) {
+        throw new Error('Winner ID is not a player in this match');
+    }
+
+    const bluePlayerId = match.blue_player_id;
+    const redPlayerId = match.red_player_id;
+    const isBlueWinner = winnerId === bluePlayerId;
+    const loser = isBlueWinner ? redPlayerId : bluePlayerId;
+
+    await rankingService.updateOrInitializeRanking(winnerId, 1, 1);
+
+    if (loser) {
+        await rankingService.updateOrInitializeRanking(loser, 1, 0);
+    }
+
+    return match;
 };
 
 function getDifficultyLabel(botDifficulty) {
@@ -113,4 +119,11 @@ function getDifficultyLabel(botDifficulty) {
     }
 }
 
-module.exports = { getMatchesForPlayer, getMatchHistoryForPlayer, createMatch, finishMatch };
+module.exports = {
+    getMatchesForPlayer,
+    getMatchHistoryForPlayer,
+    getMatches: getMatchesForPlayer,
+    getMatchHistory: getMatchHistoryForPlayer,
+    createMatch,
+    finishMatch,
+};

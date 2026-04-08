@@ -2,7 +2,13 @@ const matchService = require('../domain/matchService');
 
 const createMatch = async (req, res) => {
     try {
-        const result = await matchService.createMatch(req.body);
+        const { bluePlayerId, redPlayerId, isBot, botDifficulty } = req.body;
+        const result = await matchService.createMatch(
+            bluePlayerId,
+            redPlayerId,
+            isBot,
+            botDifficulty
+        );
         res.status(201).json({ 
             message: "Match created succesfully", 
             match: result 
@@ -52,4 +58,11 @@ async function finishMatch(req, res) {
     }
 }
 
-module.exports = { getPlayerMatches, getPlayerMatchHistory, createMatch, finishMatch };
+module.exports = {
+    getPlayerMatches,
+    getPlayerMatchHistory,
+    getMatches: getPlayerMatches,
+    getMatchHistory: getPlayerMatchHistory,
+    createMatch,
+    finishMatch,
+};
