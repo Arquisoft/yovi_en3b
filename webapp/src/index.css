@@ -9,10 +9,11 @@ body, html {
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: clamp(0.6875rem, 0.45vw + 0.5rem, 1rem);
   line-height: 1.5;
   font-weight: 400;
 
@@ -37,10 +38,9 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  display: block;
+  min-width: 20rem;
+  min-height: 100dvh;
 }
 
 h1 {
@@ -49,8 +49,8 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
@@ -64,7 +64,7 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 0.25rem auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {

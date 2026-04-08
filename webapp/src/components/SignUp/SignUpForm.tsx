@@ -83,7 +83,7 @@ const SignUpForm: React.FC = () => {
           &times;
         </button>
         
-        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginBottom: '20px' }}>SIGN UP</h1>
+        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginBottom: '1.25rem' }}>SIGN UP</h1>
         
         <form onSubmit={handleSave} className="signup-form">
           <div className="avatar-display-section">
