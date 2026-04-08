@@ -26,15 +26,15 @@ module.exports = {
       r.user_id,
       u.username,
       u.nickname,
-      u.photo,
+      u.photo as "avatarId",
       r.score,
       r.total_matches,
       r.win_matches,
       COALESCE(ROUND((r.win_matches::numeric * 100) / NULLIF(r.total_matches, 0)), 0)::int AS win_rate,
       COALESCE(last_match.winner_id = r.user_id, false) AS last_game_won,
-      ROW_NUMBER() OVER (ORDER BY r.score DESC, r.updated_at DESC) AS position
+      ROW_NUMBER() OVER (ORDER BY r.score DESC, r.updated_at DESC)::INT AS position
     FROM rankings r
-    INNER JOIN users u ON u.id = r.user_id
+    LEFT JOIN users u ON u.id = r.user_id
     LEFT JOIN LATERAL (
       SELECT winner_id
       FROM matches m

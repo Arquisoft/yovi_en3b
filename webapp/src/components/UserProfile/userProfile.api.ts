@@ -10,8 +10,7 @@ const MOCK_RANKING: UserRanking = {
 
 export async function getMyProfile(): Promise<UserProfile> {
   const username = localStorage.getItem("username");
-
-  const res = await fetch(`${API_URL}/users/findUserByUsername/${username}`, {
+  const res = await fetch(`${API_URL}/users/findUserByUsername?username=${username}`, {
     method: "GET",
   });
 

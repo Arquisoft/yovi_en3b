@@ -18,7 +18,7 @@ type GlobalRankingResponse = {
     position: number;
     username: string;
     nickname: string | null;
-    photo: string | null;
+    avatarId: string | null;
     score: number;
     win_rate: number;
     total_matches: number;
@@ -42,7 +42,7 @@ export async function getGlobalRanking(): Promise<GlobalRankingEntry[]> {
     position: entry.position,
     username: entry.username,
     displayName: entry.nickname || entry.username,
-    avatarId: entry.photo || "avatar_01",
+    avatarId: entry.avatarId || "avatar_01",
     points: entry.score,
     winRate: entry.win_rate,
     gamesPlayed: entry.total_matches,
