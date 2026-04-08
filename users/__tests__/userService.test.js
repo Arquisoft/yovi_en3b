@@ -197,7 +197,7 @@ describe('POST /users/createuser', () => {
 })
 
 ///////////////////////////////////////////////////////////FIND USER BY USER NAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
-describe('POST /users/findUserByUsername', () => {
+describe('GET /users/findUserByUsername', () => {
     afterEach(() => {
         vi.restoreAllMocks()
     })
@@ -209,7 +209,7 @@ describe('POST /users/findUserByUsername', () => {
             rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
         });
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 username: testName,
             })
@@ -219,14 +219,14 @@ describe('POST /users/findUserByUsername', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })
     // NOT PASSING A USERNAME
     it('returns 400 if no username is provided', async () => {
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 // Enviamos el body vacío o sin el campo username
             })
@@ -242,7 +242,7 @@ describe('POST /users/findUserByUsername', () => {
         });
 
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ username: 'UsuarioFantasma' })
             .set('Accept', 'application/json')
 
@@ -254,7 +254,7 @@ describe('POST /users/findUserByUsername', () => {
         vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .get('/users/findUserByUsername')
             .send({ 
                 username: 'test',
             })
@@ -289,7 +289,7 @@ describe('POST /users/loginUser', () => {
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
-        expect(res.body).toHaveProperty('photo', 'photo');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
        
     })
@@ -359,107 +359,160 @@ describe('POST /users/loginUser', () => {
     })
 })
 
-///////////////////////////////////////////////////////////ADDITIONAL EDGE CASE TESTS//////////////////////////////////////////////////////////////////////////////////////////////
-describe('Edge Cases and Additional Coverage', () => {
+///////////////////////////////////////////////////////////CHANGE USER PASSWORD TESTS//////////////////////////////////////////////////////////////////////////////////////////////
+describe('POST /users/changePassword', () => {
     afterEach(() => {
         vi.restoreAllMocks()
     })
-
-    // Test for password field validation in createUser
-    it('returns 400 if password is empty string in createuser', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({ rows: [] });
+    // POSITIVE TEST
+    it('returns 200 and user data without password if the password has been successfully changed', async () => {
+        const testName = 'Pablo'
+        vi.spyOn(db, 'query')
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+            })
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
+            });;
+        vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
+        vi.spyOn(bcrypt, 'hash').mockResolvedValueOnce('hashed_password_new');
 
         const res = await request(app)
-            .post('/users/createuser')
+            .post('/users/changePassword')
             .send({ 
-                username: 'TestUser',
-                nickname: 'Test',
-                email: 'test@test.com',
-                password: '',
-                photo: "photo"
+                username: testName,
+                password: "password123",
+                newPassword: "password123456789"
             })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(400)
-        expect(res.body.error).toBe("Missing fields")
-    });
-
-    // Test for bcrypt error during user creation
-    it('returns 500 if bcrypt fails during password hashing', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({ rows: [] });
-        vi.spyOn(bcrypt, 'hash').mockRejectedValueOnce(new Error("Bcrypt error"));
-
-        const res = await request(app)
-            .post('/users/createuser')
-            .send({ 
-                username: 'TestUser',
-                nickname: 'Test',
-                email: 'test@test.com',
-                password: 'password123',
-                photo: "photo"
-            })
-            .set('Accept', 'application/json')
-
-        expect(res.status).toBe(500)
-        expect(res.body.error).toBe("Internal server error")
-    });
-
-    // Test for bcrypt compare error during login
-    it('returns 500 if bcrypt compare fails during login', async () => {
+        expect(res.status).toBe(200)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
+        expect(res.body).not.toHaveProperty('password');
+       
+    })
+    // PASSWORD IS INCORRECT
+    it('returns 401 if the password is incorrect', async () => {
+        const testUser = { username: 'Pablo', password: 'password123' }
+        
         vi.spyOn(db, 'query').mockResolvedValueOnce({
-            rows: [{username: 'Pablo', password: 'hash123', nickname: 'Pablo'}]
+            rows: [testUser]
         });
-        vi.spyOn(bcrypt, 'compare').mockRejectedValueOnce(new Error("Bcrypt compare error"));
+        vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
 
         const res = await request(app)
-            .post('/users/loginUser')
+            .post('/users/changePassword')
             .send({ 
                 username: 'Pablo',
+                password: 'WRONG_PASSWORD',
+                newPassword: 'password123456'  
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(401)
+        expect(res.body.error).toBe("Invalid username or password")
+    })
+    // USER NOT EXISTS WITH THAT USERNAME
+    it('returns 401 if the user does not exist', async () => {
+        vi.spyOn(db, 'query').mockResolvedValueOnce({
+            rows: [] 
+        });
+
+        const res = await request(app)
+            .post('/users/changePassword')
+            .send({ 
+                username: 'Fantasma',
+                password: 'password123',
+                newPassword: 'password123'
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(401)
+        expect(res.body.error).toBe("Invalid username or password") 
+    })
+    // ABRUPT ERROR
+    it('returns 500 if something breaks abruptly',  async () => {
+        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+
+        const res = await request(app)
+            .post('/users/changePassword')
+            .send({ 
+                username: 'Fantasma',
                 password: 'password123'
             })
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(500)
-        expect(res.body.error).toBe("Internal server error")
-    });
+        expect(res.body.error).toBe("Internal server error") 
+    })
+})
 
-    // Test for findUserByUsername with empty password field in response
-    it('returns user data without password in findUserByUsername', async () => {
+///////////////////////////////////////////////////////////CHANGE USER NICKNAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
+describe('POST /users/changeNickname', () => {
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+    // POSITIVE TEST
+    it('returns 200 and user data without password if the nickname has been successfully changed', async () => {
         const testName = 'Pablo'
-        vi.spyOn(db, 'query').mockResolvedValue({
-            rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com', password: 'hashed123' }]
-        });
+        vi.spyOn(db, 'query')
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+            })
+            .mockResolvedValueOnce({
+                rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
+            });;
+
 
         const res = await request(app)
-            .post('/users/findUserByUsername')
+            .post('/users/changeNickname')
             .send({ 
                 username: testName,
+                nickname: testName
             })
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(200)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
         expect(res.body).not.toHaveProperty('password');
-    });
+       
+    })
+    // USER NOT EXISTS WITH THAT USERNAME
+    it('returns 404 if the user does not exist', async () => {
+        vi.spyOn(db, 'query').mockResolvedValueOnce({
+            rows: [] 
+        });
 
-    // Test for login with both missing username and password  
-    it('returns 400 if both username and password are missing', async () => {
         const res = await request(app)
-            .post('/users/loginUser')
-            .send({ })
+            .post('/users/changeNickname')
+            .send({ 
+                username: 'Fantasma',
+                nickname: 'Ghost'
+            })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(400)
-        expect(res.body.error).toBe("Missing fields")
-    });
+        expect(res.status).toBe(404)
+        expect(res.body.error).toBe("User not found") 
+    })
+    // ABRUPT ERROR
+    it('returns 500 if something breaks abruptly',  async () => {
+        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
 
-    // Test for login with only missing password
-    it('returns 400 if only password is missing in login', async () => {
         const res = await request(app)
-            .post('/users/loginUser')
-            .send({ username: 'TestUser' })
+            .post('/users/changeNickname')
+            .send({ 
+                username: 'Fantasma',
+                nickname: 'Ghost'
+            })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(400)
-        expect(res.body.error).toBe("Missing fields")
-    });
+        expect(res.status).toBe(500)
+        expect(res.body.error).toBe("Internal server error") 
+    })
 })
