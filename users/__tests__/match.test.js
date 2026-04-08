@@ -2,6 +2,10 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import { createRequire } from 'node:module';
 
+vi.mock('../src/db/db.js', () => ({
+    query: vi.fn()
+}));
+
 const require = createRequire(import.meta.url);
 import app from '../index.js';
 const db = require('../src/db/db.js');
@@ -271,6 +275,9 @@ describe('POST /matches/finish', () => {
             })
             .mockResolvedValueOnce({
                 rows: [{ user_id: winnerId, total_matches: 1, win_matches: 1 }]
+            })
+            .mockResolvedValueOnce({
+                rows: [{ user_id: botId, total_matches: 1, win_matches: 0 }]
             });
 
         const res = await request(app)

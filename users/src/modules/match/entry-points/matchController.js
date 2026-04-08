@@ -22,21 +22,21 @@ async function getPlayerMatches(req, res) {
     try {
         const playerId = req.params.playerId; 
         
-        const matches = await matchService.getMatchesForPlayer(playerId);
+        const matches = await matchService.getMatches(playerId);
         
         res.status(200).json(matches);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 }
 
 async function getPlayerMatchHistory(req, res) {
     try {
         const playerId = req.params.playerId;
-        const matches = await matchService.getMatchHistoryForPlayer(playerId);
+        const matches = await matchService.getMatchHistory(playerId);
         res.status(200).json(matches);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 }
 
@@ -54,7 +54,8 @@ async function finishMatch(req, res) {
             match: result 
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        const status = /not found/i.test(error.message) ? 404 : 400;
+        res.status(status).json({ error: error.message });
     }
 }
 

@@ -5,6 +5,7 @@ import * as api from '../components/UserProfile/userProfile.api';
 
 // Mocks of the API functions
 vi.mock('../components/UserProfile/userProfile.api', () => ({
+  FALLBACK_RANKING: { position: 0, totalPlayers: 0 },
   getMyProfile: vi.fn(),
   getMyRanking: vi.fn(),
   updateMyProfile: vi.fn(),
@@ -113,5 +114,51 @@ describe('useUserProfile Hook', () => {
 
     expect(api.updateMyProfile).not.toHaveBeenCalled();
     expect(result.current.saving).toBe(false);
+  });
+
+  it('uses the fallback ranking when ranking fetch fails', async () => {
+    vi.mocked(api.getMyRanking).mockRejectedValueOnce(new Error('Ranking unavailable'));
+
+    const { result } = renderHook(() => useUserProfile(true));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.ranking).toEqual({ position: 0, totalPlayers: 0 });
+  });
+
+  it('sets an unknown error when profile loading fails with a non-Error value', async () => {
+    vi.mocked(api.getMyProfile).mockRejectedValueOnce('boom');
+
+    const { result } = renderHook(() => useUserProfile(true));
+
+    await waitFor(() => expect(result.current.error).toBe('Unknown error'));
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('preserves the backend message when save fails with an Error object', async () => {
+    const { result } = renderHook(() => useUserProfile(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    vi.mocked(api.updateMyProfile).mockRejectedValueOnce(new Error('Save failed'));
+
+    await act(async () => {
+      await result.current.save();
+    });
+
+    expect(result.current.error).toBe('Save failed');
+    expect(result.current.saving).toBe(false);
+  });
+
+  it('returns early in resetDraft if no profile has been loaded yet', () => {
+    const { result } = renderHook(() => useUserProfile(false));
+
+    act(() => {
+      result.current.setDraftName('Temp');
+      result.current.setDraftAvatarId('avatar_09');
+      result.current.resetDraft();
+    });
+
+    expect(result.current.draftName).toBe('Temp');
+    expect(result.current.draftAvatarId).toBe('avatar_09');
   });
 });

@@ -1,12 +1,20 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 import { createRequire } from 'node:module';
 import bcrypt from 'bcrypt';
+
+vi.mock('../src/db/db.js', () => ({
+    query: vi.fn()
+}));
 
 const require = createRequire(import.meta.url);
 import app from '../index.js'
 
 const db = require('../src/db/db.js');
+
+beforeEach(() => {
+    db.query = vi.fn();
+});
 
 ///////////////////////////////////////////////////////////CREATE USER TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/createuser', () => {
@@ -18,7 +26,7 @@ describe('POST /users/createuser', () => {
     // POSITIVE TEST
     it('returns a greeting message for the provided username', async () => {
         
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({ rows: [] }) 
             .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
@@ -141,7 +149,7 @@ describe('POST /users/createuser', () => {
     it('returns 400 if the user already exists', async () => {
 
         
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [{ username: testName }]
         });
 
@@ -161,7 +169,7 @@ describe('POST /users/createuser', () => {
     it('returns 400 if there already exists a user with that email', async () => {
 
         
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
                 rows: [{ email: 'pablo@test.com' }]
@@ -181,7 +189,7 @@ describe('POST /users/createuser', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/createuser')
@@ -208,7 +216,7 @@ describe('GET /users/findUserByUsername', () => {
     //POSITIVE TEST
     it('returns some data abour the user', async () => {
         const testName = 'Pablo'
-        vi.spyOn(db, 'query').mockResolvedValue({
+        db.query.mockResolvedValue({
             rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
         });
         const res = await request(app)
@@ -240,7 +248,7 @@ describe('GET /users/findUserByUsername', () => {
     })
     // USER NOT FOUND
     it('returns 404 if the user is not found in the database', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -254,7 +262,7 @@ describe('GET /users/findUserByUsername', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .get('/users/findUserByUsername')
@@ -276,7 +284,7 @@ describe('POST /users/loginUser', () => {
     // POSITIVE TEST
     it('returns 200 and user data without password if credentials are correct', async () => {
         const testName = 'Pablo'
-        vi.spyOn(db, 'query').mockResolvedValue({
+        db.query.mockResolvedValue({
             rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
@@ -312,7 +320,7 @@ describe('POST /users/loginUser', () => {
     it('returns 401 if the password is incorrect', async () => {
         const testUser = { username: 'Pablo', password: 'password123' }
         
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [testUser]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
@@ -330,7 +338,7 @@ describe('POST /users/loginUser', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 401 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -347,7 +355,7 @@ describe('POST /users/loginUser', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/loginUser')
@@ -370,7 +378,7 @@ describe('POST /users/changePassword', () => {
     // POSITIVE TEST
     it('returns 200 and user data without password if the password has been successfully changed', async () => {
         const testName = 'Pablo'
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({
                 rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
             })
@@ -401,7 +409,7 @@ describe('POST /users/changePassword', () => {
     it('returns 401 if the password is incorrect', async () => {
         const testUser = { username: 'Pablo', password: 'password123' }
         
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [testUser]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
@@ -420,7 +428,7 @@ describe('POST /users/changePassword', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 401 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -438,7 +446,7 @@ describe('POST /users/changePassword', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/changePassword')
@@ -461,7 +469,7 @@ describe('POST /users/changeNickname', () => {
     // POSITIVE TEST
     it('returns 200 and user data without password if the nickname has been successfully changed', async () => {
         const testName = 'Pablo'
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({
                 rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
             })
@@ -488,7 +496,7 @@ describe('POST /users/changeNickname', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 404 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -505,7 +513,7 @@ describe('POST /users/changeNickname', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/changeNickname')

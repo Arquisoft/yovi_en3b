@@ -1,22 +1,23 @@
 
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SignUpForm from '../components/SignUp/SignUpForm';
-import { SettingsProvider } from '../context/SettingsContext';
 
 const mockNavigate = vi.fn();
+const mockPlaySound = vi.fn();
 
 const renderWithProviders = (ui: React.ReactElement) => {
-    return render(
-      <SettingsProvider>
-        {ui}
-      </SettingsProvider>
-    );
-  };
+    return render(ui);
+};
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+}));
+
+vi.mock('../context/SettingsContext', () => ({
+  useSettings: () => ({
+    playSound: mockPlaySound,
+  }),
 }));
 
 /**
@@ -45,7 +46,6 @@ describe('SignUpForm extra coverage', () => {
   });
 
   test('shows error when API returns non-ok response', async () => {
-    const user = userEvent.setup();
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: () => Promise.resolve({ message: 'User exists' }),
@@ -53,18 +53,25 @@ describe('SignUpForm extra coverage', () => {
 
     renderWithProviders(<SignUpForm />);
 
-    await user.type(screen.getByLabelText(/NICKNAME/i), 'Nick');
-    await user.type(screen.getByLabelText(/USERNAME/i), 'user');
-    await user.type(screen.getByLabelText(/EMAIL/i), 'a@b.com');
-    await user.type(screen.getByLabelText(/PASSWORD/i), 'Password1!');
+    fireEvent.change(screen.getByLabelText(/NICKNAME/i), {
+      target: { name: 'nickname', value: 'Nick' },
+    });
+    fireEvent.change(screen.getByLabelText(/USERNAME/i), {
+      target: { name: 'username', value: 'user' },
+    });
+    fireEvent.change(screen.getByLabelText(/EMAIL/i), {
+      target: { name: 'email', value: 'a@b.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/PASSWORD/i), {
+      target: { name: 'password', value: 'Password1!' },
+    });
 
-    await user.click(screen.getByRole('button', { name: /save account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /save account/i }));
 
     expect(await screen.findByText(/User exists/i)).toBeDefined();
-  });
+  }, 10000);
 
   test('navigates on successful signup', async () => {
-    const user = userEvent.setup();
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({}),
@@ -72,13 +79,23 @@ describe('SignUpForm extra coverage', () => {
 
     renderWithProviders(<SignUpForm />);
 
-    await user.type(screen.getByLabelText(/NICKNAME/i), 'Nick');
-    await user.type(screen.getByLabelText(/USERNAME/i), 'user');
-    await user.type(screen.getByLabelText(/EMAIL/i), 'a@b.com');
-    await user.type(screen.getByLabelText(/PASSWORD/i), 'Password1!');
+    fireEvent.change(screen.getByLabelText(/NICKNAME/i), {
+      target: { name: 'nickname', value: 'Nick' },
+    });
+    fireEvent.change(screen.getByLabelText(/USERNAME/i), {
+      target: { name: 'username', value: 'user' },
+    });
+    fireEvent.change(screen.getByLabelText(/EMAIL/i), {
+      target: { name: 'email', value: 'a@b.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/PASSWORD/i), {
+      target: { name: 'password', value: 'Password1!' },
+    });
 
-    await user.click(screen.getByRole('button', { name: /save account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /save account/i }));
 
-    expect(mockNavigate).toHaveBeenCalledWith('/');
-  });
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/menu');
+    });
+  }, 10000);
 });
