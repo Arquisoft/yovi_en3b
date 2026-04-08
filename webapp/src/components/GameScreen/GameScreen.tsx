@@ -236,16 +236,13 @@ const GameScreen: React.FC = () => {
 
     const restartGame = () => {
         playSound('click.mp3');
-<<<<<<< HEAD
         setBoardState({});
         setHistory([]);
         setGameResult(null);
         setCurrentPlayer(1);
         setTimeLeft(initialTime);
         setMatchId(null); // Reset match ID for new game
-=======
         navigate('/menu', { state: { openConfig: true } });
->>>>>>> 66aeb62 (fixed navigation to menu with config open on game restart)
     };
 
     // Keep the board visible for all configured board sizes (3..10)
