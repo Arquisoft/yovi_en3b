@@ -13,6 +13,7 @@ The following quality tree provides a high-level overview of the quality attribu
     *** Internationalization (Multi-language)
   ** **Performance**
     *** AI Response Time (Bot algorithms)
+    *** UI Responsiveness
   ** **Security**
     *** Data Privacy (Password encryption)
     *** Input Validation (Registration integrity)
@@ -31,7 +32,7 @@ The following tables describe specific scenarios that concretize the quality req
 | US-1 | Accessibility | **Stimulus**: A colorblind user accesses the settings menu and toggles the "Colorblind mode". +
 **Response**: The system immediately updates the color palette across the entire UI (e.g., changing player colors to Orange and Blue) without requiring a page reload.
 | US-2 | Internationalization | **Stimulus**: A user selects a different language (e.g., Turkish or Asturian) from the language dialog. +
-**Response**: The system applies the selected i18n translation strings instantaneously to all text elements in the interface.
+**Response**: The system applies the selected i18n translation strings instantaneously to all text elements in the interface, modifying the UI language seamlessly.
 |===
 
 ==== Performance Scenarios
@@ -39,9 +40,9 @@ The following tables describe specific scenarios that concretize the quality req
 |===
 | ID | Quality Attribute | Scenario Description
 | PE-1 | AI Response Time | **Stimulus**: A player confirms their move in a match against the "Hard" bot. +
-**Response**: The backend AI algorithm (Minimax/Dijkstra) calculates the optimal counter-move and updates the board state in under 2 seconds to keep the gameplay fluid.
+**Response**: The backend AI algorithm (Minimax/Dijkstra) calculates the optimal counter-move and updates the board state efficiently, ensuring a fluid gameplay experience without excessive delays.
 | PE-2 | UI Responsiveness | **Stimulus**: A user navigates from the Main Menu to the Profile Overlay or Game Preview. +
-**Response**: The modal opens smoothly and renders the hexagonal grid or user data within 500 milliseconds.
+**Response**: The modal opens smoothly and renders the required components (hexagonal grid, user data, etc.) almost instantly, providing a seamless user experience.
 |===
 
 ==== Security Scenarios
@@ -50,8 +51,8 @@ The following tables describe specific scenarios that concretize the quality req
 | ID | Quality Attribute | Scenario Description
 | SE-1 | Data Privacy | **Stimulus**: A new user registers using the Sign-Up form. +
 **Response**: The backend uses the `bcrypt` library to securely hash the password before storing it in the PostgreSQL database, ensuring plain-text passwords are never saved.
-| SE-2 | Input Integrity | **Stimulus**: A user attempts to register with an email or username that already exists. +
-**Response**: The backend database rejects the insertion preventing duplicate accounts.
+| SE-2 | Input Integrity | **Stimulus**: A user attempts to register with an email or username that already exists in the database. +
+**Response**: The backend database rejects the insertion and the system displays a clear, localized error message ("The email already exists") preventing duplicate accounts and maintaining data integrity.
 |===
 
 ==== Maintainability & Testability Scenarios
@@ -59,7 +60,7 @@ The following tables describe specific scenarios that concretize the quality req
 |===
 | ID | Quality Attribute | Scenario Description
 | MT-1 | Automated Testing | **Stimulus**: A developer modifies the game logic or user registration workflow. +
-**Response**: Automated End-to-End (E2E) tests using Playwright and Cucumber spin up isolated Docker databases, execute user flows, and report success or failure, preventing regressions.
+**Response**: Automated End-to-End (E2E) tests using Playwright and Cucumber spin up isolated Docker databases, execute user flows (e.g., user registration, playing a match against a bot), and report success or failure, preventing regressions.
 | MT-2 | Architecture | **Stimulus**: A developer needs to add a new feature to fetch user match history. +
-**Response**: The developer can cleanly implement this by adding a specific Query in the Data Access layer (Repository) and validating logic in the Domain layer (Service), adhering to the established layered architecture.
+**Response**: The developer can cleanly implement this by adding a specific Query in the Data Access layer (Repository) and validating logic in the Domain layer (Service), adhering to the established layered architecture (Controllers, Services, Repositories).
 |===
