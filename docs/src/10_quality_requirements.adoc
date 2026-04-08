@@ -47,8 +47,8 @@ The following tables describe specific scenarios that concretize the quality req
 [cols="1,2,4", options="header"]
 |===
 | ID | Quality Attribute | Scenario Description
-| **PE-1** | AI Response Time | **Stimulus:** A player confirms their move in a match against the "Hard" bot. + 
-**Response:** The AI algorithm calculates the counter-move and updates the board state in under 2 seconds to keep the gameplay fluid and engaging.
+| **PE-1** | AI Response Time | **Stimulus:** A player confirms their move in a match against the bot. + 
+**Response:** The AI algorithm calculates the counter-move and updates the board state in under 3 seconds to keep the gameplay fluid and engaging.
 | **PE-2** | UI Responsiveness | **Stimulus:** A user navigates from the Main Menu to the Profile Overlay or Game Preview. + 
 **Response:** The modal opens smoothly and renders the hexagonal grid or user data within 500 milliseconds.
 |===
