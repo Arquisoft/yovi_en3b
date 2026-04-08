@@ -70,8 +70,8 @@ describe('HistoryPage', () => {
     
     expect(screen.getByText('HISTORIAL')).toBeDefined();
     expect(await screen.findByText('PARTIDAS')).toBeDefined();
-    expect(screen.getAllByText(/Bot Easy/i)).toHaveLength(2);
-    expect(screen.getByText(/Bot Medium/i)).toBeDefined();
+    expect(await screen.findAllByText(/Bot Easy/i)).toHaveLength(2);
+    expect(await screen.findByText(/Bot Medium/i)).toBeDefined();
   });
 
   test('navigates back to menu when clicking the back button', () => {

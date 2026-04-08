@@ -54,6 +54,7 @@ const GameScreen: React.FC = () => {
     // Effect to create match on component mount
     useEffect(() => {
         if (isMatchCreating || matchId) return;
+        if (!localStorage.getItem('userId')) return;
         
         const createGameMatch = async () => {
             setIsMatchCreating(true);

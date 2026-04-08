@@ -28,7 +28,7 @@ describe('rankingRepository', () => {
       const result = await rankingRepository.getRankingByUser(userId);
 
       expect(db.query).toHaveBeenCalledWith(
-        rankingQueries.getRankingByUser,
+        rankingQueries.findRankingByUser,
         [userId]
       );
       expect(result).toEqual(mockRanking);
@@ -78,7 +78,7 @@ describe('rankingRepository', () => {
 
       expect(db.query).toHaveBeenCalledWith(
         rankingQueries.addToRanking,
-        [userId, 1, 1, 50]
+        [userId, 1, 1]
       );
       expect(result).toEqual(mockNewRanking);
     });
@@ -104,7 +104,7 @@ describe('rankingRepository', () => {
       // Verify score was calculated correctly
       expect(db.query).toHaveBeenCalledWith(
         rankingQueries.addToRanking,
-        [userId, 2, 1, 0]
+        [userId, 2, 1]
       );
     });
 
@@ -133,22 +133,38 @@ describe('rankingRepository', () => {
     it('updates existing ranking entry', async () => {
       const userId = 'player-003';
       const newStats = { totalMatches: 11, winMatches: 8 };
+      const currentRanking = {
+        user_id: userId,
+        total_matches: 10,
+        win_matches: 7,
+        score: 200,
+      };
       const mockUpdatedRanking = {
         user_id: userId,
         total_matches: 11,
         win_matches: 8,
-        score: 350,
+        score: 250,
       };
 
-      vi.spyOn(db, 'query').mockResolvedValue({
-        rows: [mockUpdatedRanking],
-      });
+      vi.spyOn(db, 'query')
+        .mockResolvedValueOnce({
+          rows: [currentRanking],
+        })
+        .mockResolvedValueOnce({
+          rows: [mockUpdatedRanking],
+        });
 
       const result = await rankingRepository.updateRanking(userId, newStats);
 
-      expect(db.query).toHaveBeenCalledWith(
+      expect(db.query).toHaveBeenNthCalledWith(
+        1,
+        rankingQueries.findRankingByUser,
+        [userId]
+      );
+      expect(db.query).toHaveBeenNthCalledWith(
+        2,
         rankingQueries.updateRanking,
-        [11, 8, 350, userId]
+        [11, 8, 250, userId]
       );
       expect(result).toEqual(mockUpdatedRanking);
     });
@@ -350,14 +366,14 @@ describe('rankingRepository', () => {
       vi.spyOn(db, 'query')
         .mockResolvedValueOnce({ rows: [newRanking] }) // Add
         .mockResolvedValueOnce({ rows: [newRanking] }) // Get
+        .mockResolvedValueOnce({ rows: [newRanking] }) // Find current before update
         .mockResolvedValueOnce({
-          // Update
           rows: [
             {
               user_id: userId,
               total_matches: 2,
               win_matches: 2,
-              score: 150,
+              score: 100,
             },
           ],
         });
@@ -379,7 +395,7 @@ describe('rankingRepository', () => {
         winMatches: 2,
       });
       expect(updated.total_matches).toBe(2);
-      expect(updated.score).toBe(150);
+      expect(updated.score).toBe(100);
     });
 
     it('handles global leaderboard with multiple players', async () => {

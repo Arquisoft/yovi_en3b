@@ -1,7 +1,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UserProfile, UserRanking } from "./userProfile.type";
-import { getMyProfile, getMyRanking, updateMyProfile } from "./userProfile.api";
+import {
+  FALLBACK_RANKING,
+  getMyProfile,
+  getMyRanking,
+  updateMyProfile,
+} from "./userProfile.api";
 
 export function useUserProfile(open: boolean) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -33,9 +38,12 @@ export function useUserProfile(open: boolean) {
         setDraftName(p.displayName);
         setDraftAvatarId(p.avatarId);
 
-        // Always fetch ranking (with fallback to mock data if fails)
-        const r = await getMyRanking(p.id);
-        setRanking(r);
+        try {
+          const r = await getMyRanking(p.id);
+          setRanking(r);
+        } catch {
+          setRanking(structuredClone(FALLBACK_RANKING));
+        }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Unknown error");
       } finally {

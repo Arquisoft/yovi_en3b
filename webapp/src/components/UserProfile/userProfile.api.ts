@@ -2,8 +2,7 @@ import type { UserProfile, UserRanking } from "./userProfile.type";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-// Fallback mock data for when backend is unavailable or user not in rankings
-const MOCK_RANKING: UserRanking = {
+export const FALLBACK_RANKING: UserRanking = {
   position: 57,
   totalPlayers: 161,
 };
@@ -57,29 +56,21 @@ export async function updateMyProfile(patch: { displayName: string, avatarId: st
 
 
 export async function getMyRanking(userId?: string): Promise<UserRanking> {
-  try {
-    if (!userId) {
-      const profile = await getMyProfile();
-      userId = profile.id;
-    }
-
-    console.log(`Fetching ranking for userId: ${userId}`);
-    const res = await fetch(`${API_URL}/ranking/me?userId=${userId}`, { 
-      method: "GET"
-    });
-    
-    if (!res.ok) {
-      console.warn(`Ranking API returned ${res.status}: ${res.statusText}`);
-      return structuredClone(MOCK_RANKING);
-    }
-
-    const data = await res.json();
-    console.log("Ranking data from API:", data);
-    return data;
-  } catch (error) {
-    console.error("Error fetching ranking:", error);
-    return structuredClone(MOCK_RANKING);
+  if (!userId) {
+    const profile = await getMyProfile();
+    userId = profile.id;
   }
+
+  const res = await fetch(`${API_URL}/ranking/me?userId=${userId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Could not load the ranking");
+  }
+
+  return res.json();
 }
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {

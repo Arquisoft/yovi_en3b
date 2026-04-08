@@ -130,13 +130,13 @@ describe('rankingService', () => {
       const updatedRanking = { user_id: userId, total_matches: 6, win_matches: 4, score: 200 };
 
       vi.spyOn(rankingRepo, 'getRankingByUser').mockResolvedValue(existingRanking);
-      vi.spyOn(rankingRepo, 'updateRanking').mockResolvedValue(updatedRanking);
+      vi.spyOn(rankingRepo, 'addToRanking').mockResolvedValue(updatedRanking);
 
       const result = await rankingService.updateOrInitializeRanking(userId, 1, 1);
 
-      expect(rankingRepo.updateRanking).toHaveBeenCalledWith(userId, {
-        totalMatches: 6,
-        winMatches: 4,
+      expect(rankingRepo.addToRanking).toHaveBeenCalledWith(userId, {
+        totalMatches: 1,
+        winMatches: 1,
       });
       expect(result.total_matches).toBe(6);
       expect(result.win_matches).toBe(4);
@@ -148,20 +148,20 @@ describe('rankingService', () => {
       const updatedRanking = { user_id: userId, total_matches: 6, win_matches: 3, score: 150 };
 
       vi.spyOn(rankingRepo, 'getRankingByUser').mockResolvedValue(existingRanking);
-      vi.spyOn(rankingRepo, 'updateRanking').mockResolvedValue(updatedRanking);
+      vi.spyOn(rankingRepo, 'addToRanking').mockResolvedValue(updatedRanking);
 
       const result = await rankingService.updateOrInitializeRanking(userId, 1, 0);
 
-      expect(rankingRepo.updateRanking).toHaveBeenCalledWith(userId, {
-        totalMatches: 6,
-        winMatches: 3,
+      expect(rankingRepo.addToRanking).toHaveBeenCalledWith(userId, {
+        totalMatches: 1,
+        winMatches: 0,
       });
       expect(result.win_matches).toBe(3);
     });
 
     it('throws error when database fails', async () => {
       const userId = 'error_user';
-      vi.spyOn(rankingRepo, 'getRankingByUser').mockRejectedValue(new Error('DB Error'));
+      vi.spyOn(rankingRepo, 'addToRanking').mockRejectedValue(new Error('DB Error'));
 
       await expect(rankingService.updateOrInitializeRanking(userId, 1, 1))
         .rejects

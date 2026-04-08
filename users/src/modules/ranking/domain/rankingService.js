@@ -36,17 +36,7 @@ const getGlobalRanking = async () => {
 
 const updateOrInitializeRanking = async (userId, totalMatches, winMatches) => {
   try {
-    const existing = await rankingRepo.getRankingByUser(userId);
-    
-    if (existing) {
-      // Update existing ranking - add the new match stats
-      const newTotal = existing.total_matches + totalMatches;
-      const newWins = existing.win_matches + winMatches;
-      return rankingRepo.updateRanking(userId, { totalMatches: newTotal, winMatches: newWins });
-    } else {
-      // Initialize new ranking entry
-      return rankingRepo.addToRanking(userId, { totalMatches, winMatches });
-    }
+    return await rankingRepo.addToRanking(userId, { totalMatches, winMatches });
   } catch (error) {
     throw new Error(`Failed to update or initialize ranking: ${error.message}`);
   }

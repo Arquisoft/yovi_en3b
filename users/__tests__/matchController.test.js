@@ -70,7 +70,7 @@ describe('matchController', () => {
       });
     });
 
-    it('returns 400 when service throws error', async () => {
+    it('returns 404 when match is not found', async () => {
       const req = {
         body: { matchId: 'match-error', winnerId: 'player-id' },
       };
@@ -82,7 +82,7 @@ describe('matchController', () => {
 
       await matchController.finishMatch(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Match not found',
       });
@@ -239,6 +239,8 @@ describe('matchController', () => {
       };
       const res = makeRes();
 
+      vi.spyOn(matchService, 'createMatch').mockRejectedValue(new Error("If you play against a BOT, you must select a difficulty."));
+
       await matchController.createMatch(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
@@ -294,7 +296,7 @@ describe('matchController', () => {
         'blue-player',
         'red-player',
         false,
-        0
+        undefined
       );
     });
   });
