@@ -147,11 +147,7 @@ const GameScreen: React.FC = () => {
 
     const restartGame = () => {
         playSound('click.mp3');
-        setBoardState({});
-        setHistory([]);
-        setGameResult(null);
-        setCurrentPlayer(1);
-        setTimeLeft(initialTime);
+        navigate('/menu', { state: { openConfig: true } });
     };
 
     return (

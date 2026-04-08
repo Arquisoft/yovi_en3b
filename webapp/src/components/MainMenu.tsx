@@ -1,18 +1,17 @@
 // UBICACIÓN: webapp/src/pages/MainMenu.tsx
-import React, { useState } from 'react';
-import { Languages, Settings, User, LogOut } from 'lucide-react'; 
-import { useNavigate } from 'react-router-dom';
-import { useI18n } from '../i18n/useTranslation';
-import { useSettings } from '../context/SettingsContext'; 
-import HowToPlay from '../components/HowToPlay/HowToPlay';
-import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay';
-import GamePreviewModal from '../components/GamePreviewModal/GamePreviewModal';
-import { LanguageDialog } from '../components/LanguageDialog/LanguageDialog';
-import SettingsModal from '../components/Settings/SettingsModal';
-import RankingScreen from '../components/RankingScreen/RankingScreen'; 
-import '../App.css';
+import React, { useState, useEffect } from 'react'; // React hooks
+import { Languages, Settings, User, LogOut } from 'lucide-react'; // Icons
+import { useNavigate, useLocation } from 'react-router-dom'; // Navigation hooks
+import { useI18n } from '../i18n/useTranslation'; // Translation hook
+import { useSettings } from '../context/SettingsContext'; // Settings context
+import HowToPlay from '../components/HowToPlay/HowToPlay'; // How to play component
+import { ProfileOverlay } from '../components/UserProfile/ProfileOverlay'; // Profile overlay
+import GamePreviewModal from '../components/GamePreviewModal/GamePreviewModal'; // Game preview modal
+import { LanguageDialog } from '../components/LanguageDialog/LanguageDialog'; // Language dialog
+import SettingsModal from '../components/Settings/SettingsModal'; // Settings modal
+import RankingScreen from '../components/RankingScreen/RankingScreen'; // Ranking screen
+import '../App.css'; // Global styles
 
-// MOCK DATA
 const MOCK_RANKING_DATA = [
   { id: '1', username: 'NeonKnight', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', points: 2500, winRate: 85, gamesPlayed: 100, lastGameWon: true },
   { id: '2', username: 'CyberGhost', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', points: 2100, winRate: 72, gamesPlayed: 90, lastGameWon: false },
@@ -21,22 +20,29 @@ const MOCK_RANKING_DATA = [
 ];
 
 const MainMenu: React.FC = () => {
-  const { t } = useI18n();
-  const { colorBlindMode, playSound } = useSettings(); // Access playSound from settings context
-  const [showPlayOptions, setShowPlayOptions] = useState(false);
-  const [showHowTo, setShowHowTo] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); 
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showRanking, setShowRanking] = useState(false);
+  const { t } = useI18n(); // Translation function
+  const { colorBlindMode, playSound } = useSettings(); // Settings state
+  const [showPlayOptions, setShowPlayOptions] = useState(false); // Modal state
+  const [showHowTo, setShowHowTo] = useState(false); // How to play state
+  const [profileOpen, setProfileOpen] = useState(false); // Profile state
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); // Logout state
+  const [languageOpen, setLanguageOpen] = useState(false); // Language state
+  const [showSettings, setShowSettings] = useState(false); // Settings state
+  const [showRanking, setShowRanking] = useState(false); // Ranking state
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Navigation function
+  const location = useLocation(); // Location object to read state
 
-  // Helper function to handle clicks and sounds
+  useEffect(() => {
+    if (location.state?.openConfig) {
+      setShowPlayOptions(true); // Open the preview modal if requested
+      window.history.replaceState({}, document.title); // Reset the state to avoid re-opening
+    }
+  }, [location.state]); // Effect depends on location changes
+
   const handleMenuAction = (action: () => void) => {
-    playSound('click.mp3'); // Play feedback sound
-    action(); // Execute the specific state change
+    playSound('click.mp3'); // Play click sound
+    action(); // Run the action
   };
 
   return (
@@ -76,8 +82,6 @@ const MainMenu: React.FC = () => {
           </button>
         </div>
 
-        {/* --- MODAL COMPONENTS --- */}
-
         {showRanking && (
           <div className="modal-overlay"> 
             <RankingScreen 
@@ -101,8 +105,8 @@ const MainMenu: React.FC = () => {
                 <button 
                   className="opt-btn btn-danger" 
                   onClick={() => {
-                    playSound('click.mp3'); // Sound feedback on logout
-                    navigate('/');
+                    playSound('click.mp3'); // Sound feedback
+                    navigate('/'); // Go to login
                   }}
                 >
                   {t.buttons.confirmLogout}
@@ -119,9 +123,9 @@ const MainMenu: React.FC = () => {
           isOpen={showPlayOptions} 
           onClose={() => setShowPlayOptions(false)} 
           onStart={(settings) => { 
-            playSound('click.mp3'); // Sound when starting a game
-            setShowPlayOptions(false); 
-            navigate('/game', { state: settings }); 
+            playSound('click.mp3'); // Sound feedback
+            setShowPlayOptions(false); // Close modal
+            navigate('/game', { state: settings }); // Navigate to game with settings
           }} 
         />
         {showHowTo && <HowToPlay onClose={() => setShowHowTo(false)} />}
