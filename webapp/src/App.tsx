@@ -27,6 +27,8 @@ const AppContent = () => {
   );
 };
 
+
+
 // 2.We wrapped the entire AppContent with both Providers to ensure global state is available
 function App() {
   return (
