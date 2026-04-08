@@ -1,9 +1,12 @@
+// UBICACIÓN: webapp/src/components/SignUp/SignUpForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Check, X } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext'; // Import settings for playSound
 import './SignUpForm.css';
 
 const SignUpForm: React.FC = () => {
+  const { playSound } = useSettings(); // Access sound player function
   const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
   
   const [formData, setFormData] = useState({
@@ -29,11 +32,12 @@ const SignUpForm: React.FC = () => {
   const allValidationsPass = Object.values(passwordValidations).every(Boolean);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value }); // Updates specific field in state
+    setFormData({ ...formData, [e.target.name]: e.target.value }); 
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    playSound('click.mp3'); // Play sound when attempting to save
     if (!allValidationsPass) return;
 
     setLoading(true);
@@ -69,9 +73,17 @@ const SignUpForm: React.FC = () => {
   return (
     <div className="signup-container">
       <div className="signup-card">
-        <button className="boton-cerrar-fijo" onClick={() => navigate('/')}>&times;</button>
+        <button 
+          className="boton-cerrar-fijo" 
+          onClick={() => {
+            playSound('click.mp3'); // Sound on close
+            navigate('/');
+          }}
+        >
+          &times;
+        </button>
         
-        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginBottom: '20px' }}>SIGN UP</h1>
+        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginBottom: '1.25rem' }}>SIGN UP</h1>
         
         <form onSubmit={handleSave} className="signup-form">
           <div className="avatar-display-section">
@@ -88,7 +100,10 @@ const SignUpForm: React.FC = () => {
                   key={id} 
                   type="button" 
                   className={`avatar-opt ${formData.avatarId === id ? 'active' : ''}`} 
-                  onClick={() => setFormData({...formData, avatarId: id})}
+                  onClick={() => {
+                    playSound('click.mp3'); // Sound when selecting an avatar
+                    setFormData({...formData, avatarId: id});
+                  }}
                 >
                   {emoji} 
                 </button>
@@ -122,7 +137,14 @@ const SignUpForm: React.FC = () => {
                 onChange={handleChange} 
                 required 
               />
-              <button type="button" className="eye-btn" onClick={() => setShowPass(!showPass)}>
+              <button 
+                type="button" 
+                className="eye-btn" 
+                onClick={() => {
+                  playSound('click.mp3'); // Sound when toggling visibility
+                  setShowPass(!showPass);
+                }}
+              >
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>

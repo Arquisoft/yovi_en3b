@@ -2,8 +2,8 @@
 
 .game-layout {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100%;
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%) !important;
   font-family: 'Orbitron', sans-serif;
   overflow: hidden;
@@ -14,7 +14,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  min-width: 0;
 }
 
 /* HEADER & PLAYER CARDS */
@@ -23,32 +24,32 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 900px;
-  margin-bottom: 25px;
+  max-width: 56.25rem;
+  margin-bottom: 1.5625rem;
 }
 
 .player-card {
-  padding: 12px 30px;
+  padding: 0.75rem 1.875rem;
   background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.9375rem;
   color: white;
-  min-width: 150px;
+  min-width: 9.375rem;
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .player-card.active {
   border-color: #3b82f6;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 1.25rem rgba(59, 130, 246, 0.4);
   background: rgba(37, 99, 235, 0.15);
 }
 
 .game-timer-wrapper {
   background: rgba(15, 23, 42, 0.8);
-  border: 2px solid rgba(96, 165, 250, 0.4);
-  padding: 8px 25px;
-  border-radius: 20px;
+  border: 0.125rem solid rgba(96, 165, 250, 0.4);
+  padding: 0.5rem 1.5625rem;
+  border-radius: 1.25rem;
 }
 
 .timer-value {
@@ -61,15 +62,15 @@
 .board-area {
   flex: 1;
   width: 95%;
-  max-width: 1000px;
+  max-width: 62.5rem;
   background: rgba(15, 23, 42, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 30px;
+  backdrop-filter: blur(0.625rem);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.05);
+  border-radius: 1.875rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   overflow: hidden;
 }
 
@@ -88,28 +89,30 @@
 
 /* SIDEBAR & CHAT */
 .game-sidebar {
-  width: 350px;
+  width: clamp(16rem, 28vw, 21.875rem);
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
   background: rgba(15, 23, 42, 0.3);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 0.0625rem solid rgba(255, 255, 255, 0.1);
   position: relative;
+  min-width: 15rem;
+  max-width: 100%;
 }
 
 /* EXIT BUTTON IMPROVED VISIBILITY */
 .exit-sidebar-btn {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0.9375rem;
+  right: 0.9375rem;
   /* Fondo gris claro/blanco translúcido para que destaque */
   background: rgba(255, 255, 255, 0.15) !important; 
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.4) !important;
   /* Icono en blanco puro */
   color: #ffffff !important; 
-  width: 36px; /* Ligeramente más grande */
-  height: 36px;
-  border-radius: 10px;
+  width: 2.25rem; /* Ligeramente más grande */
+  height: 2.25rem;
+  border-radius: 0.625rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -117,7 +120,7 @@
   z-index: 100;
   transition: all 0.3s ease;
   /* Sombra para separar del fondo */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.5); 
 }
 
 /* Efecto Hover: Brillo intenso */
@@ -125,24 +128,24 @@
   background: rgba(255, 255, 255, 0.25) !important;
   border-color: #ffffff !important;
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0.9375rem rgba(255, 255, 255, 0.3);
 }
 
 /* Ajuste para los iconos de configuración para que no compitan en brillo */
 .global-settings-bar {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
   
 }
 
 .icon-btn-global {
   background: rgba(30, 41, 59, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1) !important;
   color: #cbd5e1 !important; /* Gris muy claro pero no blanco puro */
-  padding: 10px;
-  border-radius: 12px;
+  padding: 0.625rem;
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -156,19 +159,19 @@
 .chat-container {
   flex: 1;
   background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 40px;
+  margin-top: 2.5rem;
 }
 
 /* CHAT HEADER IMPROVED */
 .chat-header {
-  padding: 15px;
+  padding: 0.9375rem;
   background: rgba(96, 165, 250, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
 }
@@ -176,14 +179,14 @@
 .bot-profile-badge {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .bot-avatar-circle {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   background: rgba(15, 23, 42, 0.8);
-  border: 2px solid #60a5fa;
+  border: 0.125rem solid #60a5fa;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -210,17 +213,17 @@
 
 .chat-messages {
   flex: 1;
-  padding: 15px;
+  padding: 0.9375rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .message.received {
   background: rgba(51, 65, 85, 0.8);
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0.625rem;
+  border-radius: 0.625rem;
   color: white;
   font-size: 0.85rem;
   align-self: flex-start;
@@ -228,12 +231,12 @@
 
 /* 1. El contenedor: quitamos un poco de padding para ganar espacio */
 .chat-input-area {
-  padding: 10px; /* Reducido de 15px a 10px */
+  padding: 0.625rem; /* Reducido de 0.9375rem a 0.625rem */
   display: flex;
   align-items: center;
-  gap: 8px; /* Espacio más pequeño entre input y botón */
+  gap: 0.5rem; /* Espacio más pequeño entre input y botón */
   background: rgba(15, 23, 42, 0.6);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 0.0625rem solid rgba(255, 255, 255, 0.1);
 }
 
 /* 2. El input: Nos aseguramos de que use todo el espacio posible */
@@ -241,9 +244,9 @@
   flex: 1; /* Esto es clave: empuja al botón a la derecha */
   min-width: 0; /* Evita que el input empuje el sidebar hacia afuera */
   background: rgba(15, 23, 42, 0.9) !important;
-  border: 1px solid #334155 !important;
-  border-radius: 8px;
-  padding: 12px 15px; /* Más cómodo para escribir */
+  border: 0.0625rem solid #334155 !important;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.9375rem; /* Más cómodo para escribir */
   color: white !important;
   font-family: 'Orbitron', sans-serif;
   font-size: 0.9rem; /* Un pelín más grande */
@@ -253,9 +256,9 @@
 .send-btn {
   background: #2563eb !important;
   color: white !important;
-  padding: 0 15px; /* Damos ancho con padding en lugar de width fijo */
-  height: 42px; /* Altura que combine con el input */
-  border-radius: 8px;
+  padding: 0 0.9375rem; /* Damos ancho con padding en lugar de width fijo */
+  height: 2.625rem; /* Altura que combine con el input */
+  border-radius: 0.5rem;
   border: none;
   cursor: pointer;
   display: flex;
@@ -283,8 +286,9 @@
 .send-confirm-btn {
   background: #2563eb !important;
   color: white !important;
-  width: 40px;
-  border-radius: 8px;
+  width: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 0.5rem;
   border: none;
   cursor: pointer;
 }
@@ -292,14 +296,14 @@
 /* FOOTER ACTIONS */
 .game-footer {
   display: flex;
-  gap: 15px;
+  gap: 0.9375rem;
 }
 
 .game-action-btn {
   background: #1e293b;
-  border: 1px solid #334155;
-  padding: 12px 24px;
-  border-radius: 12px;
+  border: 0.0625rem solid #334155;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
   color: white;
   cursor: pointer;
 }
@@ -316,7 +320,7 @@
 .hex-cell {
     fill: rgba(255, 255, 255, 0.05) !important;
     stroke: rgba(96, 165, 250, 0.3) !important;
-    stroke-width: 0.2px;
+    stroke-width: 0.0125rem;
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -330,21 +334,21 @@
 .hex-cell.pending-selection {
     fill: rgba(96, 165, 250, 0.6) !important;
     stroke: #ffffff !important;
-    stroke-width: 0.4px;
+    stroke-width: 0.025rem;
 }
 
 /* Pieza confirmada del Jugador 1 (Azul Neón) */
 .hex-cell.p1-selected {
     fill: #60a5fa !important;
     stroke: #ffffff !important;
-    filter: drop-shadow(0 0 1px #60a5fa);
+    filter: drop-shadow(0 0 0.0625rem #60a5fa);
 }
 
 /* Pieza confirmada del Bot/Jugador 2 (Rojo/Coral) */
 .hex-cell.p2-selected {
     fill: #f87171 !important;
     stroke: #ffffff !important;
-    filter: drop-shadow(0 0 1px #f87171);
+    filter: drop-shadow(0 0 0.0625rem #f87171);
 }
 
 /* Animación cuando el tiempo es crítico */
@@ -361,52 +365,52 @@
 
 .result-modal {
     text-align: center !important;
-    padding: 50px !important;
-    border: 3px solid #60a5fa !important; /* Borde neón */
+    padding: 3.125rem !important;
+    border: 0.1875rem solid #60a5fa !important; /* Borde neón */
 }
 
 .text-win {
     color: #60a5fa;
     font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
-    text-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
-    margin-bottom: 20px;
+    text-shadow: 0 0 0.9375rem rgba(96, 165, 250, 0.8);
+    margin-bottom: 1.25rem;
 }
 
 .text-lose {
     color: #f87171;
     font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
-    text-shadow: 0 0 15px rgba(248, 113, 113, 0.8);
-    margin-bottom: 20px;
+    text-shadow: 0 0 0.9375rem rgba(248, 113, 113, 0.8);
+    margin-bottom: 1.25rem;
 }
 
 .modal-buttons-column {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 0.9375rem;
     width: 100%;
-    margin-top: 30px;
+    margin-top: 1.875rem;
 }
 
-.modal-text {
+.result-modal-text {
   color: #ffffff !important;           /* Blanco puro */
   font-family: 'Orbitron', sans-serif !important; /* Fuente Orbitron */
   font-size: 1rem;                     /* Tamaño legible */
   text-align: center;                  /* Centrado */
-  margin-bottom: 25px;                 /* Espacio con los botones */
+  margin-bottom: 1.5625rem;                 /* Espacio con los botones */
   line-height: 1.5;
 }
 
 .btn-blue-outline {
     background: transparent !important;
-    border: 2px solid #60a5fa !important;
+    border: 0.125rem solid #60a5fa !important;
     color: #60a5fa !important;
 }
 
 .btn-red-outline {
     background: transparent !important;
-    border: 2px solid #f87171 !important;
+    border: 0.125rem solid #f87171 !important;
     color: #f87171 !important;
 }
 
@@ -414,14 +418,14 @@
     align-self: flex-end;
     background-color: #2563eb;
     color: white;
-    padding: 8px 12px;
-    border-radius: 12px 12px 0 12px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem 0.75rem 0 0.75rem;
     max-width: 80%;
     word-wrap: break-word;
 }
 
 .chat-messages::-webkit-scrollbar {
-  width: 4px;
+  width: 0.25rem;
 }
 
 .chat-messages::-webkit-scrollbar-track {
@@ -430,7 +434,7 @@
 
 .chat-messages::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 0.625rem;
 }
 
 .hex-cell {
@@ -438,7 +442,7 @@
 }
 
 .p1-selected {
-    filter: drop-shadow(0 0 8px var(--glow-color, #60a5fa));
+    filter: drop-shadow(0 0 0.5rem var(--glow-color, #60a5fa));
 }
 
 /* --- Variables dinámicas para el juego --- */
@@ -456,8 +460,8 @@
 .hex-cell.p1-selected {
     fill: var(--player1-color) !important;
     stroke: #ffffff !important;
-    stroke-width: 0.4px;
-    filter: drop-shadow(0 0 0px var(--player1-color)); /* El brillo ahora coincide con la ficha */
+    stroke-width: 0.025rem;
+    filter: drop-shadow(0 0 0 var(--player1-color)); /* El brillo ahora coincide con la ficha */
     transition: all 0.3s ease;
 }
 
@@ -465,8 +469,8 @@
 .hex-cell.p2-selected {
     fill: var(--player2-color) !important;
     stroke: #ffffff !important;
-    stroke-width: 0.4px;
-    filter: drop-shadow(0 0 0px var(--player2-color)); /* Brillo dinámico */
+    stroke-width: 0.025rem;
+    filter: drop-shadow(0 0 0 var(--player2-color)); /* Brillo dinámico */
     transition: all 0.3s ease;
 }
 
@@ -475,7 +479,7 @@
     fill: var(--player1-color) !important;
     opacity: 0.5; /* Se ve translúcido antes de confirmar */
     stroke: #ffffff !important;
-    stroke-width: 0.5px;
+    stroke-width: 0.0312rem;
 }
 
 /* --- Botón de Confirmar Dinámico --- */
@@ -497,12 +501,70 @@
 }
 
 .game-timer-wrapper {
-    border: 2px solid var(--player1-color);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border: 0.125rem solid var(--player1-color);
+    box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.3);
 }
 
 /* Avatar del bot en el chat */
 .bot-avatar-circle {
-    border: 2px solid var(--player1-color);
+    border: 0.125rem solid var(--player1-color);
     color: var(--player1-color);
+}
+
+@media (max-width: 75rem) {
+  .game-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .game-main-content {
+    width: 100%;
+    min-height: 58dvh;
+  }
+
+  .game-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+  }
+
+  .player-card {
+    flex: 1 1 9rem;
+    min-width: 8.5rem;
+  }
+
+  .board-area {
+    width: 100%;
+    min-height: 20rem;
+  }
+
+  .game-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    min-height: 18rem;
+  }
+
+  .chat-container {
+    margin-top: 1rem;
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .timer-value {
+    font-size: clamp(1.4rem, 7vw, 2rem);
+  }
+
+  .game-footer {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .game-action-btn {
+    flex: 1 1 45%;
+    text-align: center;
+  }
 }

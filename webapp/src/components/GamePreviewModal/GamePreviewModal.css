@@ -1,451 +1,408 @@
-/* GamePreviewModal.css */
-
-/* 1. ANIMACIONES (Pop suave y Fade del fondo) */
+/* ===== Animations ===== */
 @keyframes modalFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes modalPopUp {
-  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  from { opacity: 0; transform: scale(0.9) translateY(0.625rem); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* 2. OVERLAY TRANSLÚCIDO (Igual que el How to Play) */
-.modal-overlay {
+/* ===== Overlay ===== */
+.preview-modal-overlay {
+  --preview-overlay-pad: clamp(0.75rem, 3vh, 1.5rem);
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45); 
-  backdrop-filter: blur(10px); 
+  min-height: 100dvh;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(0.625rem);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: var(--preview-overlay-pad);
   z-index: 1000;
+  box-sizing: border-box;
   animation: modalFadeIn 0.4s ease-out;
 }
 
-/* 3. CONTENIDO DEL MODAL (Actualizado con el borde del How to Play) */
-.modal-content {
+/* ===== Modal ===== */
+.preview-modal-content {
+  --preview-accent: var(--game-accent, #60a5fa);
+  --preview-accent-dark: var(--game-accent-dark, #2563eb);
+
   position: relative !important;
+  width: min(100%, 31.25rem);
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #7f1d1d 100%) !important;
-  padding: 60px 40px 40px 40px;
-  border-radius: 30px;
-  
-  /* EL BORDE AZUL QUE PEDISTE */
-  border: 2px solid #60a5fa !important; 
-  
-  width: 90%;
-  max-width: 500px;
-  
-  /* Sombra sutil pero con un toque azul para el brillo exterior */
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.7); 
-  
+  border: 0.125rem solid var(--preview-accent) !important;
+  border-radius: 1.875rem;
+  padding: clamp(1.35rem, 3vw, 2rem) clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 1.4rem);
+  box-shadow:
+    0 0 1.25rem color-mix(in srgb, var(--preview-accent) 35%, transparent),
+    0 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
   animation: modalPopUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  max-height: min(92dvh, 42rem);
+  overflow-y: auto;
 }
 
-/* --- El resto del CSS se mantiene igual para no romper el tablero ni los controles --- */
+.preview-modal-content.color-blind {
+  --preview-accent: #f59e0b;
+  --preview-accent-dark: #d97706;
+}
 
+.preview-modal-content button {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* ===== Close button ===== */
+.preview-close-btn {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  color: var(--preview-accent);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem;
+  z-index: 2;
+  text-shadow: 0 0 0.75rem color-mix(in srgb, var(--preview-accent) 60%, transparent);
+}
+
+.preview-close-btn:hover {
+  color: #ffffff;
+}
+
+.preview-close-btn:focus-visible {
+  outline: 0.125rem solid var(--preview-accent);
+  outline-offset: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+/* ===== Title ===== */
+.preview-modal-title {
+  margin: 0 0 0.8rem;
+  text-align: center;
+  font-family: 'Cubic', sans-serif;
+  color: var(--preview-accent);
+  text-shadow: 0 0 1.25rem color-mix(in srgb, var(--preview-accent) 50%, transparent);
+  text-transform: uppercase;
+  font-size: clamp(1.55rem, 4vw, 2rem);
+  line-height: 1.05;
+}
+
+/* ===== Wide variant ===== */
 .preview-modal-wide {
-  max-width: 950px !important;
-  width: 90% !important;
-  padding: 50px !important;
+  max-width: 56rem !important;
+  width: min(100%, 56rem) !important;
+  max-height: min(92dvh, 44rem);
+  padding: clamp(1.1rem, 3vw, 1.75rem) !important;
 }
 
+/* ===== Main layout ===== */
 .preview-layout {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 60px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.95fr);
+  gap: clamp(0.9rem, 2.5vw, 1.75rem);
   align-items: start;
-  margin-top: 20px;
+  margin-top: 0.5rem;
 }
 
-/* --- COLUMNA IZQUIERDA (Tablero) - TU CÓDIGO INTACTO --- */
-
+/* ===== Left column ===== */
 .preview-left-column {
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
-
   background: rgba(255, 255, 255, 0.02);
-
-  border-radius: 25px;
-
-  padding: 30px;
-
-  border: 1px solid rgba(96, 165, 250, 0.1);
-
+  border-radius: 1.25rem;
+  padding: 1rem;
+  border: 0.0625rem solid rgba(96, 165, 250, 0.1);
 }
-
-
 
 .p-time-limit-top {
-
   color: #ffffff;
-
   font-family: 'Orbitron', sans-serif;
-
-  font-size: 1.1rem;
-
+  font-size: 0.95rem;
   font-weight: bold;
-
-  margin-bottom: 30px;
-
-  letter-spacing: 2px;
-
+  margin-bottom: 1rem;
+  letter-spacing: 0.125rem;
   text-transform: uppercase;
-
-  text-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
-
-  min-height: 1.5rem;
-
+  text-shadow: 0 0 0.625rem rgba(96, 165, 250, 0.8);
+  min-height: 1.2rem;
+  text-align: center;
 }
-
-
 
 .p-board-size-display {
-
   color: var(--game-blue) !important;
-
   font-family: 'Orbitron', sans-serif;
-
   font-weight: bold;
-
-  font-size: 1.5rem;
-
-  margin-top: 30px;
-
-  letter-spacing: 2px;
-
+  font-size: 1.25rem;
+  margin-top: 1rem;
+  letter-spacing: 0.125rem;
 }
 
-
-
-/* --- COLUMNA DERECHA (Opciones) - TU CÓDIGO INTACTO --- */
-
+/* ===== Right column ===== */
 .preview-right-column {
-
   display: flex;
-
   flex-direction: column;
-
-  gap: 35px;
-
+  gap: 1.2rem;
 }
-
-
 
 .setting-control {
-
   display: flex;
-
   flex-direction: column;
-
-  align-items: center; /* Centra el label y el stepper */
-
-  gap: 15px;
-
+  align-items: center;
+  gap: 0.65rem;
   width: 100%;
-
 }
-
-
 
 .label-white-bold {
-
   color: white !important;
-
   font-family: 'Orbitron', sans-serif;
-
-  font-size: 0.9rem;
-
+  font-size: 0.82rem;
   font-weight: bold;
-
-  letter-spacing: 2px;
-
+  letter-spacing: 0.125rem;
   text-align: center;
-
+  text-transform: uppercase;
 }
 
-
-
-/* Botones Bots */
-
+/* ===== Bot selector ===== */
 .bot-selector {
-
   display: flex;
-
-  gap: 30px;
-
+  gap: 1rem;
 }
-
-
 
 .bot-btn {
-
   background: rgba(255, 255, 255, 0.05);
-
-  border: 2px solid rgba(255, 255, 255, 0.1);
-
-  border-radius: 15px;
-
-  padding: 12px;
-
+  border: 0.125rem solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.9375rem;
+  padding: 0.6rem;
   cursor: pointer;
-
   transition: 0.3s;
-
 }
 
-
+.bot-btn:hover {
+  border-color: color-mix(in srgb, var(--preview-accent) 65%, transparent);
+}
 
 .bot-btn.active {
-
-  border-color: var(--game-blue);
-
+  border-color: var(--preview-accent);
   background: rgba(96, 165, 250, 0.2);
-
-  box-shadow: 0 0 15px var(--game-blue);
-
+  box-shadow: 0 0 0.75rem var(--preview-accent);
 }
 
-
-
-/* Stepper: - 5 + - TU CÓDIGO INTACTO */
-
+/* ===== Stepper ===== */
 .stepper-horizontal {
-
   display: flex;
-
   align-items: center;
-
-  justify-content: center; /* Centra los elementos internamente */
-
-  gap: 40px; /* Más espacio entre botones y número */
-
+  justify-content: center;
+  gap: 1.4rem;
   width: 100%;
-
 }
-
-
 
 .stepper-value {
-
   color: white !important;
-
   font-family: 'Orbitron', sans-serif;
-
-  font-size: 3.5rem; /* Número más grande */
-
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
   font-weight: bold;
-
-  min-width: 80px;
-
+  min-width: 3rem;
   text-align: center;
-
 }
-
-
 
 .step-btn {
-
   background: transparent;
-
   color: white;
-
-  border: none; /* Eliminamos el borde */
-
-  width: 60px; /* Botones más grandes */
-
-  height: 60px;
-
-  font-size: 2.5rem; /* El símbolo + o - más grande */
-
+  border: none;
+  width: clamp(2rem, 7vw, 3rem);
+  height: clamp(2rem, 7vw, 3rem);
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
   cursor: pointer;
-
   transition: all 0.2s ease;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   opacity: 0.8;
-
+  padding: 0;
 }
-
-
 
 .step-btn:hover {
-
-  background: transparent; /* Mantenemos el fondo limpio */
-
-  color: var(--game-blue); /* Brillo al pasar el ratón */
-
-  transform: scale(1.2); /* Efecto de aumento */
-
+  background: transparent;
+  color: var(--preview-accent);
+  transform: scale(1.15);
   opacity: 1;
-
 }
 
-
-
-/* Slider Dificultad - TU CÓDIGO INTACTO */
-
+/* ===== Difficulty slider ===== */
 .difficulty-slider-container {
-
   width: 100%;
-
-  padding: 0 10px;
-
+  padding: 0 0.4rem;
   box-sizing: border-box;
-
 }
-
-
 
 .neon-slider {
-
   -webkit-appearance: none;
-
   appearance: none;
-
   width: 100% !important;
-
-  height: 6px;
-
+  height: 0.375rem;
   background: rgba(96, 165, 250, 0.2);
-
-  border-radius: 3px;
-
+  border-radius: 0.1875rem;
   outline: none;
-
-  margin: 20px 0;
-
+  margin: 0.6rem 0 0.8rem;
   cursor: pointer;
-
 }
-
-
 
 .slider-labels-below {
-
   display: flex;
-
   justify-content: space-between;
-
   width: 100%;
-
-  padding: 0 5px;
-
-  margin-top: 5px;
-
+  padding: 0 0.15rem;
+  margin-top: 0.15rem;
 }
-
-
 
 .slider-labels-below span {
-
   flex: 1;
-
   color: #ffffff !important;
-
   font-family: 'Orbitron', sans-serif;
-
-  font-size: 0.75rem;
-
-  letter-spacing: 1px;
-
+  font-size: 0.68rem;
+  letter-spacing: 0.04rem;
   text-transform: uppercase;
-
   transition: all 0.3s ease;
-
   opacity: 0.6;
-
 }
-
-
 
 .slider-labels-below span.active {
-
   opacity: 1;
-
   font-weight: bold;
-
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(96, 165, 250, 0.3);
-
+  text-shadow:
+    0 0 0.625rem rgba(255, 255, 255, 0.5),
+    0 0 1.25rem rgba(96, 165, 250, 0.3);
 }
 
-
-
-.slider-labels-below span:first-child { text-align: left; }
-
-.slider-labels-below span:nth-child(2) { text-align: center; }
-
-.slider-labels-below span:last-child { text-align: right; }
-
-
-
-.btn-play-now-preview {
-
-  margin-top: 10px;
-
-  padding: 22px !important;
-
-  font-size: 1.4rem !important;
-
+.slider-labels-below span:first-child {
+  text-align: left;
 }
 
+.slider-labels-below span:nth-child(2) {
+  text-align: center;
+}
+
+.slider-labels-below span:last-child {
+  text-align: right;
+}
+
+/* ===== Play button ===== */
+.preview-play-btn {
+  margin-top: 0.2rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: none;
+  padding: 0.85rem 1.1rem;
+  font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+  color: #ffffff;
+  cursor: pointer;
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.preview-play-btn:hover {
+  transform: translateY(-0.1875rem);
+  filter: brightness(1.08);
+}
+
+.preview-play-btn:focus-visible {
+  outline: 0.125rem solid #ffffff;
+  outline-offset: 0.1875rem;
+}
+
+/* ===== Visual preview ===== */
 .visual-preview-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px; /* Espacio para que el tablero no se aplaste */
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: clamp(8rem, 22vh, 13rem);
+  width: 100%;
 }
 
 .triangle-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px; /* Espacio entre filas */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  filter: drop-shadow(0 0 0.3125rem rgba(96, 165, 250, 0.5));
 }
 
 .triangle-row {
-    display: flex;
-    gap: 5px; /* Espacio entre puntos */
+  display: flex;
+  gap: 0.24rem;
 }
 
 .triangle-cell {
-    width: 24px;  /* Ajusta el tamaño según prefieras */
-    height: 28px; /* Un poco más alto que ancho para que el hexágono se vea natural */
-    background: rgba(96, 165, 250, 0.3); 
-    
-   
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    
-    /* Efectos visuales */
-    transition: all 0.3s ease;
-    box-shadow: 0 0 10px rgba(96, 165, 250, 0.4); /* Nota: clip-path puede cortar sombras exteriores */
-    border: none; /* clip-path no se lleva bien con los bordes estándar */
+  width: 1.15rem;
+  height: 1.35rem;
+  background: rgba(96, 165, 250, 0.3);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0.625rem rgba(96, 165, 250, 0.4);
+  border: none;
 }
 
-/* Para que parezca que tienen borde, podemos usar un filtro de drop-shadow o un pseudo-elemento */
 .triangle-cell:hover {
-    background: rgba(96, 165, 250, 0.6);
-    transform: scale(1.1);
+  background: rgba(96, 165, 250, 0.6);
+  transform: scale(1.08);
 }
 
-/* Opcional: Si quieres que brillen un poco más */
-.triangle-wrapper {
-    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0px; /* Ajusta el espacio para que encajen los hexágonos */
+/* ===== Responsive ===== */
+@media (max-width: 75rem) {
+  .preview-modal-wide {
+    width: min(100%, 42rem) !important;
+  }
+
+  .preview-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .preview-left-column {
+    padding: 0.9rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .preview-modal-content,
+  .preview-modal-wide {
+    width: min(100%, 28rem) !important;
+    padding: 1rem !important;
+    max-height: min(94dvh, 42rem);
+  }
+
+  .preview-modal-title {
+    font-size: 1.45rem;
+  }
+
+  .bot-selector {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .stepper-horizontal {
+    gap: 1rem;
+  }
+
+  .visual-preview-area {
+    min-height: 7rem;
+  }
+
+  .triangle-cell {
+    width: 1rem;
+    height: 1.2rem;
+  }
 }

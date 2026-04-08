@@ -3,6 +3,14 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-risks-and-technical-debt]]
 == Risks and Technical Debt
 
+ifdef::arc42help[]
+[role="arc42help"]
+****
+.Content
+A list of identified technical risks and technical debt, ordered by priority.
+****
+endif::arc42help[]
+
 === Risk Mitigation Table
 
 [cols="1,2,2" options="header"]
@@ -10,33 +18,38 @@ ifndef::imagesdir[:imagesdir: ../images]
 |Risk |Proactive Measure |Contingent Measure
 
 |**Team Attrition**
-|Maintain clean code and updated documentation so any member can take over.
-|Redistribute tasks among remaining members; focus on MVP features.
-
-|**Uneven Learning Curves**
-|Conduct internal "Pair Programming" sessions for difficult modules (Rust).
-|Reassign tasks based on individual strengths and simplify complexity.
+|Maintain clean code using ESLint/Prettier and updated arc42 documentation so any member can take over.
+|Redistribute tasks among remaining members; focus on MVP features (Game & Login).
 
 |**Rust Learning Curve**
-|Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early.
-|Use simpler AI strategies (e.g., Random Move) if logic becomes a bottleneck.
+|Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early in the development cycle.
+|Use simpler AI strategies (e.g., Random Move) or move logic to TypeScript if Rust becomes a bottleneck.
 
-|**Integration Failures**
-|Define a shared JSON Schema for YEN validation between TS and Rust.
+|**Integration Failures (TS <-> Rust)**
+|Define a shared JSON Schema for YEN validation between the Frontend and the Bot runner.
 |Hold emergency integration meetings to align data formats and parsers.
 
-|**Final Exam Pressure**
-|Set internal deadlines 2 weeks before the official delivery date.
-|Shift focus to critical bug fixes and mandatory documentation only.
-
 |**Deployment Failures**
-|Configure and test CI/CD pipelines (GitHub Actions) in the first month.
-|Perform manual deployments to alternative providers (e.g., Fly.io or Render).
+|Configure and test CI/CD pipelines (GitHub Actions) early to ensure Docker images build correctly.
+|Perform manual deployments to alternative providers (e.g., Fly.io or Render) or local staging.
 
+|**Scalability of AI**
+|Optimize Bot algorithms (Minimax/Alpha-Beta) to ensure they don't exceed the 2-second timeout.
+|Implement a "Time-Out" safeguard that forces the bot to play a safe heuristic move if time expires.
+
+|**External API Dependency**
+|Abstract the User Management API calls behind a Service Layer to isolate changes.
+|Create Mock Providers to allow offline development if the backend API is down.
 |===
 
 === Technical Debt
 
-* **AI Complexity:** Initial AI versions will use basic heuristics; advanced algorithms are considered debt for later sprints.
-* **Test Coverage:** Reaching 80% automated coverage is a pending goal while focusing on core features.
-* **YEN Robustness:** Deep validation for malformed JSON from external bots is yet to be fully implemented.
+* **AI Complexity & Heuristics:** Due to time constraints, the initial version of the bot uses basic heuristics for board evaluation. Implementing more advanced search algorithms (like Monte Carlo Tree Search) is documented as technical debt for future iterations.
+
+* **Test Coverage (UI & Edge Cases):** While core logic is tested, reaching 100% coverage for complex UI interactions and rare network failure edge cases is a pending goal. We prioritized "Happy Path" E2E tests using Playwright over exhaustive unit testing of presentational components.
+
+* **YEN Robustness:** The current parser assumes valid JSON input for bot moves. Comprehensive validation and "Sanitizing" for malformed or malicious JSON from external bots is yet to be fully implemented, representing a security and stability debt.
+
+* **Database Migration Management:** The current setup relies on manual schema adjustments or basic scripts. Implementing a robust migration tool (like Flyway or Liquibase) to manage PostgreSQL versioning is considered debt to be addressed as the data model grows.
+
+* **Code Duplication in Translation Files:** Some i18n keys are duplicated across similar modals (e.g., "Cancel" buttons). A refactor to centralize common UI strings is planned to improve maintenance.

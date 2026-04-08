@@ -8,27 +8,6 @@ ifdef::arc42help[]
 ****
 .Contents
 The most important domain and technical terms that your stakeholders use when discussing the system.
-
-You can also see the glossary as source for translations if you work in multi-language teams.
-
-.Motivation
-You should clearly define your terms, so that all stakeholders
-
-* have an identical understanding of these terms
-* do not use synonyms and homonyms
-
-
-.Form
-
-A table with columns <Term> and <Definition>.
-
-Potentially more columns in case you need translations.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-12/[Glossary] in the arc42 documentation.
-
 ****
 endif::arc42help[]
 
@@ -36,9 +15,66 @@ endif::arc42help[]
 |===
 |Term |Definition
 
-|<Term-1>
-|<definition-1>
+|ADR
+|**Architectural Decision Record**. A short text document that captures a significant architecture decision, its context, and its consequences.
 
-|<Term-2>
-|<definition-2>
+|API
+|**Application Programming Interface**. The set of protocols and definitions used by the Webapp to communicate with the Users and Gamey microservices.
+
+|CI/CD
+|**Continuous Integration / Continuous Deployment**. The automated process of integrating code changes and deploying them to the production environment via GitHub Actions.
+
+|Colorblind Mode
+|An accessibility feature that adjusts the game's color palette to ensure high contrast for users with color vision deficiencies.
+
+|Docker
+|A containerization platform used to package and run the system components (Webapp, Users, Gamey, DB) in isolated environments.
+
+|Game Y
+|The specific hexagonal strategic board game that serves as the core domain for the YOVI suite.
+
+|Gamey Engine
+|The high-performance microservice developed in **Rust** responsible for game rules, move validation, and AI calculations.
+
+|Hexagonal Board
+|The game's playing surface, composed of hexagonal cells as required by the Game Y specification.
+
+|Hint
+|A Quality of Life (QoL) feature where the Gamey Engine suggests the optimal next move to the player.
+
+|i18n
+|**Internationalization**. The process of designing the software so it can be adapted to various languages (e.g., Asturian, Turkish, English) without engineering changes.
+
+|JSON
+|**JavaScript Object Notation**. The lightweight data-interchange format used for all internal and external communication.
+
+|Micrati
+|The organization acting as the primary stakeholder and client for the development of the YOVI system.
+
+|Minimax
+|A decision-making algorithm used by the AI to determine the best move by minimizing the possible loss for a worst-case scenario.
+
+|Playwright
+|A testing framework used for End-to-End (E2E) testing to simulate user behavior in the browser.
+
+|PostgreSQL
+|The relational database management system used to store user profiles, match history, and leaderboard statistics.
+
+|Rust
+|A systems programming language focused on safety and performance, used for the core Gamey logic.
+
+|TypeScript
+|A strongly typed superscript of JavaScript used for the Frontend (React) and the Users Service (Node.js).
+
+|Users Service
+|The Node.js microservice dedicated to managing user authentication, registration, and persistent statistics.
+
+|Webapp
+|The React-based frontend that provides the User Interface and exposes the REST API for external bots.
+
+|Winrate
+|The primary metric used for the ranking system, calculated as the ratio of games won to total games played.
+
+|YEN Notation
+|The specific JSON-based communication standard defined for this project to exchange board states and moves between services.
 |===
