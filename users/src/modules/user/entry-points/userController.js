@@ -3,7 +3,7 @@ const userDto = require('../domain/userDTO');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
-// In case of a successful creation, a message is returned.
+// In case of a successful creation, the user object is returned.
 // STATUS:
     //201: resource successfully created
     //400: input error
@@ -11,8 +11,7 @@ const userDto = require('../domain/userDTO');
 const createUser = async (req, res) => {
     try {
         const result = await userService.createUser(req.body);
-        const message = `Welcome ${result.username}`;
-        res.status(201).json({message});
+        res.status(201).json(userDto.toUserResponseDto(result));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields" || error.message.includes("already exists")||error.message.includes("password")) {

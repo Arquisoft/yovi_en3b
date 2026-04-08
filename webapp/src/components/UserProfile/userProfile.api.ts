@@ -66,8 +66,7 @@ export async function getMyRanking(userId?: string): Promise<UserRanking> {
 
     console.log(`Fetching ranking for userId: ${userId}`);
     const res = await fetch(`${API_URL}/ranking/me?userId=${userId}`, { 
-      method: "GET",
-      credentials: "include" 
+      method: "GET"
     });
     
     if (!res.ok) {
