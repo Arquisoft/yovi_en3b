@@ -2,7 +2,7 @@ const toUserResponseDto = (user) => {
   return {
     username: user.username,
     email: user.email,
-    photo: user.photo,
+    avatarId: user.photo,
     nickname: user.nickname
   };
 };
@@ -10,7 +10,7 @@ const toUserInputDto = (user) => {
   return {
     username: user.username,
     email: user.email,
-    photo: user.photo,
+    photo: user.avatarId,
     nickname: user.nickname,
     password: user.password,
     newPassword: user.newPassword

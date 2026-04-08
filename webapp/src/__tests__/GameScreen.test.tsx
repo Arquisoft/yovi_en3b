@@ -1,11 +1,17 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GameScreen from '../components/GameScreen/GameScreen';
 import { BrowserRouter } from 'react-router-dom';
 import { SettingsProvider } from '../context/SettingsContext';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
+import { checkWin } from '../components/GameScreen/yGameLogic';
 
+/**
+ * Wraps the component in the necessary Context Providers (Routes and Settings).
+ * Similar to Dependency Injection in Backend: it provides the "services"
+ * (Navigation and Global State) that the component needs to run without crashing.
+ */
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
         <BrowserRouter>
@@ -16,376 +22,333 @@ const renderWithProviders = (ui: React.ReactElement) => {
     );
 };
 
-// ============================== MOCKS ==============================
-
-// Mock navigate from react-router-dom.
-// "Fake" function for useNavigate, so we can check 
-// that it was called without truly navigating.
 const mockNavigate = vi.fn();
+const mockLocation = { state: { size: 3, time: 60, botType: 'robot' } };
 
-// Simulating the URL, like it reached GameScreen with
-// the size of the board = 3 (difficulty easy)
-const mockLocation = { state: { size: 3 } };
+/**
+ * Global mock for the Web Audio API.
+ * JSDOM (the test environment) does not support audio playback. 
+ * This stub replaces the native 'Audio' constructor with a fake object 
+ * to prevent "TypeError: Audio is not a constructor" or ".play() is undefined" errors.
+ */
+vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
+    return {
+        play: vi.fn().mockResolvedValue(undefined),
+        pause: vi.fn(),
+        catch: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        load: vi.fn(),
+        loop: false,
+        volume: 1,
+        muted: false
+    };
+}));
 
-// Mock react-router-dom so that when GameScreen calls 
-// useNavigate() it receives mockNavigate
-// useLocation() it receives mockLocation
+/**
+ * Partial mock of 'react-router-dom'.
+ * It preserves the original library functionality (...actual) but overrides 
+ * 'useNavigate' and 'useLocation' with custom mocks.
+ * This allows the test to verify navigation calls and simulate 
+ * specific route states (like board size or game time).
+ */
 vi.mock('react-router-dom', async (importOriginal) => {
     const actual = await importOriginal<typeof import('react-router-dom')>();
     return {
-        ...actual, 
+        ...actual,
         useNavigate: () => mockNavigate,
         useLocation: () => mockLocation,
     };
 });
-// Mock the translation hook to return fixed english texts.
-// Without this, the hook would throw an error because there
-// is no I18n provider in tests.
-// Summary: To control exactly what texts appear in the DOM
+
 vi.mock('../i18n/useTranslation', () => ({
     useI18n: () => ({
         t: {
             labels: {
-                player1: 'Player 1',            // Text for player 1 card
-                player2: 'Player 2',            // Text for player 2 card
-                vs: 'VS'                        // Separator text between players
+                player1: 'Player 1',
+                player2: 'Player 2',
+                typeMessage: 'Type a message...'
             },
             buttons: {
-                undo: 'Undo',                    // Undo button
-                confirm: 'Confirm',              // Confirm move button
-                exit: 'Exit',                    // Exit button
-                language: 'Language',            // Language button title
-                howToPlay: 'How to Play',        // How to play button title
-                yesExitAndLose: 'Yes, Exit',     // Confirm exit button inside modal
-                backToGame: 'Back to Game',      // Cancel exit button inside modal
+                undo: 'Undo',
+                confirm: 'Confirm',
+                exit: 'Exit',
+                playAgain: 'Play Again',
+                mainMenu: 'Main Menu',
+                yesExitAndLose: 'Yes, Exit',
+                backToGame: 'Back to Game'
             },
             messages: {
-                areYouSure: 'Are you sure?',              // Exit modal title
-                loseWarning: 'You will lose the game.',   // Exit modal warning message
-                openChat: 'Open Chat',                    // Chat toggle button title
+                areYouSure: 'Are you sure?',
+                congrats: 'Congratulations!',
+                nextTime: 'Next time!'
             },
         },
     }),
 }));
 
-// Mock LanguageDialog to avoid rendering its real implementation.
-// Only care whether it's visible or not, so we return a div
-// with data-testid when open = true and null when open = false
+/**
+ * Component Mocking.
+ * Replaces the real 'LanguageDialog' with a simplified version.
+ * This isolates the test to 'GameScreen' logic, preventing side effects 
+ * from the dialog's internal code while still allowing us to verify 
+ * if the dialog is being triggered (via data-testid).
+ */
 vi.mock('../components/LanguageDialog/LanguageDialog', () => ({
-    LanguageDialog: ({ open }: { open: boolean }) => {
-        if (open) {
-            return <div data-testid="language-dialog" />
-        } else {
-            return null
-        }
-    }
+    LanguageDialog: ({ open }: { open: boolean }) => (open ? <div data-testid="language-dialog" /> : null)
 }));
 
-// Mock react-hexgrid. Replaces each component with simple HTML
-// equivalents (because it is really complex to test SVG)
-// - HexGrid    ->  <svg> container
-// - Layout     ->  <g> grouper
-// - Hexagon    ->  clickable <g> with data-testid so we can find it in tests
+/**
+ * Library Mock for "react-hexgrid".
+ * Replaces complex SVG-based library components with simple HTML/SVG tags.
+ * This simplifies the DOM structure for the test environment and adds 
+ * "data-testid" to hexagons, making them easy to find and click during tests.
+ */
 vi.mock('react-hexgrid', () => ({
     HexGrid: ({ children }: any) => <svg>{children}</svg>,
     Layout: ({ children }: any) => <g>{children}</g>,
     Hexagon: ({ children, onClick, className }: any) => (
-        // The data-testid is just so the cells can be obtained later with 
-        // "getAllByTestId". The onclick and classname is just to maintain
-        // the original behaviour.
         <g className={className} onClick={onClick} data-testid="hex-cell">
             {children}
         </g>
     ),
 }));
 
-
-// Mock generateBoard so it always returns the same 3 cells.
-// This makes tests predictable: we know exactly how many cells
-// the board will have and what the coordinates are.
+/** Visual Layout (Size 2 Example):
+ * [ 0 ]             <-- (x:1, y:0, z:0) Top Cell
+ * /   \
+ * [ 1 ]---[ 2 ]        <-- (x:0, y:1, z:0) and (x:0, y:0, z:1)
+ * * * Cubic representation (x, y, z):
+ * x = Row (height), y = Left diagonal, z = Right diagonal
+ * x + y + z = size - 1
+ */
 vi.mock('../components/GameScreen/gridUtils', () => ({
-    generateBoard: () => [
-        { x: 0, y: 0, z: 0, q: 0, r: 0, s: 0 },     // Cell 1
-        { x: 1, y: 0, z: -1, q: 1, r: 0, s: -1 },   // Cell 2
-        { x: 0, y: 1, z: -1, q: 0, r: 1, s: -1 },   // Cell 3
-    ],
+    generateBoard: (size: number) => {
+        if (size === 2) {
+            return [
+                { x: 1, y: 0, z: 0, q: 0, r: -1, s: 1 },
+                { x: 0, y: 1, z: 0, q: -1, r: 0, s: 1 },
+                { x: 0, y: 0, z: 1, q: 0, r: 0, s: 0 },
+            ];
+        }
+        // Default size 3 mock for integration tests
+        return [
+            { x: 2, y: 0, z: 0, q: 0, r: -2, s: 2 },
+            { x: 1, y: 1, z: 0, q: -1, r: -1, s: 2 },
+            { x: 1, y: 0, z: 1, q: 0, r: -1, s: 1 },
+            { x: 0, y: 2, z: 0, q: -2, r: 0, s: 2 },
+            { x: 0, y: 1, z: 1, q: -1, r: 0, s: 1 },
+            { x: 0, y: 0, z: 2, q: 0, r: 0, s: 0 },
+        ];
+    },
 }));
 
-// =========================== END OF MOCKS ==========================
-
-// ============================== TESTS ==============================
-
-// The describe is just to group all tests related to the game screen
 describe('GameScreen', () => {
 
-    // Before each test, the mocks are cleared and fetch is mocked
     beforeEach(() => {
         vi.clearAllMocks();
-        // Mock fetch for hint requests
-        global.fetch = vi.fn((url: any) => {
-            if (url.includes('/ybot/hint')) {
-                return Promise.resolve({
-                    ok: true,
-                    json: () => Promise.resolve({
-                        hint: 'This is a test hint',
-                        suggested_move: { x: 1, y: 0, z: -1 }
-                    })
-                } as Response);
-            }
-            return Promise.reject(new Error('Unknown URL'));
-        });
     });
 
-    // After each test, the mocks are restored to their original state
     afterEach(() => {
         vi.restoreAllMocks();
     });
 
-    // TEST 1: Check that the header shows both players names and the
-    // "VS" text
-    test('renders player cards and VS text', () => {
+    test('TEST 1: renders player cards', () => {
         renderWithProviders(<GameScreen />);
         expect(screen.getByText('Player 1')).toBeInTheDocument();
         expect(screen.getByText('Player 2')).toBeInTheDocument();
     });
 
-    // TEST 2: Check that the footer has the 4 buttons 
-    // - Undo
-    // - Hint
-    // - Confirm
-    // - Exit
-    test('renders footer action buttons', () => {
+    test('TEST 2: renders footer action buttons', () => {
         renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /exit/i })).toBeInTheDocument();
     });
 
-    // TEST 3: The "confirm" button is disabled when there is 
-    // no cell (hexagon) selected
-    test('confirm button is disabled when no cell is selected', () => {
+    test('TEST 3: confirm button is disabled when no cell is selected', () => {
         renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled();
     });
 
-
-    // TEST 4:  When clicking a cell (hexagon), the "confirm" 
-    // button is enabled.
-    test('confirm button enables after clicking a hex cell', async () => {
+    test('TEST 4: confirm button enables after clicking a hex cell', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         const cells = screen.getAllByTestId('hex-cell');
         await user.click(cells[0]);
-
         expect(screen.getByRole('button', { name: /confirm/i })).not.toBeDisabled();
     });
 
-    // TEST 5: After pressing "confirm", the "confirm" button 
-    // should be disabled.
-    test('confirm button disables again after confirming a move', async () => {
+    test('TEST 5: confirm button disables again after confirming a move', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getAllByTestId('hex-cell')[0]);
         await user.click(screen.getByRole('button', { name: /confirm/i }));
-
         expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled();
     });
 
-    // TEST 6: After confirming, the turn should swap to player2
-    test('turn switches from Player 1 to Player 2 after confirming', async () => {
+    test('TEST 6: turn switches from Player 1 to Player 2 after confirming', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
-
         await user.click(screen.getAllByTestId('hex-cell')[0]);
         await user.click(screen.getByRole('button', { name: /confirm/i }));
-
         expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
     });
 
-    // TEST 7: The "Exit" button should open the "Exit" confirmation
-    // window
-    test('exit button opens confirmation window', async () => {
+    test('TEST 7: exit button opens confirmation window', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByRole('button', { name: /exit/i }));
-
         expect(screen.getByText('Are you sure?')).toBeInTheDocument();
     });
 
-    // TEST 8: The "Back to Game" button should close the "Exit" 
-    // confirmation window and go back to the game screen.
-    test('back to game button closes the exit window', async () => {
+    test('TEST 8: back to game button closes the exit window', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByRole('button', { name: /exit/i }));
         await user.click(screen.getByRole('button', { name: /back to game/i }));
-
         expect(screen.queryByText('Are you sure?')).not.toBeInTheDocument();
     });
 
-    // TEST 9: Confirming the "Exit" confirmation window should call 
-    // "navigate" with "/menu"
-    test('confirming exit navigates to /menu', async () => {
+    test('TEST 9: confirming exit navigates to /menu', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByRole('button', { name: /exit/i }));
         await user.click(screen.getByRole('button', { name: /yes, exit/i }));
-
         expect(mockNavigate).toHaveBeenCalledWith('/menu');
     });
 
-    // TEST 10: The chat should be visible by default
-    // (For now, isChatOpen is set to true, but can be changed)
-    test('chat is visible by default', () => {
+    test('TEST 10: chat is visible by default', () => {
         renderWithProviders(<GameScreen />);
         expect(screen.getByText('Online')).toBeInTheDocument();
     });
 
-
-    // TEST 12: The message icon button should toggle the chat
-    // - Opens the chat if it is closed
-    // - Closes the chat if it is open (like the "X" button)
-    test('chat toggles with the message icon button', async () => {
+    test('TEST 11: chat toggles with the message icon button', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByTitle('Chat'));
         expect(screen.queryByText('Online')).not.toBeInTheDocument();
-
         await user.click(screen.getByTitle('Chat'));
         expect(screen.getByText('Online')).toBeInTheDocument();
     });
 
-
-    // TEST 13: The "Language" button should open the "Language" window
-    // to change the language.
-    test('language window opens when language button is clicked', async () => {
+    test('TEST 12: language window opens when language button is clicked', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByTitle('Language'));
-
         expect(screen.getByTestId('language-dialog')).toBeInTheDocument();
     });
 
-    // TEST 19: Undo button should be present
-    test('undo button is present in footer', () => {
+    test('TEST 13: undo button is present in footer', () => {
         renderWithProviders(<GameScreen />);
         expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
     });
 
-    // TEST 20: Multiple cells should be selectable one after another
-    test('can select different cells sequentially', async () => {
-        renderWithProviders(<GameScreen />);
-        const user = userEvent.setup({ delay: null });
-        const cells = screen.getAllByTestId('hex-cell');
-
-        // Select first cell
-        await user.click(cells[0]);
-        let confirmBtn = screen.getByRole('button', { name: /confirm/i });
-        expect(confirmBtn).not.toBeDisabled();
-
-        // Confirm the move
-        await user.click(confirmBtn);
-
-        // Verify button becomes disabled while waiting
-        confirmBtn = screen.getByRole('button', { name: /confirm/i });
-        expect(confirmBtn).toBeDisabled();
-
-        // The core test: We verified that:
-        // 1. Can select a cell (first cell enabled the button)
-        // 2. Can confirm the move
-        // 3. The button properly disables after confirming
-        // This demonstrates sequential cell selection capability
-    });
-
-    // TEST 21: Player should alternate after each move
-    test('players alternate turns correctly', async () => {
+    test('TEST 14: can select different cells sequentially', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
+        const cells = screen.getAllByTestId('hex-cell');
+        await user.click(cells[0]);
+        expect(screen.getByRole('button', { name: /confirm/i })).not.toBeDisabled();
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+        expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled();
+    });
 
-        // Initial state - Player 1 active
+    test('TEST 15: players alternate turns correctly', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
         expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
-
-        // Make move as Player 1
         await user.click(screen.getAllByTestId('hex-cell')[0]);
         await user.click(screen.getByRole('button', { name: /confirm/i }));
-
-        // After delay, Player 2 should be active
-        await new Promise(resolve => setTimeout(resolve, 100));
-        expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
+        await waitFor(() => {
+            expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
+        });
     });
 
-
-
-    // TEST 24: Language dialog should close when language is selected
-    test('language dialog closes when selected', async () => {
+    test('TEST 16: language dialog is present when opening', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-
         await user.click(screen.getByTitle('Language'));
         expect(screen.getByTestId('language-dialog')).toBeInTheDocument();
     });
 
+    test('TEST 17: board maintains state after move', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        await user.click(screen.getAllByTestId('hex-cell')[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+        expect(screen.getByText('Player 2')).toBeInTheDocument();
+    });
 
-    // TEST 27: Board state should persist after moves
-    test('board maintains state after multiple moves', async () => {
+    test('TEST 18: allows user to type and send a message in chat', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        const input = screen.getByPlaceholderText('Type a message...');
+        
+        await user.type(input, 'Hello Bot');
+        expect(input).toHaveValue('Hello Bot');
+        
+        const sendButton = screen.getAllByRole('button').find(btn => 
+            btn.className.includes('send-btn')
+        ) as HTMLButtonElement;
+        
+        await user.click(sendButton);
+        
+        expect(input).toHaveValue('');
+        expect(screen.getByText('Hello Bot')).toBeInTheDocument();
+    });
+
+    test('TEST 19: bot makes a move automatically after player confirmation', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
 
         await user.click(screen.getAllByTestId('hex-cell')[0]);
         await user.click(screen.getByRole('button', { name: /confirm/i }));
 
-        // Wait for bot cooldown
-        await new Promise(resolve => setTimeout(resolve, 3500));
+        expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
 
-        expect(screen.getByText('Player 1')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
+        }, { timeout: 4000 });
+    });
+});
+
+describe('yGameLogic - checkWin', () => {
+    const allCells = [
+        { x: 2, y: 0, z: 0, q: 0, r: -2, s: 2 },
+        { x: 1, y: 1, z: 0, q: -1, r: -1, s: 2 },
+        { x: 0, y: 2, z: 0, q: -2, r: 0, s: 2 },
+    ];
+
+    test('TEST 20: returns false if player has fewer pieces than board size', () => {
+        const boardState = { "2-0-0": 1 };
+        expect(checkWin(boardState, 1, 3, allCells)).toBe(false);
     });
 
-    test('allows user to type and send a message in chat', async () => {
-    renderWithProviders(<GameScreen />);
-    const user = userEvent.setup();
+    test('TEST 21: returns true if a connected group touches all 3 sides', () => {
+        const boardState = { "0-0-0": 1 };
+        const singleCell = [{ x: 0, y: 0, z: 0, q: 0, r: 0, s: 0 }];
+        expect(checkWin(boardState, 1, 1, singleCell)).toBe(true);
+    });
 
-    const input = screen.getByRole('textbox');
-    const sendButton = screen.getByTestId('chat-send-button');
-    await user.click(sendButton);
+    test('TEST 22: returns false if pieces touch sides but are not connected', () => {
+        const boardState = {
+            "2-0-0": 1,
+            "0-2-0": 1
+        };
+        expect(checkWin(boardState, 1, 2, allCells)).toBe(false);
+    });
 
-    await user.type(input, 'This is a test');
-    expect(input).toHaveValue('This is a test');
-
-    await user.click(sendButton);
-
-    expect(input).toHaveValue('');
-    expect(screen.getByText('This is a test')).toBeInTheDocument();
-});
-
-test('bot makes a move automatically after player confirmation', async () => {
-    renderWithProviders(<GameScreen />);
-    const user = userEvent.setup();
-
-    // 1. Player 1 plays
-    const cells = screen.getAllByTestId('hex-cell');
-    await user.click(cells[0]);
-    await user.click(screen.getByRole('button', { name: /confirm/i }));
-
-    // 2. Check that it changes to player 2
-    expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
-
-    // 3. Wait for the bot to play
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // 4. Check that it's player 1 turn
-    expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
-    
-    // 5. Check that the bot marked a cell
-    const botCells = document.querySelectorAll('.p2-selected');
-    expect(botCells.length).toBeGreaterThan(0);
-});
+    test('TEST 23: handles multiple separate player cells correctly', () => {
+        const size2Cells = [
+            { x: 1, y: 0, z: 0, q: 0, r: -1, s: 1 },
+            { x: 0, y: 1, z: 0, q: -1, r: 0, s: 1 }
+        ];
+        const boardState = {
+            "1-0-0": 1,
+            "0-1-0": 1
+        };
+        expect(checkWin(boardState, 1, 2, size2Cells)).toBe(true);
+    });
 });

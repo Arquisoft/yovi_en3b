@@ -1,7 +1,24 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { SettingsProvider } from '../context/SettingsContext';
+
+
+/**
+ * Wraps the component in the necessary Context Providers (Routes and Settings).
+ * Similar to Dependency Injection in Backend: it provides the "services"
+ * (Navigation and Global State) that the component needs to run without crashing.
+ */
+const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+        <BrowserRouter>
+            <SettingsProvider>
+                {ui}
+            </SettingsProvider>
+        </BrowserRouter>
+    );
+};
 
 // Mock navigation
 const mockNavigate = vi.fn();
@@ -10,6 +27,26 @@ vi.mock('react-router-dom', async () => {
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
+/**
+ * Global mock for the Web Audio API.
+ * JSDOM (the test environment) does not support audio playback. 
+ * This stub replaces the native 'Audio' constructor with a fake object 
+ * to prevent "TypeError: Audio is not a constructor" or ".play() is undefined" errors.
+ */
+vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
+    return {
+        play: vi.fn().mockResolvedValue(undefined),
+        pause: vi.fn(),
+        catch: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        load: vi.fn(),
+        loop: false,
+        volume: 1,
+        muted: false
+    };
+}));
+
 describe('RegisterForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -17,7 +54,7 @@ describe('RegisterForm', () => {
     });
 
     test('1. Shows error when fields are empty', async () => {
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         // Click play without filling inputs
         const playBtn = screen.getByText(/PLAY/i);
@@ -34,7 +71,7 @@ describe('RegisterForm', () => {
             json: async () => ({ token: 'fake-token' }),
         });
 
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
@@ -49,7 +86,7 @@ describe('RegisterForm', () => {
         json: async () => ({ message: 'Invalid credentials' }),
     });
 
-    render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+    renderWithProviders(<RegisterForm />);
     
     fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
     fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
@@ -64,7 +101,7 @@ describe('RegisterForm', () => {
 });
 
     test('4. Navigates to signup on button click', async () => {
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         const signUpBtn = screen.getByText(/SIGN UP/i);
         fireEvent.click(signUpBtn);
@@ -74,7 +111,7 @@ describe('RegisterForm', () => {
     });
 
     test('5. Clears error when user starts typing', async () => {
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         fireEvent.click(screen.getByText(/PLAY/i));
         expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
@@ -88,7 +125,7 @@ describe('RegisterForm', () => {
     test('6. Handles network error gracefully', async () => {
         (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
@@ -107,7 +144,7 @@ describe('RegisterForm', () => {
 
         (global.fetch as any).mockReturnValue(responsePromise);
 
-        render(<MemoryRouter><RegisterForm /></MemoryRouter>);
+        renderWithProviders(<RegisterForm />);
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
