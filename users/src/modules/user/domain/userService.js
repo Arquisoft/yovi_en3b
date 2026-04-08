@@ -106,8 +106,8 @@ const changeNickname = async (data) => {
         throw new Error('User not found');
     }
 
-    // 3. Save the new nickname in the db
-    const updatedUser = await userRepository.updateUserNickname(data.username, data.nickname);
+    // 3. Save the new nickname and photo in the db
+    const updatedUser = await userRepository.updateUserNicknameAndPhoto(data.username, data.nickname, data.photo);
 
     return updatedUser;
 };

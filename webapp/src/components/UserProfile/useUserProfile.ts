@@ -24,16 +24,24 @@ export function useUserProfile(open: boolean) {
 
     setLoading(true);
     setError(null);
+    setRanking(null);
 
-    Promise.all([getMyProfile(), getMyRanking()])
-      .then(([p, r]) => {
+    (async () => {
+      try {
+        const p = await getMyProfile();
         setProfile(p);
-        setRanking(r);
         setDraftName(p.displayName);
         setDraftAvatarId(p.avatarId);
-      })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : "Unknown error"))
-      .finally(() => setLoading(false));
+
+        // Always fetch ranking (with fallback to mock data if fails)
+        const r = await getMyRanking(p.id);
+        setRanking(r);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [open]);
 
   const save = useCallback(async () => {

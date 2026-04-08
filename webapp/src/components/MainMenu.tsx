@@ -12,14 +12,6 @@ import SettingsModal from '../components/Settings/SettingsModal';
 import RankingScreen from '../components/RankingScreen/RankingScreen'; 
 import '../App.css';
 
-// MOCK DATA
-const MOCK_RANKING_DATA = [
-  { id: '1', username: 'NeonKnight', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', points: 2500, winRate: 85, gamesPlayed: 100, lastGameWon: true },
-  { id: '2', username: 'CyberGhost', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', points: 2100, winRate: 72, gamesPlayed: 90, lastGameWon: false },
-  { id: '3', username: 'RetroPlayer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3', points: 1950, winRate: 65, gamesPlayed: 85, lastGameWon: true },
-  { id: '4', username: 'User_404', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4', points: 1200, winRate: 45, gamesPlayed: 50, lastGameWon: false },
-];
-
 const MainMenu: React.FC = () => {
   const { t } = useI18n();
   const { colorBlindMode, playSound } = useSettings(); // Access playSound from settings context
@@ -80,10 +72,7 @@ const MainMenu: React.FC = () => {
 
         {showRanking && (
           <div className="modal-overlay"> 
-            <RankingScreen 
-              users={MOCK_RANKING_DATA} 
-              onClose={() => setShowRanking(false)} 
-            />
+            <RankingScreen onClose={() => setShowRanking(false)} />
           </div>
         )}
 
