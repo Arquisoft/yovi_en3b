@@ -45,6 +45,16 @@ module.exports = {
     WHERE m.blue_player_id = $1 OR m.red_player_id = $1
     ORDER BY m.created_at DESC;
    `,
+   getMatchById: `
+    SELECT * FROM matches
+    WHERE id = $1
+    LIMIT 1;
+   `,
+   getMatchesByPlayer: `
+    SELECT * FROM matches
+    WHERE blue_player_id = $1 OR red_player_id = $2
+    ORDER BY created_at DESC;
+   `,
    finishMatch: `
     UPDATE matches 
     SET winner_id = $1, status = 'finished', ended_at = CURRENT_TIMESTAMP
