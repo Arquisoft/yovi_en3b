@@ -487,25 +487,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-concepts">8. Cross-cutting Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_concept_1">8.1. <em>&lt;Concept 1&gt;</em></a></li>
-<li><a href="#_concept_2">8.2. <em>&lt;Concept 2&gt;</em></a></li>
-<li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
+<li><a href="#_8_1_inter_component_communication_yen_notation">8.1. 8.1 Inter-Component Communication &amp; YEN Notation</a></li>
+<li><a href="#_8_2_microservices_containerization_pattern">8.2. 8.2 Microservices &amp; Containerization Pattern</a></li>
+<li><a href="#_8_3_security_authentication">8.3. 8.3 Security &amp; Authentication</a></li>
+<li><a href="#_8_4_user_experience_ux_internationalization_i18n">8.4. 8.4 User Experience (UX) &amp; Internationalization (i18n)</a></li>
 </ul>
 </li>
-<li><a href="#section-design-decisions">9. Architecture Decisions</a></li>
-<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
-<ul class="sectlevel2">
-<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
-<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
-</ul>
-</li>
-<li><a href="#section-risks-and-technical-debt">11. Risks and Technical Debt</a>
-<ul class="sectlevel2">
-<li><a href="#_risk_mitigation_table">11.1. Risk Mitigation Table</a></li>
-<li><a href="#_technical_debt">11.2. Technical Debt</a></li>
-</ul>
-</li>
-<li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -1088,7 +1075,7 @@ These stakeholders determine the extent and the level of detail of your work and
 <h3 id="_whitebox_overall_system">5.1. Whitebox Overall System</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/level-1-overview.png" alt="YOVI Level 1 Overview Diagram">
+<img src="./images/level-1-overview.jpg" alt="YOVI Level 1 Overview Diagram">
 </div>
 </div>
 <div class="dlist">
@@ -1113,19 +1100,19 @@ These stakeholders determine the extent and the level of detail of your work and
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Webapp</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>YOVI Web Client</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">React-based frontend. Visualizes the game board, manages user registration, and provides a REST API for bot interactions.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Users Service</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Users API (Node.js)</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Node.js backend managing user profiles, authentication, and game history metrics.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gamey Engine</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>GameY Service (Rust)</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Rust-based engine that validates Game Y rules, checks win conditions, and generates AI moves.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PostgreSQL</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PostgreSQL Database</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Relational database for persistent storage of user profiles and match statistics.</p></td>
 </tr>
 </tbody>
@@ -1137,10 +1124,10 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="ulist">
 <ul>
 <li>
-<p><strong>YEN Notation:</strong> Standard JSON format carrying board states between the Webapp and Gamey Engine.</p>
+<p><strong>YEN Notation:</strong> Standard JSON format carrying board states between the YOVI Web Client and GameY Service.</p>
 </li>
 <li>
-<p><strong>REST API (Internal):</strong> Endpoints enabling communication between the Webapp and Users Service.</p>
+<p><strong>REST API (Internal):</strong> Endpoints enabling communication between the YOVI Web Client and Users API.</p>
 </li>
 </ul>
 </div>
@@ -1148,7 +1135,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </dl>
 </div>
 <div class="sect3">
-<h4 id="_webapp_black_box">5.1.1. Webapp (Black Box)</h4>
+<h4 id="_yovi_web_client_black_box">5.1.1. YOVI Web Client (Black Box)</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Purpose/Responsibility</dt>
@@ -1171,7 +1158,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 </div>
 <div class="sect3">
-<h4 id="_users_service_black_box">5.1.2. Users Service (Black Box)</h4>
+<h4 id="_users_api_black_box">5.1.2. Users API (Black Box)</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Purpose/Responsibility</dt>
@@ -1194,7 +1181,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 </div>
 <div class="sect3">
-<h4 id="_gamey_engine_black_box">5.1.3. Gamey Engine (Black Box)</h4>
+<h4 id="_gamey_service_black_box">5.1.3. Gamey Service (Black Box)</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Purpose/Responsibility</dt>
@@ -1225,13 +1212,13 @@ These stakeholders determine the extent and the level of detail of your work and
 <div class="sect2">
 <h3 id="_5_2_level_2">5.2. 5.2 Level 2</h3>
 <div class="sect3">
-<h4 id="_5_2_1_white_box_gamey_engine">5.2.1. 5.2.1 White Box Gamey Engine</h4>
+<h4 id="_5_2_1_white_box_gamey_service">5.2.1. 5.2.1 White Box GameY Service</h4>
 <div class="paragraph">
-<p>Since the Gamey Engine handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.</p>
+<p>Since the GameY Service handles the core logic of Game Y, its internal structure is detailed to show the decoupling of rules and strategies.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/level-2-gamey.png" alt="Gamey Engine White Box Diagram">
+<img src="./images/level-2-gamey.jpg" alt="GameY Service White Box Diagram">
 </div>
 </div>
 <div class="paragraph">
@@ -1288,22 +1275,18 @@ These stakeholders determine the extent and the level of detail of your work and
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Responsibility</strong></th>
+<th class="tableblock halign-left valign-top"><strong>React Components</strong></th>
+<th class="tableblock halign-left valign-top">React views including the Game Board, Register Form, and Statistics dashboard.</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>UI Components</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">React views including the Game Board, Register Form, and Statistics dashboard.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>State Management</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Client State</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Centralized client-side store maintaining the current game state and user session.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>API Client</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrates asynchronous HTTP communication with Users Service and Gamey Engine.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>REST Services Client</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrates asynchronous HTTP communication with Users API and GameY Service.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1339,7 +1322,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Login.png" alt="Login" width="1257" height="717">
+<img src="./images/Login.png" alt="Login" width="1296" height="744">
 </div>
 </div>
 </div>
@@ -1350,7 +1333,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Signup.png" alt="Signup" width="1426" height="773">
+<img src="./images/Signup.png" alt="Signup" width="1476" height="802">
 </div>
 </div>
 </div>
@@ -1361,7 +1344,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Game.png" alt="Game" width="983" height="796">
+<img src="./images/Game.png" alt="Game" width="1017" height="826">
 </div>
 </div>
 </div>
@@ -1372,7 +1355,7 @@ These stakeholders determine the extent and the level of detail of your work and
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Asking%20for%20Hint.png" alt="Asking for Hint" width="506" height="305">
+<img src="./images/Asking%20for%20Hint.png" alt="Asking for Hint" width="527" height="313">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -1607,285 +1590,821 @@ when your infrastructure is more complex.</p>
 <div class="sect1">
 <h2 id="section-concepts">8. Cross-cutting Concepts</h2>
 <div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
 <div class="paragraph">
-<div class="title">Content</div>
-<p>This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>models, especially domain models</p>
-</li>
-<li>
-<p>architecture or design patterns</p>
-</li>
-<li>
-<p>rules for using specific technology</p>
-</li>
-<li>
-<p>principal, often technical decisions of an overarching (= cross-cutting) nature</p>
-</li>
-<li>
-<p>implementation rules</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Concepts form the basis for <em>conceptual integrity</em> (consistency, homogeneity) of the architecture.
-Thus, they are an important contribution to achieve inner qualities of your system.</p>
-</div>
-<div class="paragraph">
-<p>Some of these concepts cannot be assigned to individual building blocks, e.g. security or safety.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>The form can be varied:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>concept papers with any kind of structure</p>
-</li>
-<li>
-<p>cross-cutting model excerpts or scenarios using notations of the architecture views</p>
-</li>
-<li>
-<p>sample implementations, especially for technical concepts</p>
-</li>
-<li>
-<p>reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Structure</div>
-<p>A potential (but not mandatory) structure for this section could be:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Domain concepts</p>
-</li>
-<li>
-<p>User Experience concepts (UX)</p>
-</li>
-<li>
-<p>Safety and security concepts</p>
-</li>
-<li>
-<p>Architecture and design patterns</p>
-</li>
-<li>
-<p>"Under-the-hood"</p>
-</li>
-<li>
-<p>development concepts</p>
-</li>
-<li>
-<p>operational concepts</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Note: it might be difficult to assign individual concepts to one specific topic
-on this list.</p>
+<p>This section outlines the principal regulations, patterns, and solution ideas that apply across multiple building blocks of the YOVI system. By establishing these rules, we ensure conceptual integrity and consistency throughout the architecture.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/08-concepts-EN.drawio.png" alt="Possible topics for crosscutting concepts">
+<img src="./images/crosscutting-concepts-map.jpg" alt="YOVI Crosscutting Concepts Concept Map">
 </div>
+</div>
+<div class="sect2">
+<h3 id="_8_1_inter_component_communication_yen_notation">8.1. 8.1 Inter-Component Communication &amp; YEN Notation</h3>
+<div class="paragraph">
+<p>Communication between the decoupled subsystems (YOVI Web Client, Users API, and GameY Service) relies entirely on lightweight, stateless REST APIs exchanging JSON payloads.</p>
+</div>
+<div class="paragraph">
+<p>A core crosscutting domain concept is the <strong>YEN (Y-Game Extended Notation)</strong>. It is the standardized format for representing the game board, turn state, and player layout.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Impact:</strong> The React frontend must serialize board states into YEN, the external bots must read/write YEN, and the Rust engine&#8217;s <code>YEN Parser</code> must deserialize it to evaluate the core logic. Having a single source of truth for game notation ensures consistency across the TypeScript and Rust boundaries.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_8_2_microservices_containerization_pattern">8.2. 8.2 Microservices &amp; Containerization Pattern</h3>
+<div class="paragraph">
+<p>The system strictly follows a microservices architectural style to separate the high-performance CPU-bound tasks (GameY Service) from I/O-bound tasks (Users API).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Impact:</strong> To maintain consistency in deployment and operation, all core components are packaged into isolated Docker containers (WebApp, Users API, GameY Service, and PostgreSQL). This containerization concept simplifies deployment to the Docker Host Server and ensures uniform environment configurations across development, testing, and production.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_8_3_security_authentication">8.3. 8.3 Security &amp; Authentication</h3>
+<div class="paragraph">
+<p>Security is managed uniformly at the entry points of the system to protect user profiles and ensure fair play in the leaderboards.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Human Players:</strong> The <code>YOVI Web Client</code> communicates with the <code>Users API</code> to authenticate players (e.g., via JSON Web Tokens - JWT). This token is required for all state-altering requests, such as updating match history.</p>
+</li>
+<li>
+<p><strong>External Bots:</strong> External scripts/applications interacting with the <code>External Bot API</code> must use bot-specific identifiers or API keys. This prevents system abuse and accurately tracks bot performance metrics.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_8_4_user_experience_ux_internationalization_i18n">8.4. 8.4 User Experience (UX) &amp; Internationalization (i18n)</h3>
+<div class="paragraph">
+<p>To fulfill the optional system requirements, the presentation layer follows specific UX and localization patterns.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Responsive Design:</strong> The Web Client components are styled using responsive paradigms to support seamless gameplay on both PC and mobile devices.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-8/">Concepts</a> in the arc42 documentation.</p>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_1">8.1. <em>&lt;Concept 1&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_2">8.2. <em>&lt;Concept 2&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_concept_n">8.3. <em>&lt;Concept n&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
-</div>
-<div style="page-break-after: always;"></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="section-design-decisions">9. Architecture Decisions</h2>
-<div class="sectionbody">
-<div class="sidebarblock arc42help">
+<div class="sidebarblock">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Important, expensive, large scale or risky architecture decisions including rationales.
-With "decisions" we mean selecting one alternative based on given criteria.</p>
+<p>=== Ranking System Concept</p>
 </div>
 <div class="paragraph">
-<p>Please use your judgement to decide whether an architectural decision should be documented
-here in this central section or whether you better document it locally
-(e.g. within the white box template of one building block).</p>
+<p>==== Overview</p>
 </div>
 <div class="paragraph">
-<p>Avoid redundancy.
-Refer to section 4, where you already captured the most important decisions of your architecture.</p>
+<p>The Game Y ranking system provides competitive leaderboard functionality that automatically tracks player performance across all matches. It uses a score-based ranking model where players are positioned based on their win-loss records.</p>
 </div>
 <div class="paragraph">
-<div class="title">Motivation</div>
-<p>Stakeholders of your system should be able to comprehend and retrace your decisions.</p>
+<p>==== Architecture</p>
 </div>
 <div class="paragraph">
-<div class="title">Form</div>
-<p>Various options:</p>
+<p>The ranking system is implemented across three components:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Backend Database Layer</strong>: Stores ranking statistics (total_matches, win_matches, score)</p>
+</li>
+<li>
+<p><strong>Business Logic Layer</strong>: Calculates rankings, manages match completion, and updates player statistics</p>
+</li>
+<li>
+<p><strong>Frontend Presentation Layer</strong>: Displays ranking position in user profile and global leaderboard</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>==== Score Calculation Formula</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>score = 50 * (2 * wins - total_matches)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This formula ensures:
+- Victory is rewarded (+2 points per win)
+- Matches are always counted (-1 point per match)
+- High win rates result in positive scores
+- Loss-heavy records result in negative scores</p>
 </div>
 <div class="ulist">
+<div class="title">Example Calculations:</div>
 <ul>
 <li>
-<p>ADR (<a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Documenting Architecture Decisions</a>) for every important decision</p>
+<p>10 wins, 0 losses: score = 50 * (2*10 - 10) = 500</p>
 </li>
 <li>
-<p>List or table, ordered by importance and consequences or:</p>
+<p>9 wins, 1 loss: score = 50 * (2*9 - 10) = 400</p>
 </li>
 <li>
-<p>more detailed in form of separate sections per decision</p>
+<p>5 wins, 5 losses: score = 50 * (2*5 - 10) = 0</p>
+</li>
+<li>
+<p>0 wins, 10 losses: score = 50 * (2*0 - 10) = -500</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-9/">Architecture Decisions</a> in the arc42 documentation.
-There you will find links and examples about ADR.</p>
+<p>==== Data Flow: Match Completion</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>┌─────────────────┐
+│  Game Ends      │
+│  (Winner Known) │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────┐
+│ Frontend: POST /matches/finish  │
+│ {matchId, winnerId}             │
+└────────┬────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────┐
+│  Backend Receives Match End  │
+│  • Record winner             │
+│  • Set status to 'finished'  │
+└────────┬─────────────────────┘
+         │
+         ▼
+┌────────────────────────────────┐
+│  Check Player Rankings         │
+│  • Does winner have ranking?   │
+│  • Does loser have ranking?    │
+└────────┬───────────────────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+┌───────┐ ┌──────────────┐
+│ New   │ │ Existing     │
+│Player │ │ Player       │
+└───┬───┘ └──────┬───────┘
+    │            │
+    ▼            ▼
+┌──────────────┐ ┌──────────────────┐
+│Initialize:  │ │Update:           │
+│• total: 1   │ │• total += 1      │
+│• wins: 1    │ │• wins += (0 or 1)│
+│• score: 50  │ │• recalc score    │
+└──────────────┘ └──────────────────┘
+    │                    │
+    └────────┬───────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Update Database    │
+    │ Persist Rankings   │
+    └────────┬───────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Return Success     │
+    │ with Match Data    │
+    └────────────────────┘</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>==== Integration Points</p>
+</div>
+<div class="paragraph">
+<p>===== Match Service</p>
+</div>
+<div class="paragraph">
+<p>The match completion flow is integrated into the <code>matchService.finishMatch()</code> function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">const finishMatch = async (matchId, winnerId) =&gt; {
+  try {
+    // 1. Update match as finished
+    const match = await matchRepository.finishMatch(matchId, winnerId);
+
+    // 2. Update both players' rankings
+    const winnerRanking = await rankingService
+      .updateOrInitializeRanking(winnerId, 1, 1);
+
+    const loserRanking = await rankingService
+      .updateOrInitializeRanking(loserId, 1, 0);
+
+    return match;
+  } catch (error) {
+    throw new Error(`Failed to finish match: ${error.message}`);
+  }
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>===== Frontend Integration</p>
+</div>
+<div class="paragraph">
+<p>The ranking is automatically fetched and displayed when users open their profile:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-typescript" data-lang="typescript">// hooks/useUserProfile.ts
+const { profile, ranking, ... } = useUserProfile(open);
+
+// The ranking is fetched via: GET /ranking/me?userId={userId}
+// And displayed in the ProfileOverlay component</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>==== API Endpoints</p>
+</div>
+<div class="paragraph">
+<p><strong>Get User&#8217;s Ranking Position</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>GET /ranking/me?userId={userId}
+Response: { position: 5, totalPlayers: 127 }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Get Global Rankings</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>GET /ranking/global
+Response: Array of all players ranked by score</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Finish Match and Update Rankings</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>POST /matches/finish
+Request: { matchId: uuid, winnerId: uuid }
+Response: Updated match with winner information</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>==== Performance Considerations</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Ranking Calculation</strong>: Position is determined by O(n) query sorting all rankings by score</p>
+</li>
+<li>
+<p><strong>Update Frequency</strong>: Rankings are updated immediately upon match completion</p>
+</li>
+<li>
+<p><strong>Caching</strong>: Consider caching global rankings for frequently accessed data</p>
+</li>
+<li>
+<p><strong>Index Strategy</strong>: Database indexes on score and user_id columns optimize queries</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>==== Error Handling</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>New Players</strong>: Automatically initialize ranking on first match</p>
+</li>
+<li>
+<p><strong>Network Failures</strong>: Frontend gracefully falls back to mock data</p>
+</li>
+<li>
+<p><strong>Database Issues</strong>: API returns appropriate error codes (400, 404, 500)</p>
+</li>
+<li>
+<p><strong>Concurrent Updates</strong>: Database constraints ensure data integrity</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>==== Future Enhancements</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Seasonal Leaderboards</strong>: Reset rankings at season boundaries</p>
+</li>
+<li>
+<p><strong>ELO-Style Rating</strong>: Adjust points based on opponent strength</p>
+</li>
+<li>
+<p><strong>Achievements</strong>: Award badges for ranking milestones</p>
+</li>
+<li>
+<p><strong>Real-time Updates</strong>: WebSocket notifications for leaderboard changes</p>
+</li>
+<li>
+<p><strong>Statistics Tracking</strong>: Detailed player statistics and analytics</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Localization:</strong> UI components are structured to support internationalization (i18n), strictly separating hardcoded text from the views to allow dynamic switching between different languages.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
 </div>
 <div style="page-break-after: always;"></div>
+<div id="section-design-decisions" class="paragraph">
+<p>== Architecture Decisions</p>
+</div>
+<div class="paragraph">
+<p>This section contains the most important architectural decisions made during the design and development of the YOVI system, following the Michael Nygard ADR (Architecture Decision Record) structure.</p>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-001: Database Technology Selection
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+The GAME Y project requires persistent data storage to support game-related information (users, matches, etc.). At this early stage of the project, a decision about the database technology is needed to guide further architectural and implementation decisions.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The team decided to use a SQL-based relational database as the persistence technology for the project.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The data model will follow a strict relational structure.</p>
+</li>
+<li>
+<p>The backend architecture will be designed to interact with a SQL database.</p>
+</li>
+<li>
+<p>This decision may limit flexibility compared to NoSQL alternatives, but it provides strong data consistency and maturity of tooling.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-002: Backend Structure
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+After selecting the SQL database, we needed to define how to organize the source code of the backend service (<code>Users API</code>).</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The system is implemented as a Modular Monolith. This approach was chosen to minimize infrastructure complexity and deployment overhead for the current scope of the project, while the internal modular structure ensures a clear path to microservices if future scalability requires it. The "big picture" of the backend is divided into independent components, and each component is split into 3 layers: entry-points, domain, and data-access.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>High Cohesion:</strong> All code related to a specific feature is located in one folder.</p>
+</li>
+<li>
+<p><strong>Maintainability:</strong> It is easier to make changes without affecting other parts of the system.</p>
+</li>
+<li>
+<p><strong>Scalability:</strong> If a component becomes too large or complex, it can be easily extracted/divided since it is already isolated.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-003: PostgreSQL as DBMS
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+To develop the database layer, we had to choose a specific Database Management System (DBMS).</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+After analyzing the needs of the application, the team decided to use PostgreSQL as the DBMS because it offers several advantages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It is free and open-source.</p>
+</li>
+<li>
+<p>It supports both relational and non-relational (JSONB) data types, which could be useful in the future if we need to use a hybrid approach.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Ensures robustness, reliability, and data integrity.</p>
+</li>
+<li>
+<p>Provides excellent performance and concurrency handling.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-004: Selection of Mock Database for Testing
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+With the migration to a Cloud-hosted PostgreSQL database, relying on a live connection for every test introduces latency and risks data pollution during concurrent development. We need a fast, isolated way to validate our 3-layer backend logic.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The team decided to implement a Mock Database strategy using in-memory technologies (such as H2, SQLite :memory:, or mocking frameworks) for unit and integration tests.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Test Isolation:</strong> Each test runs in a clean environment, preventing interference between team members.</p>
+</li>
+<li>
+<p><strong>Execution Speed:</strong> In-memory operations are significantly faster than remote Cloud DB calls.</p>
+</li>
+<li>
+<p><strong>Development Independence:</strong> Components can be tested even without an active internet connection.</p>
+</li>
+<li>
+<p><strong>Maintenance:</strong> Requires additional effort to keep mock data schemas synchronized with the production PostgreSQL schema.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-005: Backend Programming Paradigm
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+We must choose which paradigm we are going to use to develop the backend to ensure consistency between the different modules.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The team decided to adopt the functional programming paradigm for implementing the modules instead of the Object-Oriented Paradigm (OOP). The backend relies heavily on pure functions and immutable data.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Easier testing:</strong> Using functions that do not depend on internal state reduces issues when testing the app and ensures predictable behavior.</p>
+</li>
+<li>
+<p>Extinction of unintended side effects.</p>
+</li>
+<li>
+<p><strong>Easier maintenance:</strong> Since we do not have complex inheritance hierarchies, it is easier to understand what each isolated function does.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-006: Separation of Matches and Game Saves
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+We initially considered tracking game history and board positions directly within the <code>matches</code> table. However, updating the database on every single turn would overload the server and create a bottleneck.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+We will create a dedicated <code>game_saves</code> table. The <code>matches</code> table will only be queried/updated at the start and end of a game. The active game state will only be stored in <code>game_saves</code> when the user explicitly clicks the "Save" button or exits the match.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Massively reduces database load and network traffic.</p>
+</li>
+<li>
+<p>Keeps the <code>matches</code> table clean and strictly for historical tracking.</p>
+</li>
+<li>
+<p>Introduces slightly more complex logic in the backend to manage two tables instead of one.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-007: Polyglot Architecture (TypeScript &amp; Rust)
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+The project requires a scalable web interface, a user management system, and a highly performant game engine to evaluate moves and execute AI bot strategies.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The system is implemented using a polyglot approach. The <code>YOVI Web Client</code> and <code>Users API</code> are developed in <strong>TypeScript</strong> (React and Node.js) to leverage the vast web ecosystem. The <code>GameY Service</code> (evaluation and strategy module) is implemented in <strong>Rust</strong> to guarantee memory safety and high calculation speed for the AI.</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Maximizes the performance of the AI engine while keeping web development agile.</p>
+</li>
+<li>
+<p>Increases cognitive load on the development team, as they must maintain codebases and tooling for two entirely different programming ecosystems.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-008: Stateless Game Engine Communication (YEN &amp; JSON)
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+Because the frontend and the game engine are decoupled and written in different languages, they need a standardized, language-agnostic way to exchange complex board layouts and game states.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+Communication between the Web Client/Bots and the Rust Game Engine is strictly done via stateless <strong>JSON messages</strong> over HTTP, utilizing the standard <strong>YEN (Y-Game Extended Notation)</strong> for board representation. The Rust module acts as a stateless REST service (basic web service interface).</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Ensures perfect decoupling; the Rust engine does not need to store active sessions in its memory.</p>
+</li>
+<li>
+<p>Makes it extremely easy for external third-party bots to integrate with the API.</p>
+</li>
+<li>
+<p>Requires serialization/deserialization overhead for every move.</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p>=== ADR-009: Cloud Infrastructure &amp; CI/CD
+<strong>Status:</strong> Accepted</p>
+</div>
+<div class="paragraph">
+<p><strong>Context:</strong>
+To fulfill the requirement of making the application publicly accessible and easily maintainable, we need a reliable deployment strategy that minimizes manual intervention.</p>
+</div>
+<div class="paragraph">
+<p><strong>Decision:</strong>
+The system will be deployed to a <strong>public cloud provider</strong> utilizing Docker containerization. Furthermore, all deployments will be handled via automated <strong>CI/CD pipelines</strong> (Continuous Integration and Continuous Deployment).</p>
+</div>
+<div class="paragraph">
+<p><strong>Consequences:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Guarantees that the code running in production exactly matches the tested codebase.</p>
+</li>
+<li>
+<p>Allows rapid, zero-downtime updates to the web application and game engine.</p>
+</li>
+<li>
+<p>Requires an initial time investment to write and configure the pipeline scripts (e.g., GitHub Actions).</p>
+</li>
+</ul>
+</div>
+<div style="page-break-after: always;"></div>
+<div id="section-quality-scenarios" class="paragraph">
+<p>== Quality Requirements</p>
 </div>
 </div>
-<div class="sect1">
-<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
-<div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
+</div>
 <div class="paragraph">
 <div class="title">Content</div>
-<p>This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in section 1.2. (quality goals)</p>
+<p>This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in section 1.2. (quality goals).</p>
 </div>
-<div class="paragraph">
-<p>Here you can also capture quality requirements with lesser priority,
-which will not create high risks when they are not fully achieved.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Since quality requirements will have a lot of influence on architectural
-decisions you should know for every stakeholder what is really important to them,
-concrete and measurable.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-10/">Quality Requirements</a> in the arc42 documentation.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_quality_tree">10.1. Quality Tree</h3>
-<div class="sidebarblock arc42help">
+<div class="sidebarblock">
 <div class="content">
+<div class="paragraph">
+<p>=== Quality Tree</p>
+</div>
+<div class="paragraph">
+<p>The following quality tree provides a high-level overview of the quality attributes that are most important for the <strong>GAME Y</strong> system, broken down into specific evaluation areas and prioritized to guide architectural decisions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Quality</strong></p>
+</li>
+<li>
+<p><strong>Usability</strong></p>
+</li>
+<li>
+<p>Accessibility (Colorblind support) &#8594; See [US-1]</p>
+</li>
+<li>
+<p>Internationalization (Multi-language) &#8594; See [US-2]</p>
+</li>
+<li>
+<p><strong>Performance</strong></p>
+</li>
+<li>
+<p>AI Response Time (Bot algorithms) &#8594; See [PE-1]</p>
+</li>
+<li>
+<p>UI Responsiveness (Hexagonal grid rendering) &#8594; See [PE-2]</p>
+</li>
+<li>
+<p><strong>Security</strong></p>
+</li>
+<li>
+<p>Data Privacy (Password encryption with Bcrypt) &#8594; See [SE-1]</p>
+</li>
+<li>
+<p>Input Validation (Registration integrity) &#8594; See [SE-2]</p>
+</li>
+<li>
+<p><strong>Maintainability &amp; Testability</strong></p>
+</li>
+<li>
+<p>Automated Testing (E2E &amp; Integration with Playwright) &#8594; See [MT-1]</p>
+</li>
+<li>
+<p>Architectural Cleanliness (Layer separation) &#8594; See [MT-2]</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>=== Quality Scenarios</p>
+</div>
+<div class="paragraph">
+<p>The following tables describe specific scenarios that concretize the quality requirements. They detail how the system should react to specific stimuli to ensure the architectural goals are met.</p>
+</div>
+<div class="paragraph">
+<p>==== Usability Scenarios</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ID</th>
+<th class="tableblock halign-left valign-top">Quality Attribute</th>
+<th class="tableblock halign-left valign-top">Scenario Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>US-1</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accessibility</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A colorblind user accesses the settings menu and toggles the "Colorblind mode".<br>
+<strong>Response:</strong> The system immediately updates the color palette across the entire UI (e.g., changing player colors to Orange and White/Blue) without requiring a page reload.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>US-2</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internationalization</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A user selects a different language (e.g., Turkish or English) from the language dialog.<br>
+<strong>Response:</strong> The system applies the selected i18n translation strings instantaneously to all text elements in the interface using the Translation Provider.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>==== Performance Scenarios</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ID</th>
+<th class="tableblock halign-left valign-top">Quality Attribute</th>
+<th class="tableblock halign-left valign-top">Scenario Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PE-1</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AI Response Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A player confirms their move in a match against the bot.<br>
+<strong>Response:</strong> The AI algorithm calculates the counter-move and updates the board state in under 3 seconds to keep the gameplay fluid and engaging.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>PE-2</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UI Responsiveness</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A user navigates from the Main Menu to the Profile Overlay or Game Preview.<br>
+<strong>Response:</strong> The modal opens smoothly and renders the hexagonal grid or user data within 500 milliseconds.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>==== Security Scenarios</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ID</th>
+<th class="tableblock halign-left valign-top">Quality Attribute</th>
+<th class="tableblock halign-left valign-top">Scenario Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>SE-1</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data Privacy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A new user registers using the Sign-Up form.<br>
+<strong>Response:</strong> The backend uses the <code>bcrypt</code> library to securely hash the password before storing it in the PostgreSQL database, ensuring plain-text passwords are never saved.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>SE-2</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Input Integrity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A user attempts to register with an email or username that already exists.<br>
+<strong>Response:</strong> The backend database and API layer reject the insertion, returning a clear validation error to prevent duplicate accounts.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>==== Maintainability &amp; Testability Scenarios</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ID</th>
+<th class="tableblock halign-left valign-top">Quality Attribute</th>
+<th class="tableblock halign-left valign-top">Scenario Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>MT-1</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Automated Testing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A developer modifies the game logic or user registration workflow.<br>
+<strong>Response:</strong> Automated End-to-End (E2E) tests using Playwright and Cucumber spin up isolated Docker databases, execute user flows, and report success or failure, preventing regressions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>MT-2</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Architecture</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Stimulus:</strong> A developer needs to add a new feature to fetch user match history.<br>
+<strong>Response:</strong> The developer can cleanly implement this by adding a specific Query in the Data Access layer (Repository) and validating logic in the Domain layer (Service), adhering to the established layered architecture.</p></td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<div id="section-risks-and-technical-debt" class="paragraph">
+<p>== Risks and Technical Debt</p>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <div class="title">Content</div>
-<p>The quality tree (as defined in ATAM – Architecture Tradeoff Analysis Method) with quality/evaluation scenarios as leafs.</p>
+<p>A list of identified technical risks and technical debt, ordered by priority.</p>
 </div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>The tree structure with priorities provides an overview for a sometimes large number of quality requirements.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>The quality tree is a high-level overview of the quality goals and requirements:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>tree-like refinement of the term "quality". Use "quality" or "usefulness" as a root</p>
-</li>
-<li>
-<p>a mind map with quality categories as main branches</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>In any case the tree should include links to the scenarios of the following section.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
-<div class="sidebarblock arc42help">
+<div class="sidebarblock">
 <div class="content">
 <div class="paragraph">
-<div class="title">Contents</div>
-<p>Concretization of (sometimes vague or implicit) quality requirements using (quality) scenarios.</p>
+<p>=== Risk Mitigation Table</p>
 </div>
-<div class="paragraph">
-<p>These scenarios describe what should happen when a stimulus arrives at the system.</p>
-</div>
-<div class="paragraph">
-<p>For architects, two kinds of scenarios are important:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Usage scenarios (also called application scenarios or use case scenarios) describe the system’s runtime reaction to a certain stimulus. This also includes scenarios that describe the system’s efficiency or performance. Example: The system reacts to a user’s request within one second.</p>
-</li>
-<li>
-<p>Change scenarios describe a modification of the system or of its immediate environment. Example: Additional functionality is implemented or requirements for a quality attribute change.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>Scenarios make quality requirements concrete and allow to
-more easily measure or decide whether they are fulfilled.</p>
-</div>
-<div class="paragraph">
-<p>Especially when you want to assess your architecture using methods like
-ATAM you need to describe your quality goals (from section 1.2)
-more precisely down to a level of scenarios that can be discussed and evaluated.</p>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>Tabular or free form text.</p>
-</div>
-</div>
-</div>
-<div style="page-break-after: always;"></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="section-risks-and-technical-debt">11. Risks and Technical Debt</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_risk_mitigation_table">11.1. Risk Mitigation Table</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -1902,94 +2421,61 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Team Attrition</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maintain clean code and updated documentation so any member can take over.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redistribute tasks among remaining members; focus on MVP features.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Uneven Learning Curves</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Conduct internal "Pair Programming" sessions for difficult modules (Rust).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Reassign tasks based on individual strengths and simplify complexity.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maintain clean code using ESLint/Prettier and updated arc42 documentation so any member can take over.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redistribute tasks among remaining members; focus on MVP features (Game &amp; Login).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Rust Learning Curve</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Use simpler AI strategies (e.g., Random Move) if logic becomes a bottleneck.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Develop small Proof-of-Concepts (POCs) for YEN parsing and AI logic early in the development cycle.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use simpler AI strategies (e.g., Random Move) or move logic to TypeScript if Rust becomes a bottleneck.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Integration Failures</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Define a shared JSON Schema for YEN validation between TS and Rust.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Integration Failures (TS &lt;&#8594; Rust)</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define a shared JSON Schema for YEN validation between the Frontend and the Bot runner.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Hold emergency integration meetings to align data formats and parsers.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Final Exam Pressure</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Set internal deadlines 2 weeks before the official delivery date.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Shift focus to critical bug fixes and mandatory documentation only.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Deployment Failures</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configure and test CI/CD pipelines (GitHub Actions) early to ensure Docker images build correctly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Perform manual deployments to alternative providers (e.g., Fly.io or Render) or local staging.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Deployment Failures</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configure and test CI/CD pipelines (GitHub Actions) in the first month.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Perform manual deployments to alternative providers (e.g., Fly.io or Render).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Scalability of AI</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optimize Bot algorithms (Minimax/Alpha-Beta) to ensure they don&#8217;t exceed the 2-second timeout.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Implement a "Time-Out" safeguard that forces the bot to play a safe heuristic move if time expires.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>External API Dependency</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Abstract the User Management API calls behind a Service Layer to isolate changes.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Create Mock Providers to allow offline development if the backend API is down.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>=== Technical Debt</p>
 </div>
-<div class="sect2">
-<h3 id="_technical_debt">11.2. Technical Debt</h3>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>AI Complexity:</strong> Initial AI versions will use basic heuristics; advanced algorithms are considered debt for later sprints.</p>
+<p><strong>AI Complexity &amp; Heuristics:</strong> Due to time constraints, the initial version of the bot uses basic heuristics for board evaluation. Implementing more advanced search algorithms (like Monte Carlo Tree Search) is documented as technical debt for future iterations.</p>
 </li>
 <li>
-<p><strong>Test Coverage:</strong> Reaching 80% automated coverage is a pending goal while focusing on core features.</p>
+<p><strong>Test Coverage (UI &amp; Edge Cases):</strong> While core logic is tested, reaching 100% coverage for complex UI interactions and rare network failure edge cases is a pending goal. We prioritized "Happy Path" E2E tests using Playwright over exhaustive unit testing of presentational components.</p>
 </li>
 <li>
-<p><strong>YEN Robustness:</strong> Deep validation for malformed JSON from external bots is yet to be fully implemented.</p>
+<p><strong>YEN Robustness:</strong> The current parser assumes valid JSON input for bot moves. Comprehensive validation and "Sanitizing" for malformed or malicious JSON from external bots is yet to be fully implemented, representing a security and stability debt.</p>
+</li>
+<li>
+<p><strong>Database Migration Management:</strong> The current setup relies on manual schema adjustments or basic scripts. Implementing a robust migration tool (like Flyway or Liquibase) to manage PostgreSQL versioning is considered debt to be addressed as the data model grows.</p>
+</li>
+<li>
+<p><strong>Code Duplication in Translation Files:</strong> Some i18n keys are duplicated across similar modals (e.g., "Cancel" buttons). A refactor to centralize common UI strings is planned to improve maintenance.</p>
 </li>
 </ul>
 </div>
 <div style="page-break-after: always;"></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="section-glossary">12. Glossary</h2>
-<div class="sectionbody">
-<div class="sidebarblock arc42help">
-<div class="content">
-<div class="paragraph">
-<div class="title">Contents</div>
-<p>The most important domain and technical terms that your stakeholders use when discussing the system.</p>
-</div>
-<div class="paragraph">
-<p>You can also see the glossary as source for translations if you work in multi-language teams.</p>
-</div>
-<div class="paragraph">
-<div class="title">Motivation</div>
-<p>You should clearly define your terms, so that all stakeholders</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>have an identical understanding of these terms</p>
-</li>
-<li>
-<p>do not use synonyms and homonyms</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<div class="title">Form</div>
-<p>A table with columns &lt;Term&gt; and &lt;Definition&gt;.</p>
-</div>
-<div class="paragraph">
-<p>Potentially more columns in case you need translations.</p>
-</div>
-<div class="paragraph">
-<div class="title">Further Information</div>
-<p>See <a href="https://docs.arc42.org/section-12/">Glossary</a> in the arc42 documentation.</p>
-</div>
-</div>
+<div id="section-glossary" class="paragraph">
+<p>== Glossary</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2004,22 +2490,101 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-1&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>ADR</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em><strong>Architectural Decision Record</strong>. A short text document that captures a significant architecture decision, its context, and its consequences.</em></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-2&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>API</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em><strong>Application Programming Interface</strong>. The set of protocols and definitions used by the Webapp to communicate with the Users and Gamey microservices.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>CI/CD</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em><strong>Continuous Integration / Continuous Deployment</strong>. The automated process of integrating code changes and deploying them to the production environment via GitHub Actions.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Colorblind Mode</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>An accessibility feature that adjusts the game&#8217;s color palette to ensure high contrast for users with color vision deficiencies.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Docker</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A containerization platform used to package and run the system components (Webapp, Users, Gamey, DB) in isolated environments.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Game Y</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The specific hexagonal strategic board game that serves as the core domain for the YOVI suite.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Gamey Engine</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The high-performance microservice developed in <strong>Rust</strong> responsible for game rules, move validation, and AI calculations.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Hexagonal Board</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The game&#8217;s playing surface, composed of hexagonal cells as required by the Game Y specification.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Hint</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A Quality of Life (QoL) feature where the Gamey Engine suggests the optimal next move to the player.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>i18n</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em><strong>Internationalization</strong>. The process of designing the software so it can be adapted to various languages (e.g., Asturian, Turkish, English) without engineering changes.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>JSON</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em><strong>JavaScript Object Notation</strong>. The lightweight data-interchange format used for all internal and external communication.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Micrati</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The organization acting as the primary stakeholder and client for the development of the YOVI system.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Minimax</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A decision-making algorithm used by the AI to determine the best move by minimizing the possible loss for a worst-case scenario.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Playwright</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A testing framework used for End-to-End (E2E) testing to simulate user behavior in the browser.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>PostgreSQL</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The relational database management system used to store user profiles, match history, and leaderboard statistics.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Rust</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A systems programming language focused on safety and performance, used for the core Gamey logic.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>TypeScript</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A strongly typed superscript of JavaScript used for the Frontend (React) and the Users Service (Node.js).</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Users Service</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The Node.js microservice dedicated to managing user authentication, registration, and persistent statistics.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Webapp</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The React-based frontend that provides the User Interface and exposes the REST API for external bots.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Winrate</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The primary metric used for the ranking system, calculated as the ratio of games won to total games played.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>YEN Notation</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>The specific JSON-based communication standard defined for this project to exchange board states and moves between services.</em></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2026-01-29 14:15:54 +0100
+Last updated 2026-03-26 00:24:44 +0100
 </div>
 </div>
 </body>
