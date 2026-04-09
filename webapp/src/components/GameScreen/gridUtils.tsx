@@ -1,3 +1,28 @@
+/**
+ *        (2,0,0)          <-- Top
+ *         /   \
+ *    (1,1,0) (1,0,1)      <-- Row 1
+ *     /   \   /   \
+ * (0,2,0) (0,1,1) (0,0,2)  <-- Base
+ *
+ * Summary:
+ * - x=0: Base
+ * - y=0: Left side
+ * - z=0: Right side
+ */
+
+
+/**
+ *              [ q:0, r:-2 ]                 <-- Top
+ *                 /    \
+ *      [ q:-1, r:-1 ] [ q:0, r:-1 ]          <-- Row 1
+ *          /    \         /    \
+ * [ q:-2, r:0 ] [ q:-1, r:0 ] [ q:0, r:0 ]   <-- Base
+ *
+ * "r" -> row (inverted)
+ * "q" -> 'column' (inverted)
+ */
+
 export interface Cell {
   x: number;
   y: number;

@@ -13,17 +13,14 @@ interface GamePreviewProps {
 
 const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart }) => {
   const { t } = useI18n(); 
-  const { colorBlindMode } = useSettings(); // Obtenemos el estado daltónico
+  const { colorBlindMode, playSound } = useSettings(); 
   const [boardSize, setBoardSize] = useState(5);
   const [difficulty, setDifficulty] = useState(1);
   const [selectedBot, setSelectedBot] = useState(0);
 
   if (!isOpen) return null;
 
-  // El color de acento ahora se maneja principalmente por CSS, 
-  // pero lo usamos aquí para los iconos de Lucide-React.
   const accentColor = colorBlindMode ? "#f59e0b" : "#60a5fa";
-
   const totalCells = (boardSize * (boardSize + 1)) / 2;
   
   const calculateSeconds = () => {
@@ -55,21 +52,20 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      {/* Añadimos la clase color-blind condicionalmente aquí */}
+    <div className="preview-modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
       <div 
-        className={`modal-content preview-modal-wide ${colorBlindMode ? 'color-blind' : ''}`} 
+        className={`preview-modal-content preview-modal-wide ${colorBlindMode ? 'color-blind' : ''}`} 
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="boton-cerrar-fijo" onClick={onClose}>&times;</button>
-        <h2 className="modal-title h2-preview-title">{t.labels.preview}</h2>
+        <button className="preview-close-btn" onClick={() => { playSound('click.mp3'); onClose(); }}>&times;</button>
+        <h2 className="preview-modal-title modal-title h2-preview-title">{t.labels.preview}</h2>
 
         <div className="preview-layout">
           <div className="preview-left-column">
             <p className="p-time-limit-top">{t.labels.timeLimit}: {formatTime(calculateSeconds())}</p>
             
             <div className="visual-preview-area">
-               {renderTriangle()}
+                {renderTriangle()}
             </div>
           </div>
 
@@ -79,13 +75,13 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
               <div className="bot-selector">
                 <button 
                   className={`bot-btn ${selectedBot === 0 ? 'active' : ''}`} 
-                  onClick={() => setSelectedBot(0)}
+                  onClick={() => { playSound('click.mp3'); setSelectedBot(0); }}
                 >
                   <Bot size={48} color={selectedBot === 0 ? accentColor : "#fff"} />
                 </button>
                 <button 
                   className={`bot-btn ${selectedBot === 1 ? 'active' : ''}`} 
-                  onClick={() => setSelectedBot(1)}
+                  onClick={() => { playSound('click.mp3'); setSelectedBot(1); }}
                 >
                   <Cpu size={48} color={selectedBot === 1 ? accentColor : "#fff"} />
                 </button>
@@ -93,39 +89,44 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
             </div>
 
             <div className="setting-control">
-              <label className="label-white-bold">{t.labels.difficulty}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="2" 
-                value={difficulty} 
-                onChange={(e) => setDifficulty(parseInt(e.target.value))} 
-                className="neon-slider" 
-              />
-              <div className="slider-labels-below">
-                <span className={difficulty === 0 ? 'active' : ''}>{t.buttons.easy}</span>
-                <span className={difficulty === 1 ? 'active' : ''}>{t.buttons.medium}</span>
-                <span className={difficulty === 2 ? 'active' : ''}>{t.buttons.hard}</span>
-              </div>
-            </div>
+  <label className="label-white-bold">{t.labels.difficulty}</label>
+  <div className="difficulty-slider-container">
+    <input 
+      type="range" 
+      min="0" 
+      max="2" 
+      value={difficulty} 
+      onChange={(e) => setDifficulty(parseInt(e.target.value))} 
+      className="neon-slider" 
+    />
+    <div className="slider-labels-below">
+      <span className={difficulty === 0 ? 'active' : ''}>{t.buttons.easy}</span>
+      <span className={difficulty === 1 ? 'active' : ''}>{t.buttons.medium}</span>
+      <span className={difficulty === 2 ? 'active' : ''}>{t.buttons.hard}</span>
+    </div>
+  </div>
+</div>
 
             <div className="setting-control">
               <label className="label-white-bold">{t.labels.boardSize}</label>
               <div className="stepper-horizontal">
-                <button className="step-btn" onClick={() => setBoardSize(Math.max(3, boardSize - 1))}>-</button>
+                <button className="step-btn" onClick={() => { playSound('click.mp3'); setBoardSize(Math.max(3, boardSize - 1)); }}>-</button>
                 <span className="stepper-value">{boardSize}</span>
-                <button className="step-btn" onClick={() => setBoardSize(Math.min(10, boardSize + 1))}>+</button>
+                <button className="step-btn" onClick={() => { playSound('click.mp3'); setBoardSize(Math.min(10, boardSize + 1)); }}>+</button>
               </div>
             </div>
 
             <button 
-              className="main-button btn-blue btn-play-now-preview" 
-              onClick={() => onStart({ 
-                size: boardSize, 
-                difficulty, 
-                botType: selectedBot === 0 ? 'robot' : 'chip', 
-                time: calculateSeconds() 
-              })}
+              className="main-button btn-blue btn-play-now-preview preview-play-btn" 
+              onClick={() => {
+                playSound('click.mp3');
+                onStart({ 
+                  size: boardSize, 
+                  difficulty, 
+                  botType: selectedBot === 0 ? 'robot' : 'chip', 
+                  time: calculateSeconds() 
+                });
+              }}
             >
               {t.buttons.playNow}
             </button>

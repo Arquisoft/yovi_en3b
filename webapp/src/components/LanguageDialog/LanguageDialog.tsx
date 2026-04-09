@@ -11,22 +11,31 @@ interface LanguageDialogProps {
 
 export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose }) => {
   const { t, language, setLanguage } = useI18n();
-  const { colorBlindMode } = useSettings(); // Accedemos al estado daltónico
+  const { colorBlindMode, playSound } = useSettings(); // Accedemos al estado daltónico y a playSound
 
   if (!open) return null;
 
-  const handleLanguageChange = (lang: 'es' | 'en') => {
+  const handleLanguageChange = (lang: 'es' | 'en' | 'tr') => {
+    playSound('click.mp3'); // Sonido al elegir un idioma
     setLanguage(lang);
     onClose();
   };
 
   return (
-    <div className="language-overlay" onClick={onClose}>
+    <div className="language-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
       <div 
         className={`language-modal ${colorBlindMode ? 'color-blind' : ''}`} 
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="close-x-lang" onClick={onClose}>&times;</button>
+        <button 
+          className="close-x-lang" 
+          onClick={() => {
+            playSound('click.mp3'); // Sonido al cerrar con la X
+            onClose();
+          }}
+        >
+          &times;
+        </button>
         <h2 className="language-title">{t.messages.selectLanguage}</h2>
         <div className="language-options">
           <button
@@ -40,6 +49,12 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
             onClick={() => handleLanguageChange('en')}
           >
             {t.buttons.english}
+          </button>
+          <button
+            className={`btn-lang-white ${language === 'tr' ? 'active' : ''}`}
+            onClick={() => handleLanguageChange('tr')}
+          >
+            {t.buttons.turkish}
           </button>
         </div>
       </div>

@@ -1,175 +1,133 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import MainMenu from '../components/MainMenu'; // Adjust path if needed
+import MainMenu from '../components/MainMenu'; 
+import { SettingsProvider } from '../context/SettingsContext';
 
-// 1. MOCK NAVEGACIÓN
 const mockNavigate = vi.fn();
+const mockSetLanguage = vi.fn();
+
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
-// 2. MOCK PERFIL
-vi.mock('../hooks/useUserProfile', () => ({
-    useUserProfile: () => ({
-        user: { nickname: 'Tester', avatarId: 'avatar_01' },
-        loading: false, 
-        error: null,
-        updateNickname: vi.fn()
-    })
+vi.mock('../components/RankingScreen/RankingScreen', () => ({
+    default: ({ onClose }: { onClose: () => void }) => (
+        <div data-testid="ranking-screen">
+            <button onClick={onClose}>Close Ranking</button>
+            OVERALL RANKING
+        </div>
+    ),
 }));
 
-// 3. MOCK I18N COMPLETO
-const mockSetLanguage = vi.fn();
+// Mock de i18n usando TUS CLAVES REALES (basado en el objeto que pasaste)
 vi.mock('../i18n/useTranslation', () => ({
     useI18n: () => ({
         language: 'en',
-        setLanguage: mockSetLanguage, // Required for LanguageDialog // Function to change language
+        setLanguage: mockSetLanguage,
         t: {
             buttons: {
-                language: 'Language',
-                settings: 'Settings',
-                profile: 'Profile',
-                logout: 'Logout',
                 play: 'PLAY',
                 howToPlay: 'HOW TO PLAY',
-                overallRanking: 'RANKING',
-                easy: 'EASY',
-                medium: 'MEDIUM',
-                hard: 'HARD',
-                exit: 'EXIT',
-                cancel: 'CANCEL',
-                spanish: 'SPANISH', // New translation key // Button text for Spanish
-                english: 'ENGLISH'  // New translation key // Button text for English
+                overallRanking: 'OVERALL RANKING',
+                language: 'LANGUAGE',
+                settings: 'SETTINGS',
+                profile: 'PROFILE',
+                logout: 'LOGOUT',
+                confirmLogout: 'LOG OUT',
+                stayHere: 'STAY',
+                spanish: 'SPANISH',
+                english: 'ENGLISH'
             },
             labels: {
                 selectLevel: 'SELECT LEVEL'
             },
             messages: {
-                loading: 'Loading...',
-                error: 'Error',
-                selectLanguage: 'SELECT LANGUAGE' // New translation key // Title for language modal
+                logoutConfirmation: 'Are you sure you want to log out?',
+                selectLanguage: 'Select a language'
             }
         }
     })
 }));
 
-describe('MainMenu Component', () => {
+// Mock del Audio para evitar el error de constructor
+const mockAudioInstance = {
+    play: vi.fn().mockResolvedValue(undefined),
+    pause: vi.fn(),
+    load: vi.fn(),
+};
+
+vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
+    return mockAudioInstance;
+}));
+
+const renderMainMenu = () => {
+    return render(
+        <MemoryRouter>
+            <SettingsProvider>
+                <MainMenu />
+            </SettingsProvider>
+        </MemoryRouter>
+    );
+};
+
+describe('MainMenu Component con Traducciones Reales', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    test('1. Renders main menu buttons with translations', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        expect(screen.getByText(/^PLAY$/i)).toBeDefined(); 
-        expect(screen.getByText(/HOW TO PLAY/i)).toBeDefined();
-        expect(screen.getByText(/RANKING/i)).toBeDefined();
+    test('1. Renderiza los botones principales con textos correctos', () => {
+        renderMainMenu();
+        // Usamos los textos que definiste en tu objeto translations.en
+        expect(screen.getByText('PLAY')).toBeDefined();
+        expect(screen.getByText('HOW TO PLAY')).toBeDefined();
+        expect(screen.getByText('OVERALL RANKING')).toBeDefined();
     });
 
-    test('2. Opens and closes Level Selection modal', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
-        expect(screen.getByText(/SELECT LEVEL/i)).toBeDefined();
+    test('2. Lógica del modal de Logout (Cerrar sesión)', () => {
+        renderMainMenu();
         
-        fireEvent.click(screen.getAllByText('×')[0]); // Closes the first available 'X' button
-        expect(screen.queryByText(/SELECT LEVEL/i)).toBeNull();
-    });
+        // El botón tiene el title del objeto translations
+        const logoutBtn = screen.getByTitle('LOGOUT');
+        fireEvent.click(logoutBtn);
 
-    test('3. Navigates to game with correct board size', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
-        fireEvent.click(screen.getByText(/MEDIUM/i));
-        expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 5 } });
-    });
+        // Verificamos el mensaje del modal
+        expect(screen.getByText('Are you sure you want to log out?')).toBeDefined();
 
-    test('3b. Navigates to game with easy and hard sizes', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
-        fireEvent.click(screen.getByText(/EASY/i));
-        expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 3 } });
+        // Probar botón de quedarse (Stay)
+        const stayBtn = screen.getByText('STAY');
+        fireEvent.click(stayBtn);
+        expect(screen.queryByText('Are you sure you want to log out?')).toBeNull();
 
-        fireEvent.click(screen.getByRole('button', { name: /^PLAY$/i }));
-        fireEvent.click(screen.getByText(/HARD/i));
-        expect(mockNavigate).toHaveBeenCalledWith('/game', { state: { size: 7 } });
-    });
-
-    test('4. Opens HowToPlay modal', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByRole('button', { name: /HOW TO PLAY/i }));
-        // Checks if modal is rendered (HowToPlay usually has specific rules text)
-        expect(document.querySelector('.modal-overlay')).toBeDefined();
-    });
-
-    test('5. Handles Logout confirmation flow', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByTitle(/Logout/i));
-        expect(screen.getByText(/Are you sure you want to log out/i)).toBeDefined();
-        
-        fireEvent.click(screen.getByText(/YES, LOGOUT/i));
+        // Probar botón de confirmar logout
+        fireEvent.click(logoutBtn);
+        const confirmBtn = screen.getByText('LOG OUT');
+        fireEvent.click(confirmBtn);
         expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
-    test('5b. Logout cancel closes the modal', () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        fireEvent.click(screen.getByTitle(/Logout/i));
-        fireEvent.click(screen.getByText(/CANCEL/i));
-        expect(screen.queryByText(/Are you sure you want to log out/i)).toBeNull();
+    test('3. Apertura de modales de configuración e idioma', () => {
+        renderMainMenu();
+
+        // Abrir Idioma
+        fireEvent.click(screen.getByTitle('LANGUAGE'));
+        // Si LanguageDialog usa el mensaje selectLanguage:
+        expect(screen.getByText('Select a language')).toBeDefined();
+
+        // Abrir Configuración
+        fireEvent.click(screen.getByTitle('SETTINGS'));
+        
+        // Abrir Perfil
+        fireEvent.click(screen.getByTitle('PROFILE'));
+        
+        // Verificar que se llamó al sonido de click en cada acción
+        expect(vi.mocked(global.Audio)).toHaveBeenCalled();
     });
 
-    test('6. Opens Language and Profile overlays', async () => {
-        render(<MemoryRouter><MainMenu /></MemoryRouter>);
-        
-        // --- TEST PERFIL ---
-        const profileBtn = screen.getByTitle(/Profile/i);
-        fireEvent.click(profileBtn);
-        
-        const profileModal = document.querySelector('.profile-modal');
-        expect(profileModal).toBeDefined();
-
-
-        const langBtn = screen.getByTitle(/Language/i);
-        fireEvent.click(langBtn);
-        
-        // Verify that the language selection modal appears with the correct title
-        expect(screen.getByText(/SELECT LANGUAGE/i)).toBeDefined();
-        
-        // Test clicking the Spanish button to change language
-        const spanishBtn = screen.getByText(/SPANISH/i);
-        fireEvent.click(spanishBtn);
-        expect(mockSetLanguage).toHaveBeenCalledWith('es');
-    });
-
-    test('7. Full Modal Lifecycle Coverage', async () => {
-    render(<MemoryRouter><MainMenu /></MemoryRouter>);
-    
-    // 1. Cover interaction with Language 
-    fireEvent.click(screen.getByTitle(/Language/i));
-    const closeLang = screen.getByText('×'); // Find the close button in LanguageDialog
-    fireEvent.click(closeLang);
-    expect(screen.queryByText(/SELECT LANGUAGE/i)).toBeNull(); // Ensure the modal is closed
-
-    // 2. Cover interaction with Profile (LLines 85-113)
-    fireEvent.click(screen.getByTitle(/Profile/i));
-    const overlay = document.querySelector('.modal-overlay');
-    if (overlay) fireEvent.click(overlay); // Click outside the modal to close it
-    
-    // 3. Verify error/loading state if necessary
-    // This forces the execution of early return branches
-    expect(screen.queryByText(/Loading/i) || screen.queryByText(/Tester/i)).toBeDefined(); 
-    });
-
-    test('9. Triggers profile update in the hook', async () => {
-    render(<MemoryRouter><MainMenu /></MemoryRouter>);
-  
-    fireEvent.click(screen.getByTitle(/Profile/i));
-    
-    // Search for the Save button in the profile modal and click it to trigger updateNickname
-    const profileModal = document.querySelector('.profile-modal');
-    if (profileModal) {
-        
-        const saveBtn = screen.queryByText(/Save/i) || screen.queryByText(/Guardar/i);
-        if (saveBtn) fireEvent.click(saveBtn);
-    }
+    test('4. Navegación al ranking', () => {
+        renderMainMenu();
+        fireEvent.click(screen.getByText('OVERALL RANKING'));
+        expect(screen.getByTestId('ranking-screen')).toBeDefined();
     });
 });

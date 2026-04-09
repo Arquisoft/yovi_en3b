@@ -3,7 +3,7 @@ const userDto = require('../domain/userDTO');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
-// In case of a successful creation, a message is returned.
+// In case of a successful creation, the user object is returned.
 // STATUS:
     //201: resource successfully created
     //400: input error
@@ -11,14 +11,14 @@ const userDto = require('../domain/userDTO');
 const createUser = async (req, res) => {
     try {
         const result = await userService.createUser(req.body);
-        const message = `Welcome ${result.username}`;
-        res.status(201).json({message});
+        res.type('application/json').status(201).send(JSON.stringify(userDto.toUserResponseDto(result)));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields" || error.message.includes("already exists")||error.message.includes("password")) {
-            return res.status(400).json({ error: error.message });
+            res.type('application/json').status(400).send(JSON.stringify({ error: error.message }));
+        } else {
+            res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
         }
-        return res.status(500).json({ error: "Internal server error"});
     }
 };
 
@@ -32,17 +32,17 @@ const createUser = async (req, res) => {
 const findUserByUsername = async (req, res) => {
     try {
         const user =await userService.findUserByUsername(req.query);
-        res.status(200).json(userDto.toUserResponseDto(user));
+        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "The username is required") {
-            return res.status(400).json({ error: error.message });
+            return res.type('application/json').status(400).send(JSON.stringify({ error: error.message }));
         }
         
         if (error.message === "User not found") {
-            return res.status(404).json({ error: error.message });
+            return res.type('application/json').status(404).send(JSON.stringify({ error: error.message }));
         }
-        return res.status(500).json({ error: "Internal server error"});
+        return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
 
@@ -56,17 +56,17 @@ const findUserByUsername = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const user =await userService.loginUser(req.body);
-        res.status(200).json(userDto.toUserResponseDto(user));
+        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields") {
-            return res.status(400).json({ error: error.message });
+            return res.type('application/json').status(400).send(JSON.stringify({ error: error.message }));
         }
         
         if (error.message === "Invalid username or password") {
-            return res.status(401).json({ error: error.message });
+            return res.type('application/json').status(401).send(JSON.stringify({ error: error.message }));
         }
-        return res.status(500).json({ error: "Internal server error"});
+        return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
 
@@ -79,13 +79,13 @@ const loginUser = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const user =await userService.changePassword(req.body);
-        res.status(200).json(userDto.toUserResponseDto(user));
+        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "Invalid username or password") {
-            return res.status(401).json({ error: error.message });
+            return res.type('application/json').status(401).send(JSON.stringify({ error: error.message }));
         }
-        return res.status(500).json({ error: "Internal server error"});
+        return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
 // POST /users/changeNickname
@@ -97,31 +97,13 @@ const changePassword = async (req, res) => {
 const changeNickname = async (req, res) => {
     try {
         const user =await userService.changeNickname(req.body);
-        res.status(200).json(userDto.toUserResponseDto(user));
+        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "User not found") {
-            return res.status(404).json({ error: error.message });
+            return res.type('application/json').status(404).send(JSON.stringify({ error: error.message }));
         }
-        return res.status(500).json({ error: "Internal server error"});
-    }
-};
-// POST /users/changePhoto
-//Changes the photo of the indicated user
-// STATUS:
-    //200: resource successfully updated
-    //404: resource not found 
-    //500: server error
-const changePhoto = async (req, res) => {
-    try {
-        const user =await userService.changePhoto(req.body);
-        res.status(200).json(userDto.toUserResponseDto(user));
-    } catch (error) {
-        console.log(error);
-        if (error.message === "User not found") {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: "Internal server error"});
+        return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
 
@@ -130,6 +112,5 @@ module.exports = {
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname,
-    changePhoto
+    changeNickname
 };

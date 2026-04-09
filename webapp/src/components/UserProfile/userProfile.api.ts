@@ -1,57 +1,95 @@
 import type { UserProfile, UserRanking } from "./userProfile.type";
 
-/**
- * Mocked profile stored in-memory. Replace with real API calls later.
- */
-let MOCK_PROFILE: UserProfile = {
-  id: "user-001",
-  username: "UO277488",
-  displayName: "Player One",
-  avatarId: "avatar_01",
-};
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-let MOCK_RANKING: UserRanking = {
+export const FALLBACK_RANKING: UserRanking = {
   position: 57,
   totalPlayers: 161,
 };
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 export async function getMyProfile(): Promise<UserProfile> {
-  await sleep(250);
+  const username = localStorage.getItem("username");
+  const res = await fetch(`${API_URL}/users/findUserByUsername?username=${username}`, {
+    method: "GET",
+  });
 
-  // TODO: BACKEND - Replace the mock with a real API call:
-  // const res = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, { credentials: "include" });
-  // if (!res.ok) throw new Error("Failed to load profile");
-  // return await res.json();
+  // If there was an error getting the user data
+  if (!res.ok) {
+    throw new Error("Could not load the profile");
+  }
 
-  return structuredClone(MOCK_PROFILE);
+  // If the user data was retrieved
+  const data = await res.json();
+  return {
+    id: data.id || data._id || "no-id",
+    username: data.username,
+    displayName: data.nickname || data.username,
+    avatarId: data.avatarId || data.photo || "avatar_01"
+  };
 }
 
-export async function updateMyProfile(patch: Partial<Pick<UserProfile, "displayName" | "avatarId">>): Promise<UserProfile> {
-  await sleep(250);
 
-  // TODO: BACKEND - Replace the mock with a real API call:
-  // const res = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
-  //   method: "PATCH",
-  //   headers: { "Content-Type": "application/json" },
-  //   credentials: "include",
-  //   body: JSON.stringify(patch),
-  // });
-  // if (!res.ok) throw new Error("Failed to update profile");
-  // return await res.json();
+export async function updateMyProfile(patch: { displayName: string, avatarId: string }): Promise<UserProfile> {
+  const username = localStorage.getItem('username');
 
-  MOCK_PROFILE = { ...MOCK_PROFILE, ...patch };
-  return structuredClone(MOCK_PROFILE);
+  const res = await fetch(`${API_URL}/users/changeNickname`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: localStorage.getItem('username'),
+      nickname: patch.displayName,
+      photo: patch.avatarId
+    }),
+  });
+  if (!res.ok) throw new Error("Error changing the nickname");
+
+  const data = await res.json();
+  return {
+    id: data.id || data._id || "no-id",
+    username: username || "user",
+    displayName: data.nickname || patch.displayName,
+    avatarId: data.avatarId || data.photo || patch.avatarId
+  };
 }
 
-export async function getMyRanking(): Promise<UserRanking> {
-  await sleep(200);
 
-  // TODO: BACKEND - Replace with a ranking service call:
-  // const res = await fetch(`${import.meta.env.VITE_API_URL}/ranking/me`, { credentials: "include" });
-  // if (!res.ok) throw new Error("Failed to load ranking");
-  // return await res.json();
+export async function getMyRanking(userId?: string): Promise<UserRanking> {
+  if (!userId) {
+    const profile = await getMyProfile();
+    userId = profile.id;
+  }
 
-  return structuredClone(MOCK_RANKING);
+  const res = await fetch(`${API_URL}/ranking/me?userId=${userId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Could not load the ranking");
+  }
+
+  return res.json();
 }
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  const username = localStorage.getItem('username');
+
+  const res = await fetch(`${API_URL}/users/changePassword`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ 
+      username: username,
+      currentPassword: currentPassword, 
+      newPassword: newPassword 
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Error changing password. Check your current password.");
+  }
+} 

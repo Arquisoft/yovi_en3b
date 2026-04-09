@@ -30,16 +30,18 @@ const updateUserNickname = async (username, nickname) => {
     const result = await db.query(queries.updateUserNickname, [nickname, username]);
     return result.rows[0];
 }
-//Changes the photo of the user
-const updateUserPhoto = async (username, photo) => {
-    const result = await db.query(queries.updateUserPhoto, [photo, username]);
+
+//Changes the nickname and photo of the user
+const updateUserNicknameAndPhoto = async (username, nickname, photo) => {
+    const result = await db.query(queries.updateUserNicknameAndPhoto, [nickname, photo, username]);
     return result.rows[0];
 }
+
 module.exports = {
     createUser,
     findUserByUsername,
     findUserByEmail,
     updateUserPassword,
     updateUserNickname,
-    updateUserPhoto
+    updateUserNicknameAndPhoto
 };

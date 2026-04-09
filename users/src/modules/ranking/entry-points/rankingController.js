@@ -33,4 +33,29 @@ const get = async (req, res) => {
   }
 };
 
-module.exports = { add, update, get };
+const getMyRankingPosition = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+    const result = await rankingService.getUserRankingPosition(userId);
+    if (!result) {
+      return res.status(404).json({ error: 'User not found in rankings' });
+    }
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const getGlobalRanking = async (_req, res) => {
+  try {
+    const result = await rankingService.getGlobalRanking();
+    res.json({ ranking: result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { add, update, get, getMyRankingPosition, getGlobalRanking };

@@ -1,97 +1,301 @@
-/* UBICACIÓN: webapp/src/components/HowToPlay/HowToPlay.css */
+/* ===== Overlay específico del HowToPlay ===== */
+.modal-overlay {
+  --howto-overlay-pad: clamp(0.75rem, 3vh, 1.5rem);
+  position: fixed;
+  inset: 0;
+  min-height: 100dvh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(0.5rem);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: var(--howto-overlay-pad);
+  z-index: 1000;
+  box-sizing: border-box;
+}
 
-/* --- VARIABLES DE COLOR --- */
+/* ===== Variables de color ===== */
 .how-to-play-modal {
-    --p1-piece: #60a5fa; /* Azul estándar */
-    --p2-piece: #ef4444; /* Rojo estándar */
-    --accent-ui: #60a5fa;
+  --p1-piece: #60a5fa;
+  --p2-piece: #ef4444;
+  --accent-ui: var(--game-accent, #60a5fa);
 }
 
-/* --- CAMBIO A MODO DALTÓNICO --- */
+/* ===== Modo daltónico ===== */
 .how-to-play-modal.color-blind {
-    --p1-piece: #f59e0b; /* Naranja */
-    --p2-piece: #ffffff; /* Blanco */
-    --accent-ui: #f59e0b;
+  --p1-piece: #f59e0b;
+  --p2-piece: #ffffff;
+  --accent-ui: #f59e0b;
 }
 
-.how-to-play-modal { 
+/* ===== Modal base ===== */
+.modal-content.how-to-play-modal {
   position: relative !important;
-  width: min(500px, 95vw) !important; 
-  padding: 40px !important; 
+  width: min(100%, 31.25rem) !important;
+  max-height: calc(100dvh - (var(--howto-overlay-pad) * 2));
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 3.8rem 1rem 1rem !important;
   background: rgba(15, 23, 42, 0.95) !important;
-  border: 2px solid var(--accent-ui) !important; /* Borde dinámico */
-  border-radius: 30px !important;
+  border: 0.125rem solid var(--accent-ui) !important;
+  border-radius: 1.875rem !important;
+  box-shadow:
+    0 0 1.25rem color-mix(in srgb, var(--accent-ui) 30%, transparent),
+    0 1.25rem 2.5rem -0.75rem rgba(0, 0, 0, 0.7);
+  margin: 0 auto 1rem !important;
 }
 
-/* Títulos de pasos dinámicos */
-.step-text h3 { 
-    font-size: 0.95rem; 
-    color: var(--accent-ui) !important; /* Título dinámico */
-    margin: 0; 
-    text-transform: uppercase; 
-}
-
-/* Iconos de pasos dinámicos */
-.step-icon { 
-    background: var(--accent-ui); /* Fondo icono dinámico */
-    padding: 10px; 
-    border-radius: 50%; 
-    display: flex; 
-    color: white; 
-}
-
-.triangle-frame { 
-  padding: 15px 25px;
-  border: 2px solid var(--accent-ui); /* Borde dibujo dinámico */
-  border-radius: 15px; 
-  background: rgba(0,0,0,0.4); 
-  box-shadow: 0 0 15px var(--accent-ui);
-}
-
-/* --- PIEZAS DEL TABLERO DE EJEMPLO --- */
-.ball { 
-  width: 14px;
-  height: 14px; 
-  border-radius: 50%; 
-  transition: background 0.4s ease; /* Transición suave al cambiar modo */
-}
-
-/* Clases genéricas que ahora usan las variables */
-.ball.p1-color { 
-    background: var(--p1-piece); 
-    filter: drop-shadow(0 0 5px var(--p1-piece));
-}
-.ball.p2-color { 
-    background: var(--p2-piece); 
-    filter: drop-shadow(0 0 5px var(--p2-piece));
-}
-
-/* El resto del CSS se mantiene igual... */
-.how-to-play-modal h3, .how-to-play-modal p, .how-to-play-modal .step-number, .how-to-play-modal {
+/* ===== Tipografía ===== */
+.how-to-play-modal,
+.how-to-play-modal h3,
+.how-to-play-modal p,
+.how-to-play-modal .step-number {
   font-family: 'Orbitron', sans-serif !important;
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
 }
-.board-container { display: flex; justify-content: center; margin-bottom: 15px; }
-.balls-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 6px; }
-.instructions-list { display: flex; flex-direction: column; gap: 15px; text-align: left; margin-bottom: 25px; }
-.step-card { 
-  display: flex; align-items: center; gap: 15px; padding: 15px;
-  background: rgba(255,255,255,0.05); border-radius: 15px; 
-  border: 1px solid rgba(96, 165, 250, 0.2); position: relative;
+
+/* ===== Title con Cubic ===== */
+.how-to-play-modal .modal-title,
+.how-to-play-modal h2.modal-title,
+.modal-content.how-to-play-modal h2 {
+  font-family: 'Cubic', sans-serif !important;
+  color: var(--accent-ui) !important;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: var(--text-shadow);
+  font-size: clamp(1.45rem, 4vw, 2.1rem) !important;
+  line-height: 1.05;
+  margin: 0 0 1rem !important;
+  padding: 0 2.8rem !important;
+  word-break: break-word;
 }
-.step-number { 
-  position: absolute; top: -10px; left: -10px; background: #ef4444; 
-  width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center;
-  font-size: 0.8rem; font-weight: bold; color: white;
+
+/* ===== Botón cerrar ===== */
+.how-to-play-modal .boton-cerrar-fijo {
+  position: absolute !important;
+  top: 0.55rem !important;
+  right: 0.75rem !important;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--accent-ui) !important;
+  font-size: 2.2rem !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  z-index: 10;
+  text-shadow: var(--text-shadow);
 }
-.step-text p { font-size: 0.85rem; color: #94a3b8; margin: 5px 0 0 0; line-height: 1.4; }
+
+.how-to-play-modal .boton-cerrar-fijo:hover {
+  color: #ffffff !important;
+}
+
+/* ===== Board preview ===== */
+.board-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.triangle-frame {
+  padding: 0.72rem 1.05rem;
+  border: 0.125rem solid var(--accent-ui);
+  border-radius: 0.9375rem;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--accent-ui) 70%, transparent);
+}
+
+.balls-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.24rem;
+}
+
+.ball {
+  width: 0.78rem;
+  height: 0.78rem;
+  border-radius: 50%;
+  transition: background 0.4s ease;
+}
+
+.ball.p1-color {
+  background: var(--p1-piece);
+  filter: drop-shadow(0 0 0.3125rem var(--p1-piece));
+}
+
+.ball.p2-color {
+  background: var(--p2-piece);
+  filter: drop-shadow(0 0 0.3125rem var(--p2-piece));
+}
+
+/* ===== Instructions ===== */
+.instructions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  text-align: left;
+  margin-bottom: 0.95rem;
+}
+
+.step-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.78rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.9375rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--accent-ui) 28%, transparent);
+  position: relative;
+}
+
+.step-number {
+  position: absolute;
+  top: -0.5rem;
+  left: -0.5rem;
+  background: #ef4444;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+}
+
+.step-icon {
+  background: var(--accent-ui);
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  color: white;
+  flex-shrink: 0;
+}
+
+.step-text h3 {
+  font-size: 0.86rem;
+  color: var(--accent-ui) !important;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.08;
+}
+
+.step-text p {
+  font-size: 0.79rem;
+  color: #94a3b8;
+  margin: 0.2rem 0 0 0;
+  line-height: 1.32;
+}
+
+/* ===== Video resource ===== */
+.video-resource {
+  margin-top: 0.7rem;
+  padding: 0.58rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.video-resource .confirm-text {
+  font-size: 0.85rem !important;
+  margin: 0 0 0.45rem 0 !important;
+  color: #fafafa !important;
+  font-family: 'Orbitron', sans-serif !important;
+}
+
+.video-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--accent-ui);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  transition: 0.3s;
+}
+
+.video-link-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* ===== Understood button ===== */
 .understood-btn {
-  width: 100% !important; height: 48px !important; padding: 0 !important;
-  margin-top: 10px !important; display: flex !important; align-items: center !important;
-  justify-content: center !important; font-size: 1rem !important; font-weight: 700;
-  border-radius: 12px !important; cursor: pointer; transition: transform 0.2s ease;
-  font-family: 'Orbitron', sans-serif !important; letter-spacing: 3px;
+  width: 100% !important;
+  min-height: 2.65rem !important;
+  height: 2.65rem !important;
+  padding: 0 !important;
+  margin-top: 0.8rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.95rem !important;
+  font-weight: 700;
+  border-radius: 0.75rem !important;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 0.14rem;
 }
-.understood-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-.video-resource { margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center; }
-.video-link-btn { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; color: var(--accent-ui); font-family: 'Orbitron', sans-serif; font-size: 0.8rem; transition: 0.3s; }
+
+.understood-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 40rem) {
+  .modal-content.how-to-play-modal {
+    width: min(100%, 28rem) !important;
+    padding: 3.4rem 0.9rem 0.9rem !important;
+  }
+
+  .how-to-play-modal .modal-title,
+  .how-to-play-modal h2.modal-title,
+  .modal-content.how-to-play-modal h2 {
+    font-size: 1.3rem !important;
+    padding: 0 2.3rem !important;
+  }
+
+  .how-to-play-modal .boton-cerrar-fijo {
+    top: 0.45rem !important;
+    right: 0.65rem !important;
+    font-size: 2rem !important;
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .step-card {
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.72rem;
+  }
+
+  .step-icon {
+    flex-shrink: 0;
+  }
+
+  .step-text h3 {
+    font-size: 0.8rem;
+  }
+
+  .step-text p {
+    font-size: 0.75rem;
+  }
+
+  .triangle-frame {
+    padding: 0.62rem 0.88rem;
+  }
+
+  .ball {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+}
