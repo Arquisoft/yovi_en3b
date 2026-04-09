@@ -1,5 +1,6 @@
 const userService = require('../domain/userService');
 const userDto = require('../domain/userDTO');
+const { generateUserToken } = require('../../../auth/authUtils');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
@@ -56,6 +57,8 @@ const findUserByUsername = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const user =await userService.loginUser(req.body);
+        const token = generateUserToken(user)
+        res.setHeader('Authorization', `Bearer ${token}`);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
@@ -78,7 +81,8 @@ const loginUser = async (req, res) => {
     //500: server error
 const changePassword = async (req, res) => {
     try {
-        const user =await userService.changePassword(req.body);
+        const data = {id: req.user.id, username: req.user.username, currentPassword: req.body.currentPassword, newPassword: req.body.newPassword};
+        const user =await userService.changePassword(data);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
@@ -88,15 +92,16 @@ const changePassword = async (req, res) => {
         return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
-// POST /users/changeNickname
+// POST /users/changeNicknameAndPhoto
 //Changes the nickname of the indicated user
 // STATUS:
     //200: resource successfully updated
     //404: resource not found 
     //500: server error
-const changeNickname = async (req, res) => {
+const changeNicknameAndPhoto = async (req, res) => {
     try {
-        const user =await userService.changeNickname(req.body);
+        const data = {id: req.user.id, username: req.user.username, photo: req.body.photo, nickname: req.body.nickname};
+        const user =await userService.changeNicknameAndPhoto(data);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
@@ -112,5 +117,5 @@ module.exports = {
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname
+    changeNicknameAndPhoto
 };

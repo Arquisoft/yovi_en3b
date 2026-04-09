@@ -106,7 +106,7 @@ const changePassword = async (data) => {
 };
 
 // Changes the nickname of a user
-const changeNickname = async (data) => {
+const changeNicknameAndPhoto = async (data) => {
     // 1. Search the username
     const user = await userRepository.findUserByUsername(data.username);
     
@@ -143,6 +143,6 @@ module.exports = {
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname,
+    changeNicknameAndPhoto,
     changePhoto
 };
