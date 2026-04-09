@@ -2,6 +2,9 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
 
+<p align="center"> Do you want to play? Try it here! </p>
+<p align="center"> http://20.199.16.53/ </p>
+
 <p align="center">
   <a href="https://arquisoft.github.io/yovi_en3b/">
     <img src="https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Arc42 Documentation">
