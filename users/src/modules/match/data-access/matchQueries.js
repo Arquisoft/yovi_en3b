@@ -31,7 +31,7 @@ module.exports = {
         WHEN m.blue_player_id = $1 THEN red_user.photo
         ELSE blue_user.photo
       END AS opponent_avatar_id,
-      ((latest_save.resulting_board_state ->> 'size')::int) AS board_size
+      ((latest_save.resulting_board_state::jsonb ->> 'size')::int) AS board_size
     FROM matches m
     LEFT JOIN users blue_user ON blue_user.id = m.blue_player_id
     LEFT JOIN users red_user ON red_user.id = m.red_player_id
