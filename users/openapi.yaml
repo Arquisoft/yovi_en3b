@@ -4,6 +4,37 @@ info:
   version: 1.0.0
   description: API for managing users
 paths:
+  /play:
+    post:
+      tags: [Bots]
+      summary: "Realiza un movimiento contra un bot"
+      description: "Envía el estado del tablero en notación YEN y recibe el siguiente movimiento del bot."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bot_id:
+                  type: string
+                  description: "ID de la estrategia (easy, random, llm)"
+                position:
+                  type: object
+                  description: "Tablero en formato YEN"
+                  properties:
+                    size: { type: integer }
+                    turn: { type: string, enum: [R, B] }
+                    layout: { type: string, example: "B/.B/RB./B..R" }
+      responses:
+        "200":
+          description: "Movimiento sugerido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  move: { type: string, description: "Coordenada o acción (ej. '3,0,0' o 'swap')" }
   /createuser:
     post:
       tags: [Users]
@@ -146,6 +177,8 @@ paths:
     post:
       tags: [Users]
       summary: Change the password of a user
+      security:
+        - bearerAuth: []
       description: It takes the credentials of the user to check his authorization and changes his password
       requestBody:
         required: true
@@ -195,6 +228,8 @@ paths:
     post:
       tags: [Users]
       summary: Change the nickname of a user
+      security:
+        - bearerAuth: []
       description: It takes the username
       requestBody:
         required: true
@@ -233,7 +268,7 @@ paths:
                     type: string
                     example: "photo"
         "401":
-          description: User not found
+          description: User not found / No autorizado
         "500":
           description: Database server error
   /create:
@@ -622,3 +657,9 @@ paths:
                   error:
                     type: string
                     example: "Match ID is required."
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
