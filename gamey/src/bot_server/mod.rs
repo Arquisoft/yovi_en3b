@@ -7,6 +7,7 @@
 //! - `GET /status` - Health check endpoint
 //! - `POST /{api_version}/ybot/choose/{bot_id}` - Request a move from a bot
 //! - `POST /{api_version}/ybot/hint` - Get a strategic hint with difficulty consideration
+//! - `GET /{api_version}/play` - Let a bot make a move and get the new game state
 //!
 //! # Example
 //! ```no_run
@@ -26,6 +27,7 @@ pub mod state;
 pub mod version;
 pub mod hint;
 pub mod chat;
+pub mod play;
 use axum::response::IntoResponse;
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
@@ -34,8 +36,9 @@ pub use error::ErrorResponse;
 pub use version::*;
 pub use hint::{HintResponse, generate_strategic_hint};
 pub use chat::{ChatMessage, ChatRequest, ChatResponse};
+pub use play::PlayResponse;
 
-use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
+use crate::{GameYError, RandomBot, YBotRegistry, state::AppState, LLMBot, DifficultyLevel};
 
 /// Creates the Axum router with the given state.
 ///
@@ -55,6 +58,10 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/chat/{bot_id}",
             axum::routing::post(chat::chat_with_bot),
         )
+        .route(
+            "/{api_version}/play",
+            axum::routing::get(play::play),
+        )
         .layer(CorsLayer::permissive())
         .with_state(state)
 }
@@ -62,8 +69,19 @@ pub fn create_router(state: AppState) -> axum::Router {
 /// Creates the default application state with the standard bot registry.
 ///
 /// The default state includes the `RandomBot` which selects moves randomly.
+/// If the `ANTHROPIC_API_KEY` environment variable is set, LLM bots with
+/// different difficulty levels are also included.
 pub fn create_default_state() -> AppState {
-    let bots = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+    let mut bots = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+
+    // Add LLM bots if API key is available
+    if std::env::var("ANTHROPIC_API_KEY").is_ok() {
+        bots = bots
+            .with_bot_named("llm-easy", Arc::new(LLMBot::new(DifficultyLevel::Easy)))
+            .with_bot_named("llm-medium", Arc::new(LLMBot::new(DifficultyLevel::Medium)))
+            .with_bot_named("llm-hard", Arc::new(LLMBot::new(DifficultyLevel::Hard)));
+    }
+
     AppState::new(bots)
 }
 
