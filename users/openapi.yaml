@@ -3,6 +3,9 @@ info:
   title: User Service API
   version: 1.0.0
   description: API for managing users
+servers:
+  - url: http://localhost:3000
+    description: User Service API
 paths:
   /play:
     post:

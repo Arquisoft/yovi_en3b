@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios'); // <-- AÑADIDO: Necesario para llamar a Rust
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
@@ -16,7 +17,7 @@ app.use(metricsMiddleware);
 
 try {
   const swaggerDocument = YAML.load(fs.readFileSync('./openapi.yaml', 'utf8'));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Ojo: tu ruta es /api-docs (con S)
 } catch (e) {
   console.log(e);
 }
@@ -38,6 +39,43 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// --- AÑADIDO: RUTA TRADUCTORA PARA LOS BOTS ---
+app.post('/play', async (req, res) => {
+  try {
+      const { bot_id, position } = req.body;
+
+      if (!position) {
+          return res.status(400).json({ error: "Falta el campo 'position'" });
+      }
+
+      // TRADUCCIÓN: Convertimos "R"/"B" del profesor a 0/1 para tu Rust
+      const mappedTurn = position.turn === 'R' ? 0 : 1;
+
+      // JSON exacto que espera tu compañero
+      const rustPayload = {
+          size: position.size,
+          turn: mappedTurn,
+          players: ["R", "B"], 
+          layout: position.layout
+      };
+
+      const targetBot = bot_id || 'random_bot';
+      const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
+      
+      // Llamada al contenedor de Rust
+      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${targetBot}`, rustPayload);
+
+      // TRADUCCIÓN: Formato final "x,y,z"
+      const { x, y, z } = response.data.coords;
+      res.json({ move: `${x},${y},${z}` });
+
+  } catch (error) {
+      console.error("Error conectando con Rust:", error.message);
+      res.status(502).json({ error: "El motor de juego (Rust) no responde o el formato es incorrecto" });
+  }
+});
+// ----------------------------------------------
+
 app.use('/users', userRoutes);
 app.use('/matches', matchRoutes);
 app.use('/ranking', rankingRoutes);
@@ -49,8 +87,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = app
-
-
-
-
+module.exports = app;
