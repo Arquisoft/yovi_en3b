@@ -39,42 +39,44 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// --- AÑADIDO: RUTA TRADUCTORA PARA LOS BOTS ---
-app.post('/play', async (req, res) => {
+// --- API DE BOTS (ESTÁNDAR COMPETICIÓN PROFESOR) ---
+app.get('/play', async (req, res) => {
   try {
-      const { bot_id, position } = req.body;
+      // 1. Extraemos los parámetros de la URL (Query Params)
+      const positionString = req.query.position;
+      const bot_id = req.query.bot_id || 'random_bot';
 
-      if (!position) {
-          return res.status(400).json({ error: "Falta el campo 'position'" });
+      if (!positionString) {
+          return res.status(400).json({ error: "Falta el parámetro 'position' en la URL" });
       }
 
-      // TRADUCCIÓN: Convertimos "R"/"B" del profesor a 0/1 para tu Rust
-      const mappedTurn = position.turn === 'R' ? 0 : 1;
+      // 2. Convertimos el string de la URL a un objeto JSON
+      let rustPayload;
+      try {
+          rustPayload = JSON.parse(positionString);
+      } catch (e) {
+          return res.status(400).json({ error: "El parámetro position no es un JSON válido" });
+      }
 
-      // JSON exacto que espera tu compañero
-      const rustPayload = {
-          size: position.size,
-          turn: mappedTurn,
-          players: ["R", "B"], 
-          layout: position.layout
-      };
-
-      const targetBot = bot_id || 'random_bot';
+      // 3. Llamamos al contenedor de Rust (gamey) enviándole el JSON
       const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
-      
-      // Llamada al contenedor de Rust
-      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${targetBot}`, rustPayload);
+      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${bot_id}`, rustPayload);
 
-      // TRADUCCIÓN: Formato final "x,y,z"
-      const { x, y, z } = response.data.coords;
-      res.json({ move: `${x},${y},${z}` });
+      // 4. Devolvemos EXACTAMENTE el formato que pide el profesor
+      if (response.data.coords) {
+          res.json({ coords: response.data.coords });
+      } else if (response.data.action) {
+          res.json({ action: response.data.action });
+      } else {
+          // Por si Rust devuelve un resign o algo distinto
+          res.json(response.data); 
+      }
 
   } catch (error) {
       console.error("Error conectando con Rust:", error.message);
-      res.status(502).json({ error: "El motor de juego (Rust) no responde o el formato es incorrecto" });
+      res.status(502).json({ error: "El motor de juego (Rust) no responde o formato inválido" });
   }
 });
-// ----------------------------------------------
 
 app.use('/users', userRoutes);
 app.use('/matches', matchRoutes);

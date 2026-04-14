@@ -2,42 +2,50 @@ openapi: 3.0.0
 info:
   title: User Service API
   version: 1.0.0
-  description: API for managing users
+  description: API for managing users, games and bots
 servers:
   - url: http://localhost:3000
-    description: User Service API
+    description: API Gateway / User Service
+
 paths:
   /play:
-    post:
+    get:
       tags: [Bots]
-      summary: "Realiza un movimiento contra un bot"
-      description: "Envía el estado del tablero en notación YEN y recibe el siguiente movimiento del bot."
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                bot_id:
-                  type: string
-                  description: "ID de la estrategia (easy, random, llm)"
-                position:
-                  type: object
-                  description: "Tablero en formato YEN"
-                  properties:
-                    size: { type: integer }
-                    turn: { type: string, enum: [R, B] }
-                    layout: { type: string, example: "B/.B/RB./B..R" }
+      summary: "Jugar contra un bot (Formato Competición)"
+      description: "Obtiene el siguiente movimiento de un bot basado en la notación YEN."
+      parameters:
+        - name: position
+          in: query
+          required: true
+          description: "Estado actual en formato JSON YEN"
+          schema:
+            type: string
+            example: '{"size":4,"turn":0,"players":["B","R"],"layout":"B/.B/RB./B..R"}'
+        - name: bot_id
+          in: query
+          required: false
+          description: "Identificador del bot (ej. random_bot, easy_bot)"
+          schema:
+            type: string
+            example: "random_bot"
       responses:
         "200":
-          description: "Movimiento sugerido"
+          description: "Movimiento sugerido (Coordenadas o Acción)"
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  move: { type: string, description: "Coordenada o acción (ej. '3,0,0' o 'swap')" }
+                  coords:
+                    type: object
+                    properties:
+                      x: { type: integer, example: 1 }
+                      y: { type: integer, example: 2 }
+                      z: { type: integer, example: 0 }
+                  action:
+                    type: string
+                    example: "swap"
+
   /createuser:
     post:
       tags: [Users]
@@ -86,6 +94,7 @@ paths:
           description: Error creating user (some fields missing or there exist another user with that critical information)
         "500":
           description: Database server error
+          
   /findUserByUsername:
     get:
       tags: [Users]
@@ -129,6 +138,7 @@ paths:
           description: It did not find a user with that username
         "500":
           description: Database server error.
+          
   /loginUser:
     post:
       tags: [Users]
@@ -176,6 +186,7 @@ paths:
           description: Invalid username or password
         "500":
           description: Database server error
+
   /changePassword:
     post:
       tags: [Users]
@@ -227,6 +238,7 @@ paths:
           description: Invalid username or password
         "500":
           description: Database server error
+
   /changeNickname:
     post:
       tags: [Users]
@@ -274,6 +286,7 @@ paths:
           description: User not found / No autorizado
         "500":
           description: Database server error
+
   /create:
     post:
       tags: [Matches]
@@ -326,6 +339,7 @@ paths:
                   error:
                     type: string
                     example: "If you play against a BOT, you must select a difficulty."
+
   /save:
     post:
       tags: [GameSave]
@@ -382,6 +396,7 @@ paths:
                   error:
                     type: string
                     example: "Player ID is required."
+
   /:matchId:
     post:
       tags: [GameSave]
@@ -413,6 +428,7 @@ paths:
                     example: "Moves retrieved successfully"
         "400":
           description: "Match ID is required"
+
   /:matchId/moves/:moveNumber:
     post:
       tags: [GameSave]
@@ -456,6 +472,7 @@ paths:
                   error:
                     type: string
                     example: "Match ID is required."
+
   /finish:
     post:
       tags: [Matches]
@@ -515,6 +532,7 @@ paths:
                   error:
                     type: string
                     example: "matchId and winnerId are required"
+
   /ranking/me:
     get:
       tags: [Ranking]
@@ -563,6 +581,7 @@ paths:
                   error:
                     type: string
                     example: "User not found in rankings"
+
   /ranking/global:
     get:
       tags: [Ranking]
@@ -621,6 +640,7 @@ paths:
                 properties:
                   error:
                     type: string
+
   /:matchId/latest:
     post:
       tags: [GameSave]
@@ -660,6 +680,7 @@ paths:
                   error:
                     type: string
                     example: "Match ID is required."
+
 components:
   securitySchemes:
     bearerAuth:
