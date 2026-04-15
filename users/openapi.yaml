@@ -1,685 +1,14 @@
 openapi: 3.0.0
 info:
-  title: User Service API
+  title: YOVI Project API
   version: 1.0.0
-  description: API for managing users, games and bots
+  description: >
+    API documentation for the YOVI Game project. 
+    This service manages user authentication, match statistics, 
+    game state persistence, and provides an interface for AI competition.
 servers:
   - url: http://localhost:3000
-    description: API Gateway / User Service
-
-paths:
-  /play:
-    get:
-      tags: [Bots]
-      summary: "Jugar contra un bot (Formato Competición)"
-      description: "Obtiene el siguiente movimiento de un bot basado en la notación YEN."
-      parameters:
-        - name: position
-          in: query
-          required: true
-          description: "Estado actual en formato JSON YEN"
-          schema:
-            type: string
-            example: '{"size":4,"turn":0,"players":["B","R"],"layout":"B/.B/RB./B..R"}'
-        - name: bot_id
-          in: query
-          required: false
-          description: "Identificador del bot (ej. random_bot, easy_bot)"
-          schema:
-            type: string
-            example: "random_bot"
-      responses:
-        "200":
-          description: "Movimiento sugerido (Coordenadas o Acción)"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  coords:
-                    type: object
-                    properties:
-                      x: { type: integer, example: 1 }
-                      y: { type: integer, example: 2 }
-                      z: { type: integer, example: 0 }
-                  action:
-                    type: string
-                    example: "swap"
-
-  /createuser:
-    post:
-      tags: [Users]
-      summary: Creates a new user
-      description: Creates a new user with the given nickname, username, email, password and photo.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - nickname
-                - username
-                - email
-                - password
-                - photo
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-                nickname:
-                  type: string
-                  example: "testuser"
-                email:
-                  type: string
-                  example: "testuser@testuser"
-                photo:
-                  type: string
-                  example: "photo"
-                password:
-                  type: string
-                  example: "123456"
-      responses:
-        "201":
-          description: User created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Welcome testuser"
-        "400":
-          description: Error creating user (some fields missing or there exist another user with that critical information)
-        "500":
-          description: Database server error
-          
-  /findUserByUsername:
-    get:
-      tags: [Users]
-      summary: Searches for a user
-      description: Searches for a user with that username and returns it
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-      responses:
-        "200":
-          description: User found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
-        "400":
-          description: The username is required
-        "404":
-          description: It did not find a user with that username
-        "500":
-          description: Database server error.
-          
-  /loginUser:
-    post:
-      tags: [Users]
-      summary: Log in of a user
-      description: It compares the credentials passed to give access to the application
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - password
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "123456"
-      responses:
-        "200":
-          description: User logged in
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
-        "400":
-          description: Missing fields
-        "401":
-          description: Invalid username or password
-        "500":
-          description: Database server error
-
-  /changePassword:
-    post:
-      tags: [Users]
-      summary: Change the password of a user
-      security:
-        - bearerAuth: []
-      description: It takes the credentials of the user to check his authorization and changes his password
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - password
-                - newPassword
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "123456"
-                newPassword:
-                  type: string
-                  example: "hola123456"
-      responses:
-        "200":
-          description: Password correctly changed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
-        "401":
-          description: Invalid username or password
-        "500":
-          description: Database server error
-
-  /changeNickname:
-    post:
-      tags: [Users]
-      summary: Change the nickname of a user
-      security:
-        - bearerAuth: []
-      description: It takes the username
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - nickname
-              properties:
-                username:
-                  type: string
-                  example: "testuser"
-                nickname:
-                  type: string
-                  example: "paco123"
-      responses:
-        "200":
-          description: nickname correctly changed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "paco123"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
-        "401":
-          description: User not found / No autorizado
-        "500":
-          description: Database server error
-
-  /create:
-    post:
-      tags: [Matches]
-      summary: Creates a new entry in the Match table
-      description: Creates a new entry in the Match table that records important information about the match played.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - bluePlayerId
-                - redPlayerId
-                - isBot
-                - botDifficulty
-              properties:
-                bluePlayerId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-                redPlayerId:
-                  type: string
-                  format: uuid
-                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
-                isBot:
-                  type: boolean
-                  example: true
-                botDifficulty:
-                  type: integer
-                  example: 0
-      responses:
-        "201":
-          description: Match created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Match created successfully"
-        "400":
-          description: Bad Request - Validation failed (missing fields, bot config error, etc.)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "If you play against a BOT, you must select a difficulty."
-
-  /save:
-    post:
-      tags: [GameSave]
-      summary: Creates a new entry in the Game saves table
-      description: Creates a new entry in the Game saves table that records the state of a match.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - matchId
-                - moveNumber
-                - playerId
-                - moveCoordinates
-                - resultingBoardState
-              properties:
-                matchId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-                moveNumber:
-                  type: integer
-                  example: 9
-                playerId:
-                  type: string
-                  format: uuid
-                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
-                moveCoordinates:
-                  type: string
-                  example: "C3"
-                resultingBoardState:
-                  type: string
-                  example: "./../.../...."
-      responses:
-        "201":
-          description: Game save created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Game save created successfully"
-        "400":
-          description: Bad Request - Validation failed (missing fields, wrong typing, etc.)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Player ID is required."
-
-  /:matchId:
-    post:
-      tags: [GameSave]
-      summary: Returns all the movements saved of a match
-      description: Returns all the movements saved of a match
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - matchId
-              properties:
-                matchId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-      responses:
-        "200":
-          description: Moves retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Moves retrieved successfully"
-        "400":
-          description: "Match ID is required"
-
-  /:matchId/moves/:moveNumber:
-    post:
-      tags: [GameSave]
-      summary: Returns a concrete move of a match
-      description: Returns a concrete move of a match
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - matchId
-                - moveNumber
-              properties:
-                matchId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-                moveNumber:
-                  type: integer
-                  example: 9
-      responses:
-        "200":
-          description: Move retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Move retrieved successfully"
-        "400":
-          description: Bad Request - Validation failed (missing matchId, missing move number, etc.)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Match ID is required."
-
-  /finish:
-    post:
-      tags: [Matches]
-      summary: Finish a match and update player rankings
-      description: Records the match winner, updates match status to finished, and updates both players' ranking statistics. If players don't have rankings yet, they are automatically initialized.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - matchId
-                - winnerId
-              properties:
-                matchId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-                winnerId:
-                  type: string
-                  format: uuid
-                  example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
-      responses:
-        "200":
-          description: Match finished successfully and rankings updated
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Match finished successfully"
-                  match:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uuid
-                      winner_id:
-                        type: string
-                        format: uuid
-                      status:
-                        type: string
-                        example: "finished"
-                      ended_at:
-                        type: string
-                        format: date-time
-        "400":
-          description: Bad Request - Validation failed (missing fields, invalid IDs, etc.)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "matchId and winnerId are required"
-
-  /ranking/me:
-    get:
-      tags: [Ranking]
-      summary: Get current user's ranking position
-      description: Returns the user's current ranking position and total number of players in the ranking system. Rankings are calculated based on match wins and total matches played.
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: "b2d7f9a1-7c3e-4b2a-9d8f-1a2b3c4d5e6f"
-          description: The UUID of the user
-      responses:
-        "200":
-          description: User ranking retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  position:
-                    type: integer
-                    example: 5
-                  totalPlayers:
-                    type: integer
-                    example: 127
-        "400":
-          description: Bad Request - userId parameter is required
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "userId is required"
-        "404":
-          description: User not found in rankings
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "User not found in rankings"
-
-  /ranking/global:
-    get:
-      tags: [Ranking]
-      summary: Get global leaderboard
-      description: Returns all players ranked by their scores in descending order. Score is calculated as 50 * (2 * wins - total_matches). Includes player statistics and win rate.
-      responses:
-        "200":
-          description: Global rankings retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ranking:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        position:
-                          type: integer
-                          example: 1
-                        user_id:
-                          type: string
-                          format: uuid
-                        username:
-                          type: string
-                          example: "champion_player"
-                        nickname:
-                          type: string
-                          example: "Champion"
-                        photo:
-                          type: string
-                          example: "avatar_01"
-                        score:
-                          type: integer
-                          example: 450
-                        total_matches:
-                          type: integer
-                          example: 10
-                        win_matches:
-                          type: integer
-                          example: 9
-                        win_rate:
-                          type: integer
-                          description: Win rate percentage
-                          example: 90
-                        last_game_won:
-                          type: boolean
-                          example: true
-        "400":
-          description: Server error retrieving rankings
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-
-  /:matchId/latest:
-    post:
-      tags: [GameSave]
-      summary: Returns all the movements saved of a match
-      description: Returns all the movements saved of a match
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - matchId
-              properties:
-                matchId:
-                  type: string
-                  format: uuid
-                  example: "550e8400-e29b-41d4-a716-446655440000"
-      responses:
-        "200":
-          description: Latest move retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Latest move retrieved successfully"
-        "400":
-          description: Bad Request - Validation failed (missing matchId or move not found)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Match ID is required."
+    description: Development Server (Node.js API Gateway)
 
 components:
   securitySchemes:
@@ -687,3 +16,302 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+paths:
+  # --- BOTS API ---
+  /play:
+    get:
+      tags: [Bots]
+      summary: Get bot move for competition
+      description: >
+        Standardized endpoint for the final competition. Receives the board state 
+        in YEN notation via query parameters and returns the bot's calculated move.
+      parameters:
+        - name: position
+          in: query
+          required: true
+          description: "Current board state in YEN JSON format (size, turn, players, layout)."
+          schema:
+            type: string
+            example: '{"size":4,"turn":0,"players":["B","R"],"layout":"B/.B/RB./B..R"}'
+        - name: bot_id
+          in: query
+          required: false
+          description: "The identifier for the specific bot strategy (e.g., random_bot, easy_bot, hard_bot)."
+          schema:
+            type: string
+            example: "random_bot"
+      responses:
+        "200":
+          description: Successful move calculation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      coords:
+                        type: object
+                        properties:
+                          x: { type: integer, example: 1 }
+                          y: { type: integer, example: 2 }
+                          z: { type: integer, example: 0 }
+                  - type: object
+                    properties:
+                      action:
+                        type: string
+                        example: "swap"
+
+  # --- USER MANAGEMENT ---
+  /users/createuser:
+    post:
+      tags: [Users]
+      summary: Register a new user
+      description: Create a new account providing a unique username, email, and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, nickname, email, password, photo]
+              properties:
+                username: { type: string, example: "john_doe" }
+                nickname: { type: string, example: "Johnny" }
+                email: { type: string, format: email, example: "john@example.com" }
+                password: 
+                  type: string
+                  minLength: 8
+                  example: "securePass123"
+                  description: "Must be at least 8 characters long."
+                photo: { type: string, example: "avatar_01" }
+      responses:
+        "201":
+          description: User successfully created
+        "400":
+          description: Invalid input or user already exists
+
+  /users/loginUser:
+    post:
+      tags: [Users]
+      summary: Authenticate user
+      description: Logs in a user and returns a JWT in the 'Authorization' header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, example: "john_doe" }
+                password: { type: string, example: "securePass123" }
+      responses:
+        "200":
+          description: Login successful. Token provided in headers.
+          headers:
+            Authorization:
+              description: Bearer token for authenticating subsequent requests.
+              schema:
+                type: string
+                example: "Bearer eyJhbG..."
+        "401":
+          description: Invalid credentials
+
+  /users/findUserByUsername:
+    get:
+      tags: [Users]
+      summary: Find user by username
+      description: Retrieve public profile information for a specific username.
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "john_doe"
+      responses:
+        "200":
+          description: User data retrieved
+        "404":
+          description: User not found
+
+  /users/changePassword:
+    post:
+      tags: [Users]
+      summary: Update user password
+      security:
+        - bearerAuth: []
+      description: Change the current password. Requires a valid JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword: { type: string, example: "securePass123" }
+                newPassword: 
+                  type: string
+                  minLength: 8
+                  example: "newSecurePass456"
+      responses:
+        "200":
+          description: Password updated successfully
+        "401":
+          description: Unauthorized or incorrect current password
+
+  /users/changeNicknameAndPhoto:
+    post:
+      tags: [Users]
+      summary: Update profile details
+      security:
+        - bearerAuth: []
+      description: Change nickname or avatar. Requires a valid JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nickname, photo]
+              properties:
+                nickname: { type: string, example: "NewNickname" }
+                photo: { type: string, example: "avatar_05" }
+      responses:
+        "200":
+          description: Profile updated successfully
+
+  # --- MATCH MANAGEMENT ---
+  /matches/create:
+    post:
+      tags: [Matches]
+      summary: Create a new match record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bluePlayerId, redPlayerId, isBot, botDifficulty]
+              properties:
+                bluePlayerId: { type: string, format: uuid }
+                redPlayerId: { type: string, format: uuid }
+                isBot: { type: boolean }
+                botDifficulty: { type: integer }
+      responses:
+        "201":
+          description: Match created
+
+  /matches/finish:
+    post:
+      tags: [Matches]
+      summary: Mark a match as completed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [matchId, winnerId]
+              properties:
+                matchId: { type: string, format: uuid }
+                winnerId: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Match status updated and rankings calculated
+
+  # --- GAME PERSISTENCE MODULE ---
+  /gamesaves/save:
+    post:
+      tags: [GameSave]
+      summary: Save a move in a match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [matchId, moveNumber, playerId, moveCoordinates, resultingBoardState]
+              properties:
+                matchId: { type: string, format: uuid, description: "Must exist in Matches table" }
+                moveNumber: { type: integer, example: 9 }
+                playerId: { type: string, format: uuid, description: "Must exist in Users table" }
+                moveCoordinates: { type: string, example: "1,2,0", description: "Coordinates like x,y,z or A1" }
+                resultingBoardState:
+                  type: object
+                  description: "The full board state in YEN JSON format"
+                  example:
+                    size: 4
+                    turn: 0
+                    players: ["B", "R"]
+                    layout: "B/.B/RB./B..R"
+      responses:
+        "201":
+          description: Move saved successfully
+
+  /gamesaves/{matchId}:
+    post:
+      tags: [GameSave]
+      summary: Retrieve all moves for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: History of moves retrieved
+
+  /gamesaves/{matchId}/moves/{moveNumber}:
+    post:
+      tags: [GameSave]
+      summary: Retrieve a specific move
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: moveNumber
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Move details retrieved
+
+  /gamesaves/{matchId}/latest:
+    post:
+      tags: [GameSave]
+      summary: Get the most recent move of a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Latest move data retrieved
+
+  # --- RANKING ---
+  /ranking/me:
+    get:
+      tags: [Ranking]
+      summary: Get player position
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Current rank and stats retrieved
+
+  /ranking/global:
+    get:
+      tags: [Ranking]
+      summary: Get leaderboard
+      responses:
+        "200":
+          description: Global ranking list retrieved

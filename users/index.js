@@ -1,5 +1,5 @@
 const express = require('express');
-const axios = require('axios'); // <-- AÑADIDO: Necesario para llamar a Rust
+const axios = require('axios'); // <-- Needed to make a call to rust logic (bots)
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
@@ -17,7 +17,7 @@ app.use(metricsMiddleware);
 
 try {
   const swaggerDocument = YAML.load(fs.readFileSync('./openapi.yaml', 'utf8'));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Ojo: tu ruta es /api-docs (con S)
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 } catch (e) {
   console.log(e);
 }
@@ -41,10 +41,10 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// --- API DE BOTS (ESTÁNDAR COMPETICIÓN PROFESOR) ---
+// --- BOTS API ---
 app.get('/play', async (req, res) => {
   try {
-      // 1. Extraemos los parámetros de la URL (Query Params)
+      // Get parameters selected from the URL
       const positionString = req.query.position;
       const bot_id = req.query.bot_id || 'random_bot';
 
@@ -52,7 +52,7 @@ app.get('/play', async (req, res) => {
           return res.status(400).json({ error: "Falta el parámetro 'position' en la URL" });
       }
 
-      // 2. Convertimos el string de la URL a un objeto JSON
+      // Turn it into a JSON
       let rustPayload;
       try {
           rustPayload = JSON.parse(positionString);
@@ -60,17 +60,16 @@ app.get('/play', async (req, res) => {
           return res.status(400).json({ error: "El parámetro position no es un JSON válido" });
       }
 
-      // 3. Llamamos al contenedor de Rust (gamey) enviándole el JSON
+      // Make the call to the Rust module by the json
       const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
       const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${bot_id}`, rustPayload);
 
-      // 4. Devolvemos EXACTAMENTE el formato que pide el profesor
+      // Return with the correct format
       if (response.data.coords) {
           res.json({ coords: response.data.coords });
       } else if (response.data.action) {
           res.json({ action: response.data.action });
       } else {
-          // Por si Rust devuelve un resign o algo distinto
           res.json(response.data); 
       }
 
