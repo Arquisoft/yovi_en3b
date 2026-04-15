@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const userRepository = require('../data-access/userRepository');
+const rankingService = require('../../ranking/domain/rankingService');
 
 //Service of the creation of a user.
 //It checks that all the fields have been written, the email is not used yet for another user and the password fullfills the requirements.
@@ -40,6 +41,14 @@ const createUser = async (data) => {
         photo: data.photo, 
         nickname:data.nickname,
     });
+
+    // 5. Initialize ranking for the new user
+    try {
+        await rankingService.addStats(newUser.id, { totalMatches: 0, winMatches: 0 });
+    } catch (rankingError) {
+        console.error('Failed to initialize ranking for new user:', rankingError);
+        // Don't fail user creation if ranking initialization fails
+    }
     
     return newUser;
 };
@@ -96,8 +105,25 @@ const changePassword = async (data) => {
     return updatedUser;
 };
 
-// Changes the password of a user
-const changeNickname = async (data) => {
+// Changes the nickname of a user
+const changeNicknameAndPhoto = async (data) => {
+    // 1. Search the username
+    const user = await userRepository.findUserByUsername(data.username);
+    
+    // 2. Check if the user exists
+    
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    // 3. Save the new nickname and photo in the db
+    const updatedUser = await userRepository.updateUserNicknameAndPhoto(data.username, data.nickname, data.photo);
+
+    return updatedUser;
+};
+
+// Changes the photo of a user
+const changePhoto = async (data) => {
     // 1. Search the username
     const user = await userRepository.findUserByUsername(data.username);
     
@@ -108,7 +134,7 @@ const changeNickname = async (data) => {
     }
 
     // 3. Save the new nickname in the db
-    const updatedUser = await userRepository.updateUserNickname(data.username, data.nickname);
+    const updatedUser = await userRepository.updateUserPhoto(data.username, data.photo);
 
     return updatedUser;
 };
@@ -117,5 +143,6 @@ module.exports = {
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname
+    changeNicknameAndPhoto,
+    changePhoto
 };

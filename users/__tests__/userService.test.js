@@ -1,13 +1,29 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import request from 'supertest'
 import { createRequire } from 'node:module';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+vi.mock('../src/db/db.js', () => ({
+    query: vi.fn()
+}));
 
 const require = createRequire(import.meta.url);
 import app from '../index.js'
+import test from 'node:test';
 
 const db = require('../src/db/db.js');
 
+beforeEach(() => {
+    db.query = vi.fn();
+});
+
+
+process.env.JWT_SECRET = 'clave_maestra_para_tests_123';
+
+const getAuthToken = (id = 1, username = 'Pablo') => {
+        return jwt.sign({ id, username }, process.env.JWT_SECRET);
+};
 ///////////////////////////////////////////////////////////CREATE USER TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/createuser', () => {
     const testName = 'Pablo'
@@ -18,7 +34,7 @@ describe('POST /users/createuser', () => {
     // POSITIVE TEST
     it('returns a greeting message for the provided username', async () => {
         
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({ rows: [] }) 
             .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
@@ -37,8 +53,11 @@ describe('POST /users/createuser', () => {
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(201)
-        expect(res.body).toHaveProperty('message')
-        expect(res.body.message).toMatch(/Welcome Pablo/i)
+        expect(res.body).toHaveProperty('username', testName);
+        expect(res.body).toHaveProperty('nickname', testName);
+        expect(res.body).toHaveProperty('email', 'pablo@test.com');
+        expect(res.body).toHaveProperty('avatarId', 'photo');
+        expect(res.body).not.toHaveProperty('password');
        
     })
     // USERNAME IS MISSING
@@ -138,7 +157,7 @@ describe('POST /users/createuser', () => {
     it('returns 400 if the user already exists', async () => {
 
         
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [{ username: testName }]
         });
 
@@ -158,7 +177,7 @@ describe('POST /users/createuser', () => {
     it('returns 400 if there already exists a user with that email', async () => {
 
         
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
                 rows: [{ email: 'pablo@test.com' }]
@@ -178,7 +197,7 @@ describe('POST /users/createuser', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/createuser')
@@ -198,14 +217,14 @@ describe('POST /users/createuser', () => {
 
 ///////////////////////////////////////////////////////////FIND USER BY USER NAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('GET /users/findUserByUsername', () => {
+    const testName = 'Pablo';
     afterEach(() => {
         vi.restoreAllMocks()
     })
 
     //POSITIVE TEST
     it('returns some data abour the user', async () => {
-        const testName = 'Pablo'
-        vi.spyOn(db, 'query').mockResolvedValue({
+        db.query.mockResolvedValue({
             rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
         });
         const res = await request(app)
@@ -237,7 +256,7 @@ describe('GET /users/findUserByUsername', () => {
     })
     // USER NOT FOUND
     it('returns 404 if the user is not found in the database', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -251,7 +270,7 @@ describe('GET /users/findUserByUsername', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .get('/users/findUserByUsername')
@@ -267,13 +286,13 @@ describe('GET /users/findUserByUsername', () => {
 
 ///////////////////////////////////////////////////////////LOGIN USER TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/loginUser', () => {
+    const testName = 'Pablo';
     afterEach(() => {
         vi.restoreAllMocks()
     })
     // POSITIVE TEST
     it('returns 200 and user data without password if credentials are correct', async () => {
-        const testName = 'Pablo'
-        vi.spyOn(db, 'query').mockResolvedValue({
+        db.query.mockResolvedValue({
             rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
@@ -285,7 +304,9 @@ describe('POST /users/loginUser', () => {
             })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(200)
+        expect(res.status).toBe(200);
+        expect(res.headers).toHaveProperty('authorization');
+        expect(res.headers['authorization']).toMatch(/^Bearer eyJ/);
         expect(res.body).toHaveProperty('username', testName);
         expect(res.body).toHaveProperty('nickname', testName);
         expect(res.body).toHaveProperty('email', 'pablo@test.com');
@@ -298,7 +319,7 @@ describe('POST /users/loginUser', () => {
         const res = await request(app)
             .post('/users/loginUser')
             .send({ 
-                username: 'Pablo'
+                username: testName
             })
             .set('Accept', 'application/json')
 
@@ -307,9 +328,9 @@ describe('POST /users/loginUser', () => {
     })
     // PASSWORD IS INCORRECT
     it('returns 401 if the password is incorrect', async () => {
-        const testUser = { username: 'Pablo', password: 'password123' }
+        const testUser = { username: testName, password: 'password123' }
         
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [testUser]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
@@ -317,7 +338,7 @@ describe('POST /users/loginUser', () => {
         const res = await request(app)
             .post('/users/loginUser')
             .send({ 
-                username: 'Pablo',
+                username: testName,
                 password: 'WRONG_PASSWORD' 
             })
             .set('Accept', 'application/json')
@@ -327,7 +348,7 @@ describe('POST /users/loginUser', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 401 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
 
@@ -344,7 +365,7 @@ describe('POST /users/loginUser', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
             .post('/users/loginUser')
@@ -361,13 +382,14 @@ describe('POST /users/loginUser', () => {
 
 ///////////////////////////////////////////////////////////CHANGE USER PASSWORD TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/changePassword', () => {
+    const testName = 'Pablo';
+    const token = getAuthToken(1, testName);
     afterEach(() => {
         vi.restoreAllMocks()
     })
     // POSITIVE TEST
     it('returns 200 and user data without password if the password has been successfully changed', async () => {
-        const testName = 'Pablo'
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({
                 rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
             })
@@ -379,12 +401,13 @@ describe('POST /users/changePassword', () => {
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: testName,
                 password: "password123",
                 newPassword: "password123456789"
             })
-            .set('Accept', 'application/json')
+            .set('Accept', 'application/json');
 
         expect(res.status).toBe(200)
         expect(res.body).toHaveProperty('username', testName);
@@ -396,17 +419,16 @@ describe('POST /users/changePassword', () => {
     })
     // PASSWORD IS INCORRECT
     it('returns 401 if the password is incorrect', async () => {
-        const testUser = { username: 'Pablo', password: 'password123' }
-        
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
-            rows: [testUser]
+        db.query.mockResolvedValueOnce({
+            rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
-                username: 'Pablo',
+                username: testName,
                 password: 'WRONG_PASSWORD',
                 newPassword: 'password123456'  
             })
@@ -417,12 +439,13 @@ describe('POST /users/changePassword', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 401 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
-
+        
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 password: 'password123',
@@ -435,10 +458,11 @@ describe('POST /users/changePassword', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
-
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
+        
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 password: 'password123'
@@ -448,17 +472,28 @@ describe('POST /users/changePassword', () => {
         expect(res.status).toBe(500)
         expect(res.body.error).toBe("Internal server error") 
     })
+    
+
+    it('returns 401 if no token is provided', async () => {
+        const res = await request(app)
+            .post('/users/changePassword')
+            .send({ username: 'Pablo', nickname: 'NewNick' });
+
+        expect(res.status).toBe(401);
+        expect(res.body.error).toBe("Access denied: No token");
+    });
 })
 
 ///////////////////////////////////////////////////////////CHANGE USER NICKNAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
-describe('POST /users/changeNickname', () => {
+describe('POST /users/changeNicknameAndPhoto', () => {
+    const testName = 'Pablo';
+    const token = getAuthToken(1, testName);
     afterEach(() => {
         vi.restoreAllMocks()
     })
     // POSITIVE TEST
     it('returns 200 and user data without password if the nickname has been successfully changed', async () => {
-        const testName = 'Pablo'
-        vi.spyOn(db, 'query')
+        db.query
             .mockResolvedValueOnce({
                 rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
             })
@@ -466,12 +501,13 @@ describe('POST /users/changeNickname', () => {
                 rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
             });;
 
-
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: testName,
-                nickname: testName
+                nickname: testName,
+                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -485,12 +521,12 @@ describe('POST /users/changeNickname', () => {
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 404 if the user does not exist', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({
+        db.query.mockResolvedValueOnce({
             rows: [] 
         });
-
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 nickname: 'Ghost'
@@ -502,10 +538,10 @@ describe('POST /users/changeNickname', () => {
     })
     // ABRUPT ERROR
     it('returns 500 if something breaks abruptly',  async () => {
-        vi.spyOn(db, 'query').mockRejectedValueOnce(new Error("Database connection failed"));
-
+        db.query.mockRejectedValueOnce(new Error("Database connection failed"));
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 nickname: 'Ghost'
@@ -515,4 +551,13 @@ describe('POST /users/changeNickname', () => {
         expect(res.status).toBe(500)
         expect(res.body.error).toBe("Internal server error") 
     })
+
+    it('returns 401 if no token is provided', async () => {
+        const res = await request(app)
+            .post('/users/changeNicknameAndPhoto')
+            .send({ username: 'Pablo', nickname: 'NewNick' });
+
+        expect(res.status).toBe(401);
+        expect(res.body.error).toBe("Access denied: No token");
+    });
 })

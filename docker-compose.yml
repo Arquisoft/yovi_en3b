@@ -29,6 +29,7 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
       - DB_HOST=db
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - monitor-net
 

@@ -25,9 +25,16 @@ const updateUserPassword = async (username, newHashedPassword) => {
     const result = await db.query(queries.updateUserPassword, [newHashedPassword, username]);
     return result.rows[0];
 }
-//Changes the password of the user
-const updateUserNickname = async (username, nickname) => {
-    const result = await db.query(queries.updateUserNickname, [nickname, username]);
+
+//Changes the nickname and photo of the user
+const updateUserNicknameAndPhoto = async (username, nickname, photo) => {
+    const result = await db.query(queries.updateUserNicknameAndPhoto, [nickname, photo, username]);
+    return result.rows[0];
+}
+
+//Searches a user with the username indicated in the parameter
+const findUserById = async (id) => {
+    const result = await db.query(queries.findUserById, [id]);
     return result.rows[0];
 }
 module.exports = {
@@ -35,5 +42,5 @@ module.exports = {
     findUserByUsername,
     findUserByEmail,
     updateUserPassword,
-    updateUserNickname
+    updateUserNicknameAndPhoto,
 };

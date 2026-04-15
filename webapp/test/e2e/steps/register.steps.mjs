@@ -37,10 +37,10 @@ When('I enter the password {string}', async function (password) {
   await page.locator('#password').fill(password);
 })
 
-Then('I should see the login page', async function () {
-  const botonLogin = this.page.getByRole('button', { name: 'PLAY' }); 
-  await expect(botonLogin).toBeVisible();
-})
+Then('I should see the GAME Y title', async function () {
+  const gamey = this.page.getByRole('heading', { name: 'GAME Y', level: 1 }); 
+  await expect(gamey).toBeVisible();
+});
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

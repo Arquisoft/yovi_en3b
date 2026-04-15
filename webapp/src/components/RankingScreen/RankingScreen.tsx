@@ -1,28 +1,50 @@
 // UBICACIÓN: webapp/src/components/Ranking/RankingScreen.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useI18n } from '../../i18n/useTranslation';
 import { X, Trophy, Medal, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react'; 
 import { useSettings } from '../../context/SettingsContext'; // Import settings context for audio
 import './RankingScreen.css';
-
-interface RankingUser {
-  id: string;
-  username: string;
-  avatar: string;
-  points: number;
-  winRate: number;
-  gamesPlayed: number;
-  lastGameWon: boolean;
-}
+import { getAvatarGlyph } from '../avatarCatalog';
+import { getGlobalRanking, type GlobalRankingEntry } from './ranking.api';
 
 interface RankingScreenProps {
   onClose: () => void;
-  users: RankingUser[];
 }
 
-const RankingScreen: React.FC<RankingScreenProps> = ({ onClose, users }) => {
+const RankingScreen: React.FC<RankingScreenProps> = ({ onClose }) => {
   const { t } = useI18n();
   const { playSound } = useSettings(); // Hook to access global playSound function
+  const [users, setUsers] = useState<GlobalRankingEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const ranking = await getGlobalRanking();
+
+        if (!cancelled) {
+          setUsers(ranking);
+        }
+      } catch (fetchError) {
+        if (!cancelled) {
+          setError(fetchError instanceof Error ? fetchError.message : 'Could not load ranking');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const renderRankIcon = (index: number) => {
     if (index === 0) return <Trophy className="rank-icon gold" size={24} />;
@@ -60,15 +82,26 @@ const RankingScreen: React.FC<RankingScreenProps> = ({ onClose, users }) => {
         </div>
 
         <div className="ranking-list">
-          {users.map((user, index) => (
+          {loading && <div className="ranking-feedback">Loading ranking...</div>}
+          {!loading && error && <div className="ranking-feedback ranking-feedback-error">{error}</div>}
+          {!loading && !error && users.length === 0 && (
+            <div className="ranking-feedback">No ranking data available yet.</div>
+          )}
+
+          {!loading && !error && users.map((user, index) => (
             <div key={user.id} className={`ranking-item ${index < 3 ? 'top-three' : ''}`}>
               <div className="col-rank">
                 {renderRankIcon(index)}
               </div>
 
               <div className="col-user info-user-cell">
-                <img src={user.avatar} alt={user.username} className="ranking-avatar" />
-                <span className="ranking-username">{user.username}</span>
+                <div className="ranking-avatar" aria-hidden="true">
+                  {getAvatarGlyph(user.avatarId)}
+                </div>
+                <div className="ranking-user-copy">
+                  <span className="ranking-username">{user.displayName}</span>
+                  <span className="ranking-handle">@{user.username}</span>
+                </div>
               </div>
 
               <div className="col-stats-container">

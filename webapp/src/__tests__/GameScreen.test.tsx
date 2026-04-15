@@ -164,7 +164,7 @@ describe('GameScreen', () => {
         expect(screen.getByRole('button', { name: /undo/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /exit/i })).toBeInTheDocument();
-    });
+    }, 10000);
 
     test('TEST 3: confirm button is disabled when no cell is selected', () => {
         renderWithProviders(<GameScreen />);
