@@ -34,7 +34,15 @@ const RegisterForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('token', data.token); // Save auth token to local storage
+        // 1. We get the header
+        const authHeader = res.headers.get('Authorization');
+        
+        // 2. We verify that the token arises an we isolate it (Bearer + XXXXXX)
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1]; 
+          // Save auth token to local storage
+          localStorage.setItem('token', token);
+        }
         localStorage.setItem('username', username); // Save username for global reference
         localStorage.setItem('userId', data.id || ''); // Save user ID for match creation
         console.log('Login stored userId:', localStorage.getItem('userId'));
