@@ -84,6 +84,7 @@ export const translations = {
       colorBlindMode: 'MODO DALTÓNICO',
       neonEffects: 'EFECTOS NEÓN',
       visuals: 'VISUALES',
+      confirmMove: 'CONFIRMAR MOVIMIENTO',
     },
     messages: {
       loading: 'CARGANDO...',
@@ -208,6 +209,7 @@ export const translations = {
       colorBlindMode: 'COLOR BLIND MODE',
       neonEffects: 'NEON EFFECTS',
       visuals: 'VISUALS',
+      confirmMove: 'CONFIRM MOVEMENT',
     },
     messages: {
       loading: 'LOADING...',
@@ -332,6 +334,7 @@ export const translations = {
       colorBlindMode: 'RENK KÖRÜ MODU',
       neonEffects: 'NEON EFEKTLERİ',
       visuals: 'GÖRSELLER',
+      confirmMove: 'HAREKETİ ONAYLA',
     },
     messages: {
       loading: 'YÜKLENİYOR...',
