@@ -20,17 +20,6 @@ CREATE TABLE IF NOT EXISTS matches (
     ended_at TIMESTAMP
 );
 
--- GameSave table: stores move history and game state progression
-CREATE TABLE IF NOT EXISTS game_saves (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    match_id UUID NOT NULL REFERENCES matches(id), -- The match moves and state belongs to
-    move_number INT NOT NULL,                      -- Move sequence (1, 2, 3...)
-    player_last_move VARCHAR(10),                  -- Barycentric. Null in PvP.
-    bot_last_move VARCHAR(10),                     -- Barycentric. Null in PvP.
-    resulting_board_state JSONB NOT NULL,          -- YEN notation JSON (size, turn, layout)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(match_id, move_number)                  -- Prevents duplicate move numbers per match
-);
 
 -- Rankings table: stores aggregated stats per user
 CREATE TABLE IF NOT EXISTS rankings (
