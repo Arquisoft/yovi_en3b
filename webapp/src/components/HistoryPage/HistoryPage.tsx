@@ -82,21 +82,21 @@ const HistoryPage: React.FC = () => {
                 <div className="stat-card-mini">
                     <BarChart3 size={20} className="stat-icon" />
                     <div className="stat-info">
-                        <span className="stat-label">PARTIDAS</span>
+                        <span className="stat-label">{t.labels.partidas}</span>
                         <span className="stat-value">{totalMatches}</span>
                     </div>
                 </div>
                 <div className="stat-card-mini">
                     <Target size={20} className="stat-icon" />
                     <div className="stat-info">
-                        <span className="stat-label">WIN RATE</span>
+                        <span className="stat-label">{t.labels.winRate}</span>
                         <span className="stat-value">{winRate}%</span>
                     </div>
                 </div>
                 <div className="stat-card-mini">
                     <Trophy size={20} className="stat-icon win" />
                     <div className="stat-info">
-                        <span className="stat-label">VICTORIAS</span>
+                        <span className="stat-label">{t.labels.wins}</span>
                         <span className="stat-value">{wins}</span>
                     </div>
                 </div>
