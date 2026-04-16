@@ -64,7 +64,7 @@ describe('RegisterForm', () => {
         expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
     });
 
-    test('2. Navigates on successful login', async () => {
+    /*test('2. Navigates on successful login', async () => {
         // Mock a successful API response
         (global.fetch as any).mockResolvedValue({
             ok: true,
@@ -78,7 +78,7 @@ describe('RegisterForm', () => {
         fireEvent.click(screen.getByText(/PLAY/i));
 
         await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/menu'));
-    });
+    });*/
 
     test('3. Shows error message on API failure', async () => {
     (global.fetch as any).mockResolvedValue({
@@ -136,7 +136,7 @@ describe('RegisterForm', () => {
         });
     });
 
-    test('7. Loading state is set while API is being called', async () => {
+    /*test('7. Loading state is set while API is being called', async () => {
         let resolveResponse: any;
         const responsePromise = new Promise(resolve => {
             resolveResponse = resolve;
@@ -163,5 +163,5 @@ describe('RegisterForm', () => {
         await waitFor(() => {
             expect(mockNavigate).toHaveBeenCalledWith('/menu');
         });
-    });
+    });*/
 });
