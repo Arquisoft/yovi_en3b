@@ -1,170 +1,164 @@
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getMyProfile, updateMyProfile, getMyRanking, changePassword } from '../components/UserProfile/userProfile.api';
+import { useUserProfile } from '../components/UserProfile/useUserProfile';
+import * as api from '../components/UserProfile/userProfile.api';
 
-describe('userProfile API service', () => {
-    // Base URL from the original class logic
-    const API_URL = "http://localhost:3000";
+// Mocks of the API functions
+vi.mock('../components/UserProfile/userProfile.api', () => ({
+  FALLBACK_RANKING: { position: 0, totalPlayers: 0 },
+  getMyProfile: vi.fn(),
+  getMyRanking: vi.fn(),
+  updateMyProfile: vi.fn(),
+}));
 
-    beforeEach(() => {
-        // Clear all mocks and localStorage before each test
-        vi.clearAllMocks();
-        vi.stubGlobal('fetch', vi.fn());
-        localStorage.clear();
-        
-        // Mock import.meta.env.VITE_API_URL if necessary
-        vi.stubGlobal('import.meta', {
-            env: { VITE_API_URL: API_URL }
-        });
+describe('useUserProfile Hook', () => {
+  const mockProfile = {
+    id: 'u1',
+    username: 'testuser',
+    displayName: 'Player One',
+    avatarId: 'avatar_01',
+  };
+
+  const mockRanking = { position: 1, totalPlayers: 10 };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default successful implementation
+    vi.mocked(api.getMyProfile).mockResolvedValue(mockProfile);
+    vi.mocked(api.getMyRanking).mockResolvedValue(mockRanking);
+  });
+
+  it('covers full lifecycle: loading, success, and saving', async () => {
+    // 1. Render hook with open=true to trigger useEffect
+    const { result } = renderHook(() => useUserProfile(true));
+
+    // Initially should be loading
+    expect(result.current.loading).toBe(true);
+
+    // 2. Wait for loading to finish
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    
+    expect(result.current.profile).toEqual(mockProfile);
+    expect(result.current.ranking).toEqual(mockRanking);
+    expect(result.current.draftName).toBe("Player One");
+    expect(result.current.dirty).toBe(false);
+
+    // 3. Modify draft to make it dirty
+    act(() => {
+      result.current.setDraftName("New Nickname");
+      result.current.setDraftAvatarId("avatar_02");
+    });
+    expect(result.current.dirty).toBe(true);
+
+    // 4. Mock successful save
+    const updatedProfile = { ...mockProfile, displayName: "New Nickname", avatarId: "avatar_02" };
+    vi.mocked(api.updateMyProfile).mockResolvedValue(updatedProfile);
+
+    await act(async () => {
+      await result.current.save();
+    });
+    
+    expect(result.current.saving).toBe(false);
+    expect(result.current.profile?.displayName).toBe("New Nickname");
+    expect(result.current.dirty).toBe(false);
+
+    // 5. Test resetDraft function
+    act(() => {
+      result.current.setDraftName("Temp Name");
+    });
+    expect(result.current.dirty).toBe(true);
+    
+    act(() => {
+      result.current.resetDraft();
+    });
+    expect(result.current.draftName).toBe("New Nickname");
+    expect(result.current.dirty).toBe(false);
+  });
+
+  it('should not fetch data if open is false', () => {
+    renderHook(() => useUserProfile(false));
+    expect(api.getMyProfile).not.toHaveBeenCalled();
+  });
+
+  it('covers error branches when loading fails', async () => {
+    vi.mocked(api.getMyProfile).mockRejectedValueOnce(new Error("Failed to load"));
+    
+    const { result } = renderHook(() => useUserProfile(true));
+
+    await waitFor(() => expect(result.current.error).toBe("Failed to load"));
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('sets unknown error when save fails with non-Error object', async () => {
+    // Initial load success
+    const { result } = renderHook(() => useUserProfile(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Mock save rejection with a string instead of Error object
+    vi.mocked(api.updateMyProfile).mockRejectedValueOnce("Server Boom");
+
+    await act(async () => {
+      await result.current.save();
     });
 
-    describe('getMyProfile', () => {
-        it('should fetch user profile using the username from localStorage', async () => {
-            const mockUsername = 'testuser';
-            localStorage.setItem('username', mockUsername);
+    expect(result.current.error).toBe('Unknown error');
+    expect(result.current.saving).toBe(false);
+  });
 
-            const mockResponse = {
-                id: '123',
-                username: mockUsername,
-                nickname: 'TestPlayer',
-                avatarId: 'avatar_05'
-            };
-
-            // Setup successful fetch mock
-            (fetch as any).mockResolvedValue({
-                ok: true,
-                json: () => Promise.resolve(mockResponse),
-            });
-
-            const result = await getMyProfile();
-
-            expect(result).toEqual({
-                id: '123',
-                username: mockUsername,
-                displayName: 'TestPlayer',
-                avatarId: 'avatar_05'
-            });
-
-            // Verify the constructed URL with query parameters
-            expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/findUserByUsername?username=${mockUsername}`,
-                { method: 'GET' }
-            );
-        });
-
-        it('should throw an error if the profile response is not ok', async () => {
-            (fetch as any).mockResolvedValue({ ok: false });
-            await expect(getMyProfile()).rejects.toThrow("Could not load the profile");
-        });
+  it('returns early in save if profile is null', async () => {
+    const { result } = renderHook(() => useUserProfile(false)); // profile will be null
+    
+    await act(async () => {
+      await result.current.save();
     });
 
-    describe('updateMyProfile', () => {
-        it('should send a POST request to change the nickname', async () => {
-            const mockUsername = 'testuser';
-            localStorage.setItem('username', mockUsername);
-            const patch = { displayName: 'NewNickname', avatarId: 'avatar_02' };
+    expect(api.updateMyProfile).not.toHaveBeenCalled();
+    expect(result.current.saving).toBe(false);
+  });
 
-            const mockResponse = {
-                id: '123',
-                nickname: 'NewNickname',
-                avatarId: 'avatar_02'
-            };
+  it('uses the fallback ranking when ranking fetch fails', async () => {
+    vi.mocked(api.getMyRanking).mockRejectedValueOnce(new Error('Ranking unavailable'));
 
-            (fetch as any).mockResolvedValue({
-                ok: true,
-                json: () => Promise.resolve(mockResponse),
-            }); 
+    const { result } = renderHook(() => useUserProfile(true));
 
-            const result = await updateMyProfile(patch);
+    await waitFor(() => expect(result.current.loading).toBe(false));
 
-            expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/changeNicknameAndPhoto`,
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: expect.objectContaining({ 
-                        'Content-Type': 'application/json',
-                        'Authorization': expect.stringContaining('Bearer') 
-                    }),
-                    body: JSON.stringify({
-                        username: mockUsername,
-                        nickname: patch.displayName,
-                        photo: patch.avatarId
-                    })
-                })
-            );
+    expect(result.current.ranking).toEqual({ position: 0, totalPlayers: 0 });
+  });
 
-            expect(result.displayName).toBe('NewNickname');
-        });
+  it('sets an unknown error when profile loading fails with a non-Error value', async () => {
+    vi.mocked(api.getMyProfile).mockRejectedValueOnce('boom');
 
-        it('should throw an error if the update fails', async () => {
-            (fetch as any).mockResolvedValue({ ok: false });
-            await expect(updateMyProfile({ displayName: '', avatarId: '' }))
-                .rejects.toThrow("Error changing the nickname");
-        });
+    const { result } = renderHook(() => useUserProfile(true));
+
+    await waitFor(() => expect(result.current.error).toBe('Unknown error'));
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('preserves the backend message when save fails with an Error object', async () => {
+    const { result } = renderHook(() => useUserProfile(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    vi.mocked(api.updateMyProfile).mockRejectedValueOnce(new Error('Save failed'));
+
+    await act(async () => {
+      await result.current.save();
     });
 
-    describe('getMyRanking', () => {
-        it('should fetch ranking using the provided userId', async () => {
-            (fetch as any).mockResolvedValue({
-                ok: true,
-                json: () => Promise.resolve({ position: 7, totalPlayers: 42 }),
-            });
+    expect(result.current.error).toBe('Save failed');
+    expect(result.current.saving).toBe(false);
+  });
 
-            const result = await getMyRanking('user-7');
+  it('returns early in resetDraft if no profile has been loaded yet', () => {
+    const { result } = renderHook(() => useUserProfile(false));
 
-            expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/ranking/me?userId=user-7`,
-                { method: 'GET', credentials: 'include' }
-            );
-            expect(result).toEqual({ position: 7, totalPlayers: 42 });
-        });
-
-        it('should throw if ranking cannot be loaded', async () => {
-            (fetch as any).mockResolvedValue({ ok: false, statusText: 'Not Found' });
-
-            await expect(getMyRanking('missing-user')).rejects.toThrow('Could not load the ranking');
-        });
+    act(() => {
+      result.current.setDraftName('Temp');
+      result.current.setDraftAvatarId('avatar_09');
+      result.current.resetDraft();
     });
 
-    describe('changePassword', () => {
-        it('should send the current and new password to the backend', async () => {
-            const mockUsername = 'testuser';
-            localStorage.setItem('username', mockUsername);
-
-            (fetch as any).mockResolvedValue({ ok: true });
-
-            await changePassword('oldPass', 'newPass');
-
-            expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/changePassword`,
-                expect.objectContaining({
-                    method: 'POST',
-                    body: JSON.stringify({
-                        username: mockUsername,
-                        currentPassword: 'oldPass',
-                        newPassword: 'newPass'
-                    })
-                })
-            );
-        });
-
-        it('should throw a specific error message if provided by the backend', async () => {
-            const backendError = "Password too weak";
-            (fetch as any).mockResolvedValue({
-                ok: false,
-                json: () => Promise.resolve({ error: backendError })
-            });
-
-            await expect(changePassword('a', 'b')).rejects.toThrow(backendError);
-        });
-
-        it('should throw a default error message if the backend error is unknown', async () => {
-            (fetch as any).mockResolvedValue({
-                ok: false,
-                json: () => Promise.reject() // Simulate invalid JSON response
-            });
-
-            await expect(changePassword('a', 'b'))
-                .rejects.toThrow("Error changing password. Check your current password.");
-        });
-    });
+    expect(result.current.draftName).toBe('Temp');
+    expect(result.current.draftAvatarId).toBe('avatar_09');
+  });
 });
