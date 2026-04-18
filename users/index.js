@@ -43,19 +43,19 @@ app.use(express.json());
 // --- BOTS API ---
 app.get('/play', async (req, res) => {
   try {
-      // Get parameters selected from the URL
+      // Obtenemos los parámetros
       const positionString = req.query.position;
-      const bot_id = req.query.bot_id || 'random_bot';
-
+      
+      // SOLUCIÓN 1: Usamos un solo nombre de variable (requestedBotId)
+      const requestedBotId = req.query.bot_id || 'random_bot'; 
 
       // 🛡️ 1. SEGURIDAD: Lista blanca de bots permitidos
       const allowedBots = ['random_bot', 'easy_bot', 'medium_bot', 'hard_bot'];
 
-      // 🛡️ 2. VALIDACIÓN: Si pide algo raro, cortamos la petición
+      // 🛡️ 2. VALIDACIÓN: Ahora sí evalúa la variable correcta
       if (!allowedBots.includes(requestedBotId)) {
           return res.status(400).json({ error: "El bot especificado no es válido." });
       }
-
 
       if (!positionString) {
           return res.status(400).json({ error: "Falta el parámetro 'position' en la URL" });
@@ -65,12 +65,16 @@ app.get('/play', async (req, res) => {
       let rustPayload;
       try {
           rustPayload = JSON.parse(positionString);
-      } catch (e) {
+      } catch (error) { 
+          // SOLUCIÓN 3: Imprimimos el error para que SonarCloud no se queje de la excepción vacía
+          console.error("Error parseando position:", error.message);
           return res.status(400).json({ error: "El parámetro position no es un JSON válido" });
       }
 
-      // Make the call to the Rust module by the json
+      // Make the call to the Rust module
       const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
+      
+      // Al haber pasado por el array 'allowedBots', esta inyección ahora es segura
       const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${requestedBotId}`, rustPayload);
 
       // Return with the correct format
