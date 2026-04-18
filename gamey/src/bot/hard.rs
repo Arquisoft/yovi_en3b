@@ -279,7 +279,7 @@ mod tests {
 
         // HardBot será el jugador 0 (Azul), RandomBot será el jugador 1 (Rojo)
         let hard_player_id = PlayerId::new(0);
-        //let random_player_id = PlayerId::new(1);
+        let random_player_id = PlayerId::new(1);
 
         println!("Empezando simulación: HardBot vs RandomBot...");
 

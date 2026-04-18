@@ -224,12 +224,12 @@ impl LLMBot {
     }
 
     /// Decide whether to make a random move based on difficulty
-    /*fn should_make_random_move(&self) -> bool {
-        //let probability = self.difficulty.random_move_probability();
+    fn should_make_random_move(&self) -> bool {
+        let probability = self.difficulty.random_move_probability();
         let mut rng = rand::rng();
         let random_value: f32 = rng.random::<f32>() * 100.0;
         self.should_make_random_move_with_value(random_value)
-    }*/
+    }
 
     /// Decide whether to make a random move given a sampled value (0-100)
     fn should_make_random_move_with_value(&self, random_value: f32) -> bool {
