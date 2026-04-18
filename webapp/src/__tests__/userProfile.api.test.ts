@@ -57,7 +57,7 @@ describe('userProfile API service', () => {
         });
     });
 
-    /*describe('updateMyProfile', () => {
+    describe('updateMyProfile', () => {
         it('should send a POST request to change the nickname', async () => {
             const mockUsername = 'testuser';
             localStorage.setItem('username', mockUsername);
@@ -72,15 +72,18 @@ describe('userProfile API service', () => {
             (fetch as any).mockResolvedValue({
                 ok: true,
                 json: () => Promise.resolve(mockResponse),
-            });
+            }); 
 
             const result = await updateMyProfile(patch);
 
             expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/changeNickname`,
+                `${API_URL}/users/changeNicknameAndPhoto`,
                 expect.objectContaining({
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: expect.objectContaining({ 
+                        'Content-Type': 'application/json',
+                        'Authorization': expect.stringContaining('Bearer') 
+                    }),
                     body: JSON.stringify({
                         username: mockUsername,
                         nickname: patch.displayName,
@@ -97,7 +100,7 @@ describe('userProfile API service', () => {
             await expect(updateMyProfile({ displayName: '', avatarId: '' }))
                 .rejects.toThrow("Error changing the nickname");
         });
-    });*/
+    });
 
     describe('getMyRanking', () => {
         it('should fetch ranking using the provided userId', async () => {
