@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios'); // <-- Needed to make a call to rust logic (bots)
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
@@ -39,6 +40,56 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// --- BOTS API ---
+app.get('/play', async (req, res) => {
+  try {
+      const positionString = req.query.position;
+      const rawBotId = req.query.bot_id || 'random_bot';
+
+      // Hardcoded values for bot (sequrity)
+      const botMap = {
+          'random_bot': 'random_bot',
+          'easy_bot': 'easy_bot',
+          'medium_bot': 'medium_bot',
+          'hard_bot': 'hard_bot'
+      };
+      const safeBotId = botMap[rawBotId];
+
+      if (!safeBotId) {
+          return res.status(400).json({ error: "El bot especificado no es válido." });
+      }
+
+      if (!positionString) {
+          return res.status(400).json({ error: "Falta el parámetro 'position' en la URL" });
+      }
+
+      // Turn it into a JSON
+      let rustPayload;
+      try {
+          rustPayload = JSON.parse(positionString);
+      } catch (e) {
+          return res.status(400).json({ error: "El parámetro position no es un JSON válido" });
+      }
+
+      // Make the call to the Rust module
+      const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
+      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${safeBotId}`, rustPayload);
+
+      // Return with the correct format
+      if (response.data.coords) {
+          res.json({ coords: response.data.coords });
+      } else if (response.data.action) {
+          res.json({ action: response.data.action });
+      } else {
+          res.json(response.data); 
+      }
+
+  } catch (error) {
+      console.error("Error trying to connect to Rust:", error.message);
+      res.status(502).json({ error: "Rust module failed" });
+  }
+});
+
 app.use('/users', userRoutes);
 app.use('/matches', matchRoutes);
 app.use('/ranking', rankingRoutes);
@@ -49,8 +100,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = app
-
-
-
-
+module.exports = app;
