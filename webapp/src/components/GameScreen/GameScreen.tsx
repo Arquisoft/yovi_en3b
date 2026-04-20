@@ -12,7 +12,13 @@ import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { createMatch, finishMatch } from './game.api';
+import { createMatch, finishMatch, evaluateBoard } from './game.api';
+
+export interface ScoreData {
+  turn: number;
+  blue: number;
+  red: number;
+}
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -44,6 +50,7 @@ const GameScreen: React.FC = () => {
     const [matchId, setMatchId] = useState<string | null>(null);
     const [isMatchCreating, setIsMatchCreating] = useState(false);
     const [matchError, setMatchError] = useState<string | null>(null);
+    const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
     
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
@@ -103,6 +110,46 @@ const GameScreen: React.FC = () => {
             finishGameMatch();
         }
     }, [gameResult, matchId, playSound]);
+
+    // Effect to evaluate board tension after every move
+    useEffect(() => {
+        // Calculamos el turno en base a cuántas fichas hay en el tablero
+        const turnCount = Object.keys(boardState).length;
+        
+        // Si el tablero está vacío o el juego ha terminado, no hacemos nada
+        if (turnCount === 0 || gameResult) return;
+
+        const evaluateCurrentBoard = async () => {
+            try {
+                /* ¡ATENCIÓN A ESTO!
+                 * Aquí necesitas pasar el estado de tu boardState al formato que 
+                 * enviabas en tu prueba del backend. Supongo que tendréis o tendréis 
+                 * que hacer una función en yGameLogic que convierta boardState -> string YEN
+                 */
+                const yenLayoutString = "B/.B/RB./B..R"; // <--- SUSTITUIR POR FUNCIÓN REAL QUE GENERE EL STRING YEN
+                
+                const payload = {
+                    size: size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayoutString
+                };
+
+                const data = await evaluateBoard(payload);
+                
+                // Guardamos el historial para la gráfica
+                setScoreHistory(prev => [
+                    ...prev,
+                    { turn: turnCount, blue: data.blue_score, red: data.red_score }
+                ]);
+            } catch (error) {
+                console.error("Error evaluating board tension:", error);
+            }
+        };
+
+        evaluateCurrentBoard();
+    }, [boardState, size, gameResult]); // Se dispara cada vez que boardState cambia
+
 
     const formatDisplayTime = (seconds: number | null) => {
         if (seconds === null) return "∞";
@@ -324,6 +371,10 @@ const GameScreen: React.FC = () => {
             {gameResult && (
                 <div className="modal-overlay">
                     <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
+
+                        {/* AÑADIR LA GRÁFICA AQUÍ (Comentado hasta que hagamos la Fase 4) */}
+                        {/* <MatchGraph data={scoreHistory} /> */}
+                        
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>

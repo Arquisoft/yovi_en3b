@@ -1,4 +1,5 @@
 const matchService = require('../domain/matchService');
+const axios = require('axios');
 
 const createMatch = async (req, res) => {
     try {
@@ -59,6 +60,27 @@ async function finishMatch(req, res) {
     }
 }
 
+const evaluateBoard = async (req, res) => {
+    try {
+        const RUST_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
+        
+        const rustResponse = await axios.post(`${RUST_URL}/v1/evaluate`, req.body);
+
+        return res.status(200).json(rustResponse.data);
+
+    } catch (error) {
+        console.error("Error connecting to Rust engine:", error.message);
+        
+        if (error.response) {
+            return res.status(error.response.status).json(error.response.data);
+        }
+
+        return res.status(500).json({ 
+            error: "Internal server error connecting to game engine" 
+        });
+    }
+};
+
 module.exports = {
     getPlayerMatches,
     getPlayerMatchHistory,
@@ -66,4 +88,5 @@ module.exports = {
     getMatchHistory: getPlayerMatchHistory,
     createMatch,
     finishMatch,
+    evaluateBoard,
 };
