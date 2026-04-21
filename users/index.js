@@ -73,7 +73,8 @@ app.get('/play', async (req, res) => {
 
       // Make the call to the Rust module
 
-      const { URL } = require('url');
+      /*
+      const { URL } = require('node:url');
 
       const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
 
@@ -87,6 +88,13 @@ app.get('/play', async (req, res) => {
       const response = await axios.post(
           `${parsedUrl.origin}/v1/ybot/choose/${safeBotId}`,
           rustPayload
+      );
+      */
+     const RUST_URL = 'http://gamey:4000';
+
+      const rustResponse = await axios.post(
+          `${RUST_URL}/v1/ybot/choose/${safeBotId}`,
+          req.body
       );
 
       // Return with the correct format

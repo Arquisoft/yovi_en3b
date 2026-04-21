@@ -62,24 +62,27 @@ async function finishMatch(req, res) {
 
 const evaluateBoard = async (req, res) => {
     try {
+        /*
+        const { URL } = require('node:url');
 
-        const { URL } = require('url');
+        const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
 
-        const ALLOWED_HOSTS = [
-            'gamey',
-            'localhost',
-            '20.199.16.53'
-        ];
-
-        const rawUrl = process.env.DB_HOST || 'http://gamey:4000';
+        const rawUrl = process.env.BOT_SERVICE_URL ?? 'http://gamey:4000';
         const parsedUrl = new URL(rawUrl);
 
         if (!ALLOWED_HOSTS.includes(parsedUrl.hostname)) {
-            throw new Error('Invalid BOT_SERVICE_URL');
+            return res.status(500).json({ error: 'Invalid configuration' });
         }
 
         const rustResponse = await axios.post(
             `${parsedUrl.origin}/v1/evaluate`,
+            req.body
+        );
+        */
+       const RUST_URL = 'http://gamey:4000';
+
+        const rustResponse = await axios.post(
+            `${RUST_URL}/v1/evaluate`,
             req.body
         );
 
