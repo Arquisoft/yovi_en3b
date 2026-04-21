@@ -72,8 +72,22 @@ app.get('/play', async (req, res) => {
       }
 
       // Make the call to the Rust module
-      const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
-      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${safeBotId}`, rustPayload);
+
+      const { URL } = require('url');
+
+      const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
+
+      const rawUrl = process.env.DB_HOST || 'http://gamey:4000';
+      const parsedUrl = new URL(rawUrl);
+
+      if (!ALLOWED_HOSTS.includes(parsedUrl.hostname)) {
+          throw new Error('Invalid BOT_SERVICE_URL');
+      }
+
+      const response = await axios.post(
+          `${parsedUrl.origin}/v1/ybot/choose/${safeBotId}`,
+          rustPayload
+      );
 
       // Return with the correct format
       if (response.data.coords) {
