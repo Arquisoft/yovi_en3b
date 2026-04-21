@@ -13,6 +13,8 @@ interface SettingsContextType {
   isMuted: boolean; 
   setIsMuted: (v: boolean) => void; 
   playSound: (sound: string) => void; 
+  confirmMove: boolean;
+  setConfirmMove: (v: boolean) => void
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -23,6 +25,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [neonMode, setNeonMode] = useState(false);
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
+  const [confirmMove, setConfirmMove] = useState(false);
+
 
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false); 
@@ -73,7 +77,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       neonMode, toggleNeonMode,
       volume, setVolume,
       isMuted, setIsMuted,
-      playSound 
+      playSound,
+      confirmMove, setConfirmMove 
     }}>
       {children}
     </SettingsContext.Provider>
