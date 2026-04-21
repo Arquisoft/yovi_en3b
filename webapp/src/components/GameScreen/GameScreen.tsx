@@ -116,15 +116,14 @@ const GameScreen: React.FC = () => {
     useEffect(() => {
         const turnCount = Object.keys(boardState).length;
         
-        // 1. Si el tablero está vacío o el juego terminó, paramos.
+        // If the game just started or already ended, we dont sent anything
         if (turnCount === 0 || gameResult) return;
-        
-        // 2. EL CANDADO: Si ya hemos evaluado este turno exacto, paramos.
+        // If we've already evaluated this turn, we dont send anything
         if (lastEvaluatedTurn.current === turnCount) return;
 
-        // 3. Cerramos el candado para este turno
+        // Mark this turn as evalueated...
         lastEvaluatedTurn.current = turnCount;
-
+        // ...and then we evaluate it
         const evaluateCurrentBoard = async () => {
             try {
                 const yenLayoutString = boardToYen(boardState, size);
@@ -144,7 +143,7 @@ const GameScreen: React.FC = () => {
                 ]);
             } catch (error) {
                 console.error("Error evaluating board tension:", error);
-                // Si falla, abrimos el candado para que pueda reintentarlo luego
+                // If something fails, we mark it as unchecked again
                 lastEvaluatedTurn.current = turnCount - 1; 
             }
         };

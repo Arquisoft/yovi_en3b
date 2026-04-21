@@ -14,7 +14,7 @@ interface MatchGraphProps {
 }
 
 export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
-  // Si no hay datos, no dibujamos nada para no romper la UI
+  // If there is no data, we dont draw the graph
   if (!data || data.length === 0) return null;
 
   return (
@@ -39,27 +39,27 @@ export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
             axisLine={false}
           />
           
-          {/* El Tooltip muestra los datos al pasar el ratón */}
+          {/* Shows data when passing the cursor over the points */}
           <Tooltip 
             contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }}
           />
           <Legend verticalAlign="top" height={36}/>
           
-          {/* Línea Azul (Jugador 1) */}
+          {/* Blue line (Player 1) */}
           <Line 
             type="monotone" 
             dataKey="blue" 
-            name="Azul" 
+            name="P1" 
             stroke="var(--player1-color, #3b82f6)" 
             strokeWidth={3} 
             dot={{ r: 3 }} 
             activeDot={{ r: 6 }} 
           />
           
-          {/* Línea Roja (Jugador 2) */}
+          {/* Red line (Player 2) */}
           <Line 
             type="monotone" 
-            dataKey="red" 
+            dataKey="P2" 
             name="Rojo" 
             stroke="var(--player2-color, #ef4444)" 
             strokeWidth={3} 
