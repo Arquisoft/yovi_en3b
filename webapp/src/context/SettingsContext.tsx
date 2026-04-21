@@ -30,7 +30,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false); 
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false); // Nuevo estado
+  const [_isMusicPlaying, setIsMusicPlaying] = useState(false); // Nuevo estado
 
   useEffect(() => {
     document.documentElement.style.filter = `brightness(${brightness}%)`;
