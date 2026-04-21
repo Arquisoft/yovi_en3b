@@ -79,10 +79,8 @@ const evaluateBoard = async (req, res) => {
             req.body
         );
         */
-       const RUST_URL = 'http://gamey:4000';
-
         const rustResponse = await axios.post(
-            `${RUST_URL}/v1/evaluate`,
+            `http://gamey:4000/v1/evaluate`,
             req.body
         );
 

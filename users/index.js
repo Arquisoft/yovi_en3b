@@ -90,10 +90,8 @@ app.get('/play', async (req, res) => {
           rustPayload
       );
       */
-     const RUST_URL = 'http://gamey:4000';
-
       const rustResponse = await axios.post(
-          `${RUST_URL}/v1/ybot/choose/${safeBotId}`,
+          `http://gamey:4000/v1/ybot/choose/${safeBotId}`,
           req.body
       );
 
