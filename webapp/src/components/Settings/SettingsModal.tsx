@@ -1,3 +1,4 @@
+// UBICACIÓN: webapp/src/components/SettingsModal/SettingsModal.tsx
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useI18n } from '../../i18n/useTranslation';
@@ -16,7 +17,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
     volume, setVolume,
     isMuted, setIsMuted,
     playSound,
-    confirmMove, setConfirmMove
+    confirmMove, setConfirmMove,
+    // AHORA TS RECONOCE ESTOS CAMPOS GRACIAS A LA ACTUALIZACIÓN DEL CONTEXTO
+    tutorEnabled, setTutorEnabled 
   } = useSettings();
 
   const handleAction = (action: () => void) => {
@@ -41,7 +44,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             <input
               type="range" min="50" max="150"
               value={brightness}
-              onChange={(e) => setBrightness(Number(e.target.value))} // Activa el useEffect del Contexto
+              onChange={(e) => setBrightness(Number(e.target.value))} 
               className="settings-slider"
             />
           </div>
@@ -103,6 +106,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               onClick={() => handleAction(() => setConfirmMove(!confirmMove))}
             >
               {confirmMove ? t.buttons.on : t.buttons.off}
+            </button>
+          </div>
+
+          {/* TUTOR BOT ENABLE/DISABLE */}
+          <div className="setting-item">
+            <label className="modal-text">
+              {t.labels.tutorEnabled || 'ASISTENTE TUTOR'}
+            </label>
+            <button
+              className={`opt-btn ${tutorEnabled ? 'active' : ''}`}
+              onClick={() => handleAction(() => setTutorEnabled(!tutorEnabled))}
+            >
+              {tutorEnabled ? t.buttons.on : t.buttons.off}
             </button>
           </div>
         </div>

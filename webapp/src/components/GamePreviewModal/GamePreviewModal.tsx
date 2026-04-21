@@ -126,7 +126,7 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
             <button 
               className="main-button btn-blue btn-play-now-preview preview-play-btn" 
               onClick={() => {
-                playSound('click.mp3');
+                
                 onStart({ 
                   size: boardSize, 
                   difficulty, 
