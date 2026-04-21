@@ -13,6 +13,7 @@ interface SettingsContextType {
   isMuted: boolean; 
   setIsMuted: (v: boolean) => void; 
   playSound: (sound: string) => void; 
+  startBackgroundMusic: () => void; // NUEVA FUNCIÓN
   confirmMove: boolean;
   setConfirmMove: (v: boolean) => void
 }
@@ -27,18 +28,15 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isMuted, setIsMuted] = useState(false);
   const [confirmMove, setConfirmMove] = useState(false);
 
-
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false); 
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false); // Nuevo estado
 
-  // --- EFECTO DE BRILLO ---
   useEffect(() => {
-    // Aplicamos el filtro directamente al elemento raíz del documento
-    // Esto afectará a toda la webapp
-    document.documentElement.style.filter = `brightness(${brightness}%)`; // Apply brightness filter to the entire app
-  }, [brightness]); // Se ejecuta cada vez que mueves el slider de brillo
+    document.documentElement.style.filter = `brightness(${brightness}%)`;
+  }, [brightness]);
 
-  // Inicializar música de fondo
+  // Inicializar música de fondo (Solo carga el archivo, no le da al play)
   useEffect(() => {
     const audio = new Audio('/sounds/gameb.mp3'); 
     audio.loop = true;
@@ -49,25 +47,30 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
   }, []);
 
-  // Sincronizar volumen y silencio
+  // Sincronizar volumen y silencio sin auto-play
   useEffect(() => {
     if (bgMusicRef.current) {
       bgMusicRef.current.volume = volume / 100;
       bgMusicRef.current.muted = isMuted;
-      if (hasInteracted && !isMuted && volume > 0) {
-        bgMusicRef.current.play().catch(() => {});
-      }
     }
-  }, [volume, isMuted, hasInteracted]);
+  }, [volume, isMuted]);
 
   const toggleNeonMode = () => setNeonMode(!neonMode);
+
+  // Función explícita para iniciar la música
+  const startBackgroundMusic = () => {
+    if (bgMusicRef.current && !isMuted && volume > 0) {
+      bgMusicRef.current.play().catch(err => console.log("Música bloqueada:", err));
+      setIsMusicPlaying(true);
+    }
+  };
 
   const playSound = (soundFile: string) => {
     if (!hasInteracted) setHasInteracted(true); 
     if (isMuted) return;
     const audio = new Audio(`/sounds/${soundFile}`);
     audio.volume = volume / 100;
-    audio.play().catch(err => console.error("Error en sonido FX:", err));
+    audio.play().catch(err => console.error("Error en FX:", err));
   };
 
   return (
@@ -78,6 +81,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       volume, setVolume,
       isMuted, setIsMuted,
       playSound,
+      startBackgroundMusic, // Exportamos la función
       confirmMove, setConfirmMove 
     }}>
       {children}
