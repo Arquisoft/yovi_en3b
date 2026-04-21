@@ -133,7 +133,7 @@ describe('game API service', () => {
   it('surfaces backend errors during board evaluation', async () => {
     const boardPayload = { layout: 'invalid_yen' };
 
-    // Simulamos que el backend de Node devuelve un 400 Bad Request
+    // 400 Bad Request
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
       json: () => Promise.resolve({ error: 'Invalid YEN format' }),
@@ -145,7 +145,7 @@ describe('game API service', () => {
   it('falls back to the status text when board evaluation fails without JSON', async () => {
     const boardPayload = { layout: '...' };
 
-    // Simulamos un error grave del servidor (ej. 502 Bad Gateway) donde el JSON no se puede parsear
+    // 502 Bad Gateway
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
       status: 502,

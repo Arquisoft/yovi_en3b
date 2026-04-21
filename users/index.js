@@ -1,5 +1,11 @@
 const express = require('express');
-const axios = require('axios'); // <-- Needed to make a call to rust logic (bots)
+
+let axios = require('axios');
+if (process.env.NODE_ENV === 'test') {
+  // allows mock injection
+}
+module.exports._setAxios = (mock) => { axios = mock; };
+
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
@@ -92,16 +98,17 @@ app.get('/play', async (req, res) => {
       */
       const rustResponse = await axios.post(
           `http://gamey:4000/v1/ybot/choose/${safeBotId}`,
-          req.body
+          rustPayload // FIX 1: Enviamos el JSON parseado
       );
 
       // Return with the correct format
-      if (response.data.coords) {
-          res.json({ coords: response.data.coords });
-      } else if (response.data.action) {
-          res.json({ action: response.data.action });
+      // FIX 2: Usamos rustResponse en lugar de response
+      if (rustResponse.data.coords) {
+          res.json({ coords: rustResponse.data.coords });
+      } else if (rustResponse.data.action) {
+          res.json({ action: rustResponse.data.action });
       } else {
-          res.json(response.data); 
+          res.json(rustResponse.data); 
       }
 
   } catch (error) {
@@ -120,4 +127,5 @@ if (require.main === module) {
   })
 }
 
+app._setAxios = (mock) => { axios = mock; };
 module.exports = app;
