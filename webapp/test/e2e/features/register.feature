@@ -10,7 +10,7 @@ Feature: User Register
     And I enter the email "user@user"
     And I enter the password "Test@123456"
     And I click on "SAVE ACCOUNT"
-    Then I should see the login page
+    Then I should see the GAME Y title
 
   Scenario: Wrong registration, repeated username
     Given the main page opened and a user already created with username "user123456" and email "user123456@user"

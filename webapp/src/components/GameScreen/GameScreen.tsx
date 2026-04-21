@@ -12,17 +12,19 @@ import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
+import { createMatch, finishMatch } from './game.api';
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useI18n();
-    const { colorBlindMode, playSound, isMuted, setIsMuted } = useSettings(); // Added isMuted and setIsMuted
+    const { colorBlindMode, playSound, isMuted, setIsMuted, confirmMove } = useSettings();
 
     const {
         size = 5,
         time: initialTime = null,
-        botType = 'robot'
+        botType = 'robot',
+        difficulty = 1  // Add difficulty extraction
     } = location.state || {};
 
     const [timeLeft, setTimeLeft] = useState<number | null>(initialTime);
@@ -39,16 +41,68 @@ const GameScreen: React.FC = () => {
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
     const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
     const [inputValue, setInputValue] = useState('');
-    
+    const [matchId, setMatchId] = useState<string | null>(null);
+    const [isMatchCreating, setIsMatchCreating] = useState(false);
+    const [matchError, setMatchError] = useState<string | null>(null);
+
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
-    // Effect to trigger game over sounds
+    // Effect to create match on component mount
+    useEffect(() => {
+        if (isMatchCreating || matchId) return;
+        if (!localStorage.getItem('userId')) return;
+
+        const createGameMatch = async () => {
+            setIsMatchCreating(true);
+            try {
+                const match = await createMatch(
+                    true, // isBot=true (playing against bot)
+                    difficulty || 1 // use the actual difficulty (1=easy, 2=medium, 3=hard)
+                );
+                setMatchId(match.id);
+                setMatchError(null);
+            } catch (error) {
+                const msg = error instanceof Error ? error.message : 'Failed to create match';
+                console.error('Match creation error:', msg);
+                setMatchError(msg);
+            } finally {
+                setIsMatchCreating(false);
+            }
+        };
+
+        createGameMatch();
+    }, [difficulty]);
+
+    // Effect to trigger game over sounds and finish match
     useEffect(() => {
         if (gameResult === 'win') playSound('win.mp3');
         if (gameResult === 'lose') playSound('gameover.mp3');
-    }, [gameResult, playSound]);
+
+        // Finish the match when game ends
+        if (gameResult && matchId) {
+            const finishGameMatch = async () => {
+                try {
+                    const userId = localStorage.getItem('userId');
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+
+                    const winnerId = gameResult === 'win' ? userId : 'bot';
+                    await finishMatch(matchId, winnerId);
+                    console.log(`Match finished with result: ${gameResult}`);
+                } catch (error) {
+                    const msg = error instanceof Error ? error.message : 'Failed to finish match';
+                    console.error('Match finish error:', msg);
+                    setMatchError(msg);
+                }
+            };
+
+            finishGameMatch();
+        }
+    }, [gameResult, matchId, playSound]);
 
     const formatDisplayTime = (seconds: number | null) => {
         if (seconds === null) return "∞";
@@ -60,7 +114,7 @@ const GameScreen: React.FC = () => {
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
-        playSound('click.mp3'); 
+        playSound('click.mp3');
         setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
         setInputValue('');
     };
@@ -78,13 +132,19 @@ const GameScreen: React.FC = () => {
     const handleClick = (cell: Cell) => {
         const key = `${cell.x}-${cell.y}-${cell.z}`;
         if (gameResult || botCooldown || boardState[key]) return;
-        playSound('click.mp3'); 
-        setPendingMove(cell);
+
+        if (confirmMove) {
+            playSound('click.mp3');
+            setPendingMove(cell);
+        } else {
+            playSound('place-tile.mp3');
+            executeMove(cell);
+        }
     };
 
     const handleConfirm = () => {
         if (!pendingMove || gameResult) return;
-        playSound('place-tile.mp3'); 
+        playSound('place-tile.mp3');
 
         // Saves in the history of moves (for the undo)
         setHistory(prev => [...prev, boardState]);
@@ -111,8 +171,43 @@ const GameScreen: React.FC = () => {
                 const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
                 const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
                 const stateAfterBot = { ...newBoardState, [botKey]: 2 };
-                
-                playSound('place-tile.mp3'); 
+
+                playSound('place-tile.mp3');
+                setBoardState(stateAfterBot);
+
+                if (checkWin(stateAfterBot, 2, size, cells)) {
+                    setGameResult('lose');
+                }
+            }
+            setCurrentPlayer(1);
+            setBotCooldown(false);
+        }, 1200);
+    };
+
+    const executeMove = (cell: Cell) => {
+        setHistory(prev => [...prev, boardState]);
+        setCanUndo(true);
+
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
+        const newBoardState = { ...boardState, [key]: 1 };
+        setBoardState(newBoardState);
+        setPendingMove(null);
+
+        if (checkWin(newBoardState, 1, size, cells)) {
+            setGameResult('win');
+            return;
+        }
+
+        setCurrentPlayer(2);
+        setBotCooldown(true);
+        setTimeout(() => {
+            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]);
+            if (availableCells.length > 0) {
+                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
+                const stateAfterBot = { ...newBoardState, [botKey]: 2 };
+
+                playSound('place-tile.mp3');
                 setBoardState(stateAfterBot);
 
                 if (checkWin(stateAfterBot, 2, size, cells)) {
@@ -147,23 +242,29 @@ const GameScreen: React.FC = () => {
 
     const restartGame = () => {
         playSound('click.mp3');
+        setBoardState({});
+        setHistory([]);
+        setGameResult(null);
+        setCurrentPlayer(1);
+        setTimeLeft(initialTime);
+        setMatchId(null); // Reset match ID for new game
         navigate('/menu', { state: { openConfig: true } });
     };
 
     return (
-        <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}> 
+        <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}>
             <div className="game-main-content">
                 <header className="game-header">
-                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`} 
-                         style={{ borderColor: currentPlayer === 1 ? p1Color : 'transparent' }}>
+                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`}
+                        style={{ borderColor: currentPlayer === 1 ? p1Color : 'transparent' }}>
                         {t.labels.player1}
                     </div>
                     <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`}
-                         style={{ borderColor: p1Color }}>
+                        style={{ borderColor: p1Color }}>
                         <span className="timer-value" style={{ color: p1Color }}>{formatDisplayTime(timeLeft)}</span>
                     </div>
                     <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}
-                         style={{ borderColor: currentPlayer === 2 ? p2Color : 'transparent' }}>
+                        style={{ borderColor: currentPlayer === 2 ? p2Color : 'transparent' }}>
                         {t.labels.player2}
                     </div>
                 </header>
@@ -194,17 +295,23 @@ const GameScreen: React.FC = () => {
                 </main>
 
                 <footer className="game-footer">
-                    <button 
-                        className="game-action-btn" 
+                    <button
+                        className="game-action-btn"
                         onClick={handleUndo}
-                        disabled ={history.length === 0 || botCooldown || !canUndo}
+                        disabled={history.length === 0 || botCooldown || !canUndo}
+                    >
+                        <Undo2 size={18} />
+                        <span>{t.buttons.undo}</span>
+                    </button>
+                    {confirmMove && (
+                        <button
+                            className="game-action-btn btn-confirm-action"
+                            onClick={handleConfirm}
+                            disabled={!pendingMove || botCooldown}
                         >
-                            <Undo2 size={18} /> 
-                            <span>{t.buttons.undo}</span>
-                    </button>
-                    <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
-                        <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
-                    </button>
+                            <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
+                        </button>
+                    )}
                     <button className="game-action-btn btn-exit-footer" onClick={() => { playSound('click.mp3'); setShowExitConfirmation(true); }}>
                         <LogOut size={18} /> <span>{t.buttons.exit}</span>
                     </button>
@@ -214,9 +321,9 @@ const GameScreen: React.FC = () => {
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
                     {/* New Mute/Unmute button for background music */}
-                    <button 
-                        title={isMuted ? "Unmute" : "Mute"} 
-                        className="icon-btn-global" 
+                    <button
+                        title={isMuted ? "Unmute" : "Mute"}
+                        className="icon-btn-global"
                         onClick={() => {
                             playSound('click.mp3'); // UI feedback still plays
                             setIsMuted(!isMuted); // Toggle global music mute
@@ -270,6 +377,11 @@ const GameScreen: React.FC = () => {
                         <p className="result-modal-text">
                             {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
                         </p>
+                        {matchError && (
+                            <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
+                                {matchError}
+                            </p>
+                        )}
                         <div className="modal-buttons-column">
                             <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
                             <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>

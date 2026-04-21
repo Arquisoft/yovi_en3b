@@ -2,6 +2,9 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com/?lines=A+modern,+high+performance+gaming+suite+dedicated+to+the+classic+Game+Y.+🚀&width=1100)](https://git.io/typing-svg)
 
+<p align="center"> Do you want to play? Try it here! </p>
+<p align="center"> http://20.199.16.53/ </p>
+
 <p align="center">
   <a href="https://arquisoft.github.io/yovi_en3b/">
     <img src="https://img.shields.io/badge/Docs-Arc42-blue?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Arc42 Documentation">
@@ -111,6 +114,81 @@ The `gamey` component is a Rust-based game engine with bot support, built with [
 - `src/web/`: Web interface components.
 - `Cargo.toml`: Project manifest with dependencies and metadata.
 - `Dockerfile`: Defines the Docker image for the gamey service.
+
+## Running the Project
+
+### 📊 Ranking System
+
+The application includes a comprehensive ranking system that tracks player performance and calculates competitive standings.
+
+#### How Rankings Work
+
+1. **Match Completion**: When a match finishes, the winner and loser are recorded in the database
+2. **Ranking Initialization**: If a player is new, their ranking entry is automatically created
+3. **Score Calculation**: Rankings are calculated using the formula: `score = 50 * (2 * wins - total_matches)`
+4. **Position Calculation**: Player positions are determined by sorting all players by score in descending order
+
+#### Ranking API Endpoints
+
+**Get My Ranking Position**
+```
+GET /ranking/me?userId={userId}
+```
+Response:
+```json
+{
+  "position": 5,
+  "totalPlayers": 127
+}
+```
+
+**Finish a Match (Record Winner)**
+```
+POST /matches/finish
+Content-Type: application/json
+
+{
+  "matchId": "match-uuid",
+  "winnerId": "winner-user-id"
+}
+```
+
+This endpoint automatically:
+- Records the match winner
+- Updates both players' ranking statistics
+- Initializes new player rankings if needed
+
+**Get Global Rankings**
+```
+GET /ranking/global
+```
+Response: Array of players with their stats, ranked by score.
+
+#### Frontend Integration
+
+When a match completes in the game, call the `/matches/finish` endpoint with:
+- `matchId`: The ID of the completed match
+- `winnerId`: The UUID of the winning player
+
+After calling this endpoint, the user's ranking will be updated and visible in their profile.
+
+#### Example Flow
+
+```
+1. Player finishes a game (wins)
+   ↓
+2. Frontend calls: POST /matches/finish
+   { matchId: "abc123", winnerId: "user-uuid" }
+   ↓
+3. Backend records match result
+4. Backend initializes/updates player rankings
+   ↓
+5. User opens profile
+6. Frontend fetches: GET /ranking/me?userId=user-uuid
+7. Display updated ranking position
+```
+
+---
 
 ## Running the Project
 

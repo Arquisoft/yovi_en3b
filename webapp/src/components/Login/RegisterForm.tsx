@@ -36,6 +36,8 @@ const RegisterForm: React.FC = () => {
       if (res.ok) {
         localStorage.setItem('token', data.token); // Save auth token to local storage
         localStorage.setItem('username', username); // Save username for global reference
+        localStorage.setItem('userId', data.id || ''); // Save user ID for match creation
+        console.log('Login stored userId:', localStorage.getItem('userId'));
         navigate('/menu'); // Redirect user to the main menu
       } else {
         setError(data.message || 'Error in the login. Please check your credentials.');

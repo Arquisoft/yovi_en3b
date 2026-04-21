@@ -126,6 +126,11 @@
     border-color: var(--game-red);
 }
 
+.history-card.in_progress,
+.history-card.abandoned {
+    border-color: #94a3b8;
+}
+
 /* Neon Glow Effect */
 .neon-mode .history-card.win {
     box-shadow: 0 0 1.25rem var(--game-accent);
@@ -178,10 +183,23 @@
 .result-text { font-family: 'Cubic', sans-serif; font-size: 1.4rem; letter-spacing: 2px; }
 .result-text.win { color: var(--game-accent); }
 .result-text.lose { color: var(--game-red); }
+.result-text.in_progress,
+.result-text.abandoned { color: #cbd5e1; }
 
 .color-blind .icon-win { color: var(--game-accent); }
 .color-blind .icon-lose { color: #ffffff; }
 .color-blind .result-text.lose { color: #ffffff; }
+
+.history-feedback {
+    color: #e2e8f0;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.history-feedback-error {
+    color: #f87171;
+}
 
 @media (max-width: 56rem) {
     .history-card {

@@ -129,10 +129,15 @@ describe('ProfileOverlay High Coverage Boost', () => {
         
         await userEvent.click(screen.getByText('Change Password'));
         
-        // Rellenar campos válidos para activar el botón
-        await userEvent.type(screen.getByPlaceholderText('Current'), 'oldPass123!');
-        await userEvent.type(screen.getByPlaceholderText('New'), 'NewPass123!');
-        await userEvent.type(screen.getByPlaceholderText('Confirm'), 'NewPass123!');
+        fireEvent.change(screen.getByPlaceholderText('Current'), {
+            target: { value: 'oldPass123!' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('New'), {
+            target: { value: 'NewPass123!' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('Confirm'), {
+            target: { value: 'NewPass123!' },
+        });
 
         const confirmBtn = screen.getByText('Confirm');
         expect(confirmBtn).not.toBeDisabled();
@@ -149,9 +154,15 @@ describe('ProfileOverlay High Coverage Boost', () => {
         renderComponent();
         
         await userEvent.click(screen.getByText('Change Password'));
-        await userEvent.type(screen.getByPlaceholderText('Current'), 'a');
-        await userEvent.type(screen.getByPlaceholderText('New'), 'ValidPass1!');
-        await userEvent.type(screen.getByPlaceholderText('Confirm'), 'ValidPass1!');
+        fireEvent.change(screen.getByPlaceholderText('Current'), {
+            target: { value: 'a' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('New'), {
+            target: { value: 'ValidPass1!' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('Confirm'), {
+            target: { value: 'ValidPass1!' },
+        });
 
         await userEvent.click(screen.getByText('Confirm'));
 

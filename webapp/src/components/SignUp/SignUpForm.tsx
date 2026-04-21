@@ -58,7 +58,12 @@ const SignUpForm: React.FC = () => {
       });
 
       if (response.ok) {
-        navigate('/'); 
+        const data = await response.json();
+        console.log('Signup response:', data);
+        localStorage.setItem('username', formData.username);
+        localStorage.setItem('userId', data.id || '');
+        console.log('Stored userId:', localStorage.getItem('userId'));
+        navigate('/menu'); 
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Error creating account. Please try again.");

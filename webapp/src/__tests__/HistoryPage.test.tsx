@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import HistoryPage from  '../components/HistoryPage/HistoryPage';
 import { SettingsProvider } from '../context/SettingsContext';
+import { getMyMatchHistory } from '../components/HistoryPage/history.api';
 
 const mockNavigate = vi.fn(); // Mock for navigation
 
@@ -31,6 +32,10 @@ vi.mock('../i18n/useTranslation', () => ({
   }),
 }));
 
+vi.mock('../components/HistoryPage/history.api', () => ({
+  getMyMatchHistory: vi.fn(),
+}));
+
 // 3. Mock Global de Audio (para evitar el error de constructor)
 vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
   return {
@@ -44,6 +49,12 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
 describe('HistoryPage', () => {
   beforeEach(() => {
     vi.clearAllMocks(); // Limpiar historial de navegación antes de cada test
+    vi.mocked(getMyMatchHistory).mockResolvedValue([
+      { id: '1', date: '2024-03-20T00:00:00.000Z', result: 'win', size: 5, opponent: 'Bot Easy', isBot: true, opponentAvatarId: null, status: 'finished' },
+      { id: '2', date: '2024-03-19T00:00:00.000Z', result: 'lose', size: 7, opponent: 'Bot Medium', isBot: true, opponentAvatarId: null, status: 'finished' },
+      { id: '3', date: '2024-03-18T00:00:00.000Z', result: 'win', size: 5, opponent: 'Bot Easy', isBot: true, opponentAvatarId: null, status: 'finished' },
+      { id: '4', date: '2024-03-17T00:00:00.000Z', result: 'win', size: 6, opponent: 'Bot Hard', isBot: true, opponentAvatarId: null, status: 'finished' },
+    ]);
   });
 
   const renderComponent = () => render(
@@ -54,18 +65,13 @@ describe('HistoryPage', () => {
     </MemoryRouter>
   );
 
-  test('renders history content and mock matches', () => {
+  test('renders history content and fetched matches', async () => {
     renderComponent();
     
-    // Verificar título
     expect(screen.getByText('HISTORIAL')).toBeDefined();
-    
-    // Verificar que se renderizan las estadísticas (ej. PARTIDAS)
-    expect(screen.getByText('PARTIDAS')).toBeDefined();
-    
-    // Verificar que aparecen los oponentes del Mock Data
-    expect(screen.getAllByText(/Bot Chip/i)).toHaveLength(2);
-    expect(screen.getByText(/Bot Robot/i)).toBeDefined();
+    expect(await screen.findByText('PARTIDAS')).toBeDefined();
+    expect(await screen.findAllByText(/Bot Easy/i)).toHaveLength(2);
+    expect(await screen.findByText(/Bot Medium/i)).toBeDefined();
   });
 
   test('navigates back to menu when clicking the back button', () => {
@@ -81,12 +87,10 @@ describe('HistoryPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/menu');
   });
 
-  test('calculates and displays the correct win rate', () => {
+  test('calculates and displays the correct win rate', async () => {
     renderComponent();
-    
-    // Con 4 partidas y 3 victorias (según tus mock data), el win rate es 75%
-    expect(screen.getByText('75%')).toBeDefined();
-    expect(screen.getByText('4')).toBeDefined(); // Total partidas
-    expect(screen.getByText('3')).toBeDefined(); // Victorias
+    expect(await screen.findByText('75%')).toBeDefined();
+    expect(await screen.findByText('4')).toBeDefined();
+    expect(await screen.findByText('3')).toBeDefined();
   });
-});
+}); 

@@ -8,10 +8,9 @@ import { useSettings } from "../../context/SettingsContext";
 import "./ProfileOverlay.css";
 import { changePassword } from "./userProfile.api";
 import { toast } from "sonner";
+import { AVATAR_OPTIONS, getAvatarGlyph } from "../avatarCatalog";
 
 interface ProfileOverlayProps { open: boolean; onClose: () => void; }
-
-const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
 
 export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose }) => {
   const { t } = useI18n();
@@ -102,7 +101,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
           <>
             <div className="profile-avatar-display">
               <div className="profile-avatar-bubble">
-                {draftAvatarId ? AVATARS[parseInt(draftAvatarId.slice(-2)) - 1] : "👤"}
+                {getAvatarGlyph(draftAvatarId)}
               </div>
             </div>
 
@@ -210,7 +209,7 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
               <div className="profile-row">
                 <label>{t.labels.chooseAvatar}</label>
                 <div className="profile-avatar-grid">
-                  {AVATARS.map((emoji, i) => {
+                  {AVATAR_OPTIONS.map((emoji, i) => {
                     const id = `avatar_0${i + 1}`;
                     return (
                       <button
