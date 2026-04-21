@@ -59,8 +59,8 @@ export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
           {/* Red line (Player 2) */}
           <Line 
             type="monotone" 
-            dataKey="P2" 
-            name="Rojo" 
+            dataKey="red" 
+            name="P2" 
             stroke="var(--player2-color, #ef4444)" 
             strokeWidth={3} 
             dot={{ r: 3 }} 
