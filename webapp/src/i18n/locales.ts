@@ -1,11 +1,10 @@
-
 export const translations = {
   es: {
     buttons: {
       play: 'JUGAR',
       howToPlay: 'CÓMO JUGAR',
       save: 'GUARDAR',
-      reset: 'RESETEAR',
+      reset: 'RESET',
       undo: 'DESHACER',
       hint: 'PISTA',
       confirm: 'CONFIRMAR',
@@ -23,7 +22,7 @@ export const translations = {
       logout: 'CERRAR SESIÓN',
       spanish: 'ESPAÑOL',
       english: 'INGLÉS',
-      turkish: 'TURCO', // Añadido para solucionar el error de TypeScript
+      turkish: 'TURCO',
       yesExitAndLose: 'SÍ, SALIR Y PERDER',
       backToGame: 'VOLVER AL JUEGO',
       playNow: 'JUGAR AHORA',
@@ -68,7 +67,9 @@ export const translations = {
       uniqueIdCannotBeChanged: 'ID ÚNICO - NO SE PUEDE CAMBIAR',
       preview: 'PREVISUALIZACIÓN',
       timeLimit: 'TIEMPO LÍMITE',
-      opponent: 'OPONENTE',
+      opponent: 'JUGAR CONTRA',
+      computer: 'ORDENADOR', // Nueva etiqueta
+      ai: 'IA', // Nueva etiqueta
       difficulty: 'DIFICULTAD',
       boardSize: 'TAMAÑO DEL TABLERO',
       noLimit: 'SIN LÍMITE',
@@ -104,7 +105,7 @@ export const translations = {
       congrats: '¡Felicidades, has ganado!',
       nextTime: '¡Buen intento, pero has perdido esta vez!',
       winDetail: 'Has demostrado ser un gran estratega. ¡Sigue así para mantener tu racha ganadora!',
-      loseDetail: 'No te desanimes, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
+      loseDetail: 'No te desanimen, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
       logoutConfirmation: '¿Estás seguro de que quieres cerrar sesión?',
       passwordChangedSuccess: '¡Contraseña actualizada con éxito!',
       passwordsDoNotMatch: 'Las nuevas contraseñas no coinciden',
@@ -193,7 +194,9 @@ export const translations = {
       uniqueIdCannotBeChanged: 'UNIQUE ID - CANNOT BE CHANGED',
       preview: 'PREVIEW',
       timeLimit: 'TIME LIMIT',
-      opponent: 'OPPONENT',
+      opponent: 'PLAY AGAINST',
+      computer: 'COMPUTER', // New label
+      ai: 'AI', // New label
       difficulty: 'DIFFICULTY',
       boardSize: 'BOARD SIZE',
       noLimit: 'NO LIMIT',
@@ -319,6 +322,8 @@ export const translations = {
       preview: 'ÖNİZLEME',
       timeLimit: 'ZAMAN SINIRI',
       opponent: 'RAKİP',
+      computer: 'BILGISAYAR', // New label
+      ai: 'YZ', // New label (Yapay Zeka)
       difficulty: 'ZORLUK',
       boardSize: 'TAHTA BOYUTU',
       noLimit: 'SINIRSIZ',
@@ -372,7 +377,7 @@ export const translations = {
       step2Title: 'Bağlantı',
       step2Text: 'Sıranız geldiğinde, boş bir kesişim noktasına kendi renginizden bir taş yerleştirin. Amacınız kesintisiz bir hat oluşturmaktır.',
       step3Title: '"Y" Hedefi',
-      step3Text: 'Kazanmak için yolunuz üçgen tahtanın üç kenarını da birbirine bağlamalıdır. Köşeler her mi kenara da dahil sayılır!',
+      step3Text: 'Kazanmak için yolunuz üçgen tahtanın tres kenarını da birbirine bağlamalıdır. Köşeler her mi kenara da dahil sayılır!',
     }
   }
 };

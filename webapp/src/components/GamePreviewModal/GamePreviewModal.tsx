@@ -1,7 +1,7 @@
-// UBICACIÓN: webapp/src/components/GamePreviewModal/GamePreviewModal.tsx
+
 import React, { useState } from 'react';
 import { useI18n } from '../../i18n/useTranslation'; 
-import { useSettings } from '../../context/SettingsContext'; // Importamos el contexto de ajustes
+import { useSettings } from '../../context/SettingsContext'; // Contexto de ajustes
 import { Bot, Cpu } from 'lucide-react'; 
 import './GamePreviewModal.css';
 
@@ -71,41 +71,48 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
 
           <div className="preview-right-column">
             <div className="setting-control">
+              <span className="bot-label">{}</span>
               <label className="label-white-bold">{t.labels.opponent}</label>
               <div className="bot-selector">
-                <button 
-                  className={`bot-btn ${selectedBot === 0 ? 'active' : ''}`} 
-                  onClick={() => { playSound('click.mp3'); setSelectedBot(0); }}
-                >
-                  <Bot size={48} color={selectedBot === 0 ? accentColor : "#fff"} />
-                </button>
-                <button 
-                  className={`bot-btn ${selectedBot === 1 ? 'active' : ''}`} 
-                  onClick={() => { playSound('click.mp3'); setSelectedBot(1); }}
-                >
-                  <Cpu size={48} color={selectedBot === 1 ? accentColor : "#fff"} />
-                </button>
+                <div className="bot-option">
+                  <span className="bot-label">{t.labels.computer}</span>
+                  <button 
+                    className={`bot-btn ${selectedBot === 0 ? 'active' : ''}`} 
+                    onClick={() => { playSound('click.mp3'); setSelectedBot(0); }}
+                  >
+                    <Bot size={48} color={selectedBot === 0 ? accentColor : "#fff"} />
+                  </button>
+                </div>
+                <div className="bot-option">
+                  <span className="bot-label">{t.labels.ai}</span>
+                  <button 
+                    className={`bot-btn ${selectedBot === 1 ? 'active' : ''}`} 
+                    onClick={() => { playSound('click.mp3'); setSelectedBot(1); }}
+                  >
+                    <Cpu size={48} color={selectedBot === 1 ? accentColor : "#fff"} />
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="setting-control">
-  <label className="label-white-bold">{t.labels.difficulty}</label>
-  <div className="difficulty-slider-container">
-    <input 
-      type="range" 
-      min="0" 
-      max="2" 
-      value={difficulty} 
-      onChange={(e) => setDifficulty(parseInt(e.target.value))} 
-      className="neon-slider" 
-    />
-    <div className="slider-labels-below">
-      <span className={difficulty === 0 ? 'active' : ''}>{t.buttons.easy}</span>
-      <span className={difficulty === 1 ? 'active' : ''}>{t.buttons.medium}</span>
-      <span className={difficulty === 2 ? 'active' : ''}>{t.buttons.hard}</span>
-    </div>
-  </div>
-</div>
+              <label className="label-white-bold">{t.labels.difficulty}</label>
+              <div className="difficulty-slider-container">
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="2" 
+                  value={difficulty} 
+                  onChange={(e) => setDifficulty(parseInt(e.target.value))} 
+                  className="neon-slider" 
+                />
+                <div className="slider-labels-below">
+                  <span className={difficulty === 0 ? 'active' : ''}>{t.buttons.easy}</span>
+                  <span className={difficulty === 1 ? 'active' : ''}>{t.buttons.medium}</span>
+                  <span className={difficulty === 2 ? 'active' : ''}>{t.buttons.hard}</span>
+                </div>
+              </div>
+            </div>
 
             <div className="setting-control">
               <label className="label-white-bold">{t.labels.boardSize}</label>
