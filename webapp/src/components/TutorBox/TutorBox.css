@@ -1,0 +1,93 @@
+.tutor-bot-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 100;
+}
+
+.robot-icon-wrapper {
+    width: 3.75rem;
+    height: 3.75rem;
+    background: rgba(30, 41, 59, 0.9);
+    border: 0.125rem solid #60a5fa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 0.9375rem rgba(96, 165, 250, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.robot-icon-wrapper:hover {
+    transform: scale(1.1);
+    border-color: #ffffff;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -0.125rem;
+    right: -0.125rem;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0.125rem solid #1e293b;
+    animation: pulse-red 2s infinite;
+}
+
+.tutor-bubble {
+    background: #ffffff;
+    color: #1e293b;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.9375rem;
+    width: 12.5rem;
+    position: relative;
+    box-shadow: 0 0.625rem 1.5625rem rgba(0,0,0,0.3);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    animation: slideUp 0.3s ease-out;
+}
+
+.close-tutor {
+    position: absolute;
+    top: 0.3125rem;
+    right: 0.3125rem;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.tutor-arrow {
+    position: absolute;
+    bottom: -0.625rem;
+    right: 1.25rem;
+    width: 0;
+    height: 0;
+    border-left: 0.625rem solid transparent;
+    border-right: 0.625rem solid transparent;
+    border-top: 0.625rem solid #ffffff;
+}
+
+@keyframes pulse-red {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 0.625rem rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(0.625rem); }
+    to { opacity: 1; transform: translateY(0); }
+}
