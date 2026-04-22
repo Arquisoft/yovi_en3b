@@ -26,9 +26,9 @@ const GameScreen: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useI18n();
-    const { 
-        colorBlindMode, playSound, isMuted, setIsMuted, 
-        confirmMove, tutorEnabled 
+    const {
+        colorBlindMode, playSound, isMuted, setIsMuted,
+        confirmMove, tutorEnabled
     } = useSettings();
 
     const {
@@ -62,28 +62,28 @@ const GameScreen: React.FC = () => {
     // --- ESTADOS TUTOR ---
     const [tutorMessage, setTutorMessage] = useState<string | null>(null);
     const [turnStartTime, setTurnStartTime] = useState<number>(Date.now());
-    const [tutorMessagesCount, setTutorMessagesCount] = useState(0); 
-    const [movesSinceLastTip, setMovesSinceLastTip] = useState(0); 
+    const [tutorMessagesCount, setTutorMessagesCount] = useState(0);
+    const [movesSinceLastTip, setMovesSinceLastTip] = useState(0);
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
     // 1. Temporizador del juego
     useEffect(() => {
-        if (timeLeft === null || gameResult) return; 
+        if (timeLeft === null || gameResult) return;
         if (timeLeft <= 0) {
-            setGameResult('lose'); 
+            setGameResult('lose');
             return;
         }
         const timer = setInterval(() => {
-            setTimeLeft(prev => (prev !== null ? prev - 1 : null)); 
+            setTimeLeft(prev => (prev !== null ? prev - 1 : null));
         }, 1000);
-        return () => clearInterval(timer); 
+        return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
 
     // 2. Lógica del Tutor con Progresión Inteligente
     useEffect(() => {
-        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return; 
+        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return;
 
         const tutorTimer = setInterval(() => {
             const secondsSinceTurnStart = (Date.now() - turnStartTime) / 1000;
@@ -102,10 +102,10 @@ const GameScreen: React.FC = () => {
             if (conditionMet) {
                 const tips = t.tutor.tips;
                 if (tips && tips.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * tips.length);
+                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % tips.length;
                     setTutorMessage(tips[randomIndex]);
                     setTutorMessagesCount(prev => prev + 1);
-                    setMovesSinceLastTip(0); 
+                    setMovesSinceLastTip(0);
                     playSound('notification.mp3');
                 }
             }
@@ -118,7 +118,7 @@ const GameScreen: React.FC = () => {
     useEffect(() => {
         const initMatch = async () => {
             try {
-                const m = await createMatch(true, difficulty); 
+                const m = await createMatch(true, difficulty);
                 setMatchId(m.id);
             } catch (e) { console.error(e); }
         };
@@ -128,7 +128,7 @@ const GameScreen: React.FC = () => {
     useEffect(() => {
         if (gameResult && matchId) {
             const userId = localStorage.getItem('userId') || 'player';
-            finishMatch(matchId, gameResult === 'win' ? userId : 'bot'); 
+            finishMatch(matchId, gameResult === 'win' ? userId : 'bot');
             if (gameResult === 'win') playSound('win.mp3');
             else playSound('gameover.mp3');
         }
@@ -204,12 +204,12 @@ const GameScreen: React.FC = () => {
 
         playSound('click.mp3');
         const previousState = history[history.length - 1]; // Recuperamos el último estado guardado
-        
+
         setBoardState(previousState); // Revertimos el tablero
         setHistory(prev => prev.slice(0, -1)); // Eliminamos el último del historial
-        
+
         if (history.length <= 1) setCanUndo(false);
-        
+
         setPendingMove(null);
         setTutorMessage(null);
         setTurnStartTime(Date.now()); // Reiniciamos reloj para el tutor
@@ -222,15 +222,15 @@ const GameScreen: React.FC = () => {
 
         const key = `${cell.x}-${cell.y}-${cell.z}`;
         const newBoard = { ...boardState, [key]: 1 };
-        
-        setMovesSinceLastTip(prev => prev + 1); 
-        setTurnStartTime(Date.now()); 
-        setTutorMessage(null); 
+
+        setMovesSinceLastTip(prev => prev + 1);
+        setTurnStartTime(Date.now());
+        setTutorMessage(null);
         setBoardState(newBoard);
         setPendingMove(null);
 
         if (checkWin(newBoard, 1, size, cells)) {
-            setGameResult('win'); 
+            setGameResult('win');
             return;
         }
 
@@ -239,16 +239,17 @@ const GameScreen: React.FC = () => {
         setTimeout(() => {
             const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
             if (available.length > 0) {
-                const botCell = available[Math.floor(Math.random() * available.length)];
+                const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
+                const botCell = available[randomIndex];
                 const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
                 const afterBot = { ...newBoard, [botKey]: 2 };
                 setBoardState(afterBot);
                 playSound('place-tile.mp3');
-                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose'); 
+                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
             }
             setCurrentPlayer(1);
             setBotCooldown(false);
-            setTurnStartTime(Date.now()); 
+            setTurnStartTime(Date.now());
         }, 1200);
     };
 
@@ -348,9 +349,29 @@ const GameScreen: React.FC = () => {
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button className="icon-btn-global" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}</button>
-                    <button className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
-                    <button className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
+                    <button
+                        className="icon-btn-global"
+                        title="Mute" // Opcional para otros tests
+                        onClick={() => setIsMuted(!isMuted)}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    <button
+                        className="icon-btn-global"
+                        title="Language"
+                        onClick={() => setShowLanguageDialog(true)}
+                    >
+                        <Languages size={20} />
+                    </button>
+
+                    <button
+                        className="icon-btn-global"
+                        title="Chat"
+                        onClick={() => setIsChatOpen(!isChatOpen)}
+                    >
+                        <MessageSquare size={20} />
+                    </button>
                 </div>
                 {isChatOpen && (
                     <div className="chat-container">
