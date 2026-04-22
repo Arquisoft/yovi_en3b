@@ -1,5 +1,5 @@
 // UBICACIÓN: webapp/src/pages/GameScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
     Volume2, VolumeX // Added volume icons
@@ -46,6 +46,7 @@ const GameScreen: React.FC = () => {
     const [matchId, setMatchId] = useState<string | null>(null);
     const [isMatchCreating, setIsMatchCreating] = useState(false);
     const [matchError, setMatchError] = useState<string | null>(null);
+    const chatMessagesRef = useRef<HTMLDivElement | null>(null);
     
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
@@ -119,6 +120,11 @@ const GameScreen: React.FC = () => {
         return 'medium';
     };
 
+    const mapBotId = (_type: string): string => {
+        // Map frontend bot types to backend bot IDs
+        return 'llm_bot'; // Use the registered llm_bot for all bot types
+    };
+
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
@@ -136,7 +142,7 @@ const GameScreen: React.FC = () => {
                 boardState,
                 messages: nextMessages,
                 difficulty: mapDifficulty(difficulty),
-                botId: botType === 'chip' ? 'chip' : 'robot',
+                botId: mapBotId(botType),
             });
             const replyText = typeof reply === 'string' && reply.trim().length > 0
                 ? reply.trim()
@@ -164,6 +170,13 @@ const GameScreen: React.FC = () => {
         const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000);
         return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
+
+    useEffect(() => {
+        const chatMessages = chatMessagesRef.current;
+        if (!chatMessages) return;
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, [messages, isBotTyping]);
 
     const handleClick = (cell: Cell) => {
         const key = `${cell.x}-${cell.y}-${cell.z}`;
@@ -350,7 +363,7 @@ const GameScreen: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="chat-messages">
+                        <div className="chat-messages" ref={chatMessagesRef}>
                             {messages.map((msg, index) => (
                                 <div
                                     key={index}

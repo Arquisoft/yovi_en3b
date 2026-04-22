@@ -63,8 +63,6 @@ impl Default for YBotRegistry {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

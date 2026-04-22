@@ -29,6 +29,38 @@ type GameyChatResponse = {
   reply: string;
 };
 
+type GameyChatErrorResponse = {
+  message?: string;
+  error?: string;
+};
+
+function resolveChatTimeoutMs(): number {
+  const rawValue = import.meta.env.VITE_GAMEY_CHAT_TIMEOUT_MS;
+  const parsed = Number.parseInt(rawValue ?? '', 10);
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return 15_000;
+}
+
+function extractChatErrorMessage(errorText: string, status: number): string {
+  try {
+    const parsed = JSON.parse(errorText) as { message?: string; error?: string };
+    if (typeof parsed.message === 'string' && parsed.message.trim().length > 0) {
+      return parsed.message.trim();
+    }
+    if (typeof parsed.error === 'string' && parsed.error.trim().length > 0) {
+      return parsed.error.trim();
+    }
+  } catch {
+    // Fall back to the raw response body below.
+  }
+
+  return errorText || `Gamey chat request failed (${status})`;
+}
+
 function normalizeChatHistory(
   messages: Array<GameChatMessage | LegacyGameChatMessage>,
 ): Array<{ role: string; content: string }> {
@@ -66,12 +98,12 @@ function normalizeChatHistory(
  * @param size - The board dimensions (board is triangular with base of size)
  * @param boardState - Object mapping 3D coordinates (as "x-y-z" strings) to owner values
  *                     (1 for Blue, 2 for Red, undefined for empty)
- * @returns A string representation of the board layout using format like "B.R/..B./..."
+ * @returns A string representation of the board layout using format like "B/.R/B.."
  *
  * @example
- * const boardState = { "2-0-2": 1, "2-1-1": 2, "2-2-0": 1 };
+ * const boardState = { "2-0-0": 1, "1-1-0": 2, "0-0-2": 1 };
  * const layout = buildYenLayout(3, boardState);
- * // Returns something like "B/R.B/..."
+ * // Returns "B/.R/B.."
  */
 export function buildYenLayout(
   size: number,
@@ -119,7 +151,7 @@ export function buildYenLayout(
  * const reply = await requestBotChatReply({
  *   size: 3,
  *   currentPlayer: 1,
- *   boardState: { "2-0-2": 1 },
+ *   boardState: { "2-0-0": 1 },
  *   messages: [{ sender: 'player', text: 'Hello!' }],
  *   difficulty: 'hard',
  *   botId: 'llm_bot'
@@ -134,6 +166,7 @@ export async function requestBotChatReply(params: {
   botId?: string;
 }): Promise<string> {
   const GAMEY_URL = import.meta.env.VITE_GAMEY_URL ?? 'http://localhost:4000';
+  const timeoutMs = resolveChatTimeoutMs();
   const botId = params.botId ?? 'llm_bot';
   const normalizedMessages = normalizeChatHistory(params.messages);
 
@@ -148,32 +181,58 @@ export async function requestBotChatReply(params: {
   };
 
   let response: Response;
+  let timeoutId: ReturnType<typeof globalThis.setTimeout> | undefined;
+  const controller = new AbortController();
+
   try {
-    response = await fetch(
-      `${GAMEY_URL}/v1/ybot/chat/${botId}?difficulty=${params.difficulty}`,
-      {
+    response = await Promise.race([
+      fetch(`${GAMEY_URL}/v1/ybot/chat/${botId}?difficulty=${params.difficulty}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-      },
-    );
-  } catch {
+        signal: controller.signal,
+      }),
+      new Promise<Response>((_, reject) => {
+        timeoutId = globalThis.setTimeout(() => {
+          controller.abort();
+          reject(
+            new Error(
+              `Gamey chat timed out after ${Math.ceil(timeoutMs / 1000)}s. Check that the gamey service is running and try again.`,
+            ),
+          );
+        }, timeoutMs);
+      }),
+    ]);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Gamey chat timed out')) {
+      throw error;
+    }
+
     throw new Error(
       `Cannot reach Gamey service at ${GAMEY_URL}. Make sure the gamey server/container is running.`,
     );
+  } finally {
+    if (timeoutId !== undefined) {
+      globalThis.clearTimeout(timeoutId);
+    }
   }
 
   if (!response.ok) {
     const errorText = await response.text();
-
-    try {
-      const parsed = JSON.parse(errorText) as { message?: string };
-      throw new Error(parsed.message || `Gamey chat request failed (${response.status})`);
-    } catch {
-      throw new Error(errorText || `Gamey chat request failed (${response.status})`);
-    }
+    throw new Error(extractChatErrorMessage(errorText, response.status));
   }
 
-  const data = (await response.json()) as GameyChatResponse;
+  const data = (await response.json()) as GameyChatResponse | GameyChatErrorResponse;
+
+  if (!('reply' in data) || typeof data.reply !== 'string' || data.reply.trim().length === 0) {
+    if ('message' in data && typeof data.message === 'string' && data.message.trim().length > 0) {
+      throw new Error(data.message.trim());
+    }
+    if ('error' in data && typeof data.error === 'string' && data.error.trim().length > 0) {
+      throw new Error(data.error.trim());
+    }
+    throw new Error('Gamey chat response did not include a valid reply.');
+  }
+
   return data.reply;
 }

@@ -21,24 +21,27 @@
 //! }
 //! ```
 
+pub mod chat;
 pub mod choose;
 pub mod error;
+pub mod hint;
+pub mod play;
 pub mod state;
 pub mod version;
-pub mod hint;
-pub mod chat;
-pub mod play;
 use axum::response::IntoResponse;
-use std::sync::Arc;
-use tower_http::cors::CorsLayer;
+pub use chat::{ChatMessage, ChatRequest, ChatResponse};
 pub use choose::MoveResponse;
 pub use error::ErrorResponse;
-pub use version::*;
 pub use hint::{HintResponse, generate_strategic_hint};
-pub use chat::{ChatMessage, ChatRequest, ChatResponse};
 pub use play::PlayResponse;
+use std::sync::Arc;
+use tower_http::cors::CorsLayer;
+pub use version::*;
 
-use crate::{GameYError, RandomBot, YBotRegistry, state::AppState, LLMBot, DifficultyLevel};
+use crate::{
+    DifficultyLevel, GameYError, LLMBot, RandomBot, YBotRegistry,
+    bot::llm_bot::resolve_llm_api_key, state::AppState,
+};
 
 /// Creates the Axum router with the given state.
 ///
@@ -69,17 +72,36 @@ pub fn create_router(state: AppState) -> axum::Router {
 /// Creates the default application state with the standard bot registry.
 ///
 /// The default state includes the `RandomBot` which selects moves randomly.
-/// If the `ANTHROPIC_API_KEY` environment variable is set, LLM bots with
+/// If `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) is set, LLM bots with
 /// different difficulty levels are also included.
 pub fn create_default_state() -> AppState {
+    let _ = dotenv::dotenv();
+
     let mut bots = YBotRegistry::new().with_bot(Arc::new(RandomBot));
 
     // Add LLM bots if API key is available
-    if std::env::var("ANTHROPIC_API_KEY").is_ok() {
+    if let Some(api_key) = resolve_llm_api_key() {
         bots = bots
-            .with_bot_named("llm-easy", Arc::new(LLMBot::new(DifficultyLevel::Easy)))
-            .with_bot_named("llm-medium", Arc::new(LLMBot::new(DifficultyLevel::Medium)))
-            .with_bot_named("llm-hard", Arc::new(LLMBot::new(DifficultyLevel::Hard)));
+            .with_bot(Arc::new(LLMBot::new(
+                "llm_bot".to_string(),
+                DifficultyLevel::Medium,
+                api_key.clone(),
+            )))
+            .with_bot(Arc::new(LLMBot::new(
+                "llm-easy".to_string(),
+                DifficultyLevel::Easy,
+                api_key.clone(),
+            )))
+            .with_bot(Arc::new(LLMBot::new(
+                "llm-medium".to_string(),
+                DifficultyLevel::Medium,
+                api_key.clone(),
+            )))
+            .with_bot(Arc::new(LLMBot::new(
+                "llm-hard".to_string(),
+                DifficultyLevel::Hard,
+                api_key,
+            )));
     }
 
     AppState::new(bots)
@@ -101,11 +123,12 @@ pub async fn run_bot_server(port: u16) -> Result<(), GameYError> {
     let app = create_router(state);
 
     let addr = format!("0.0.0.0:{}", port);
-    let listener = tokio::net::TcpListener::bind(&addr)
-        .await
-        .map_err(|e| GameYError::ServerError {
-            message: format!("Failed to bind to {}: {}", addr, e),
-        })?;
+    let listener =
+        tokio::net::TcpListener::bind(&addr)
+            .await
+            .map_err(|e| GameYError::ServerError {
+                message: format!("Failed to bind to {}: {}", addr, e),
+            })?;
 
     println!("Server mode: Listening on http://{}", addr);
     axum::serve(listener, app)

@@ -17,6 +17,19 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
+function createAudioSafely(src: string): HTMLAudioElement | null {
+  if (typeof Audio === 'undefined') {
+    return null;
+  }
+
+  try {
+    return new Audio(src);
+  } catch (error) {
+    console.error(`Could not initialize audio for ${src}`, error);
+    return null;
+  }
+}
+
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brightness, setBrightness] = useState(100);
   const [colorBlindMode, setColorBlindMode] = useState(false);
@@ -36,7 +49,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Inicializar música de fondo
   useEffect(() => {
-    const audio = new Audio('/sounds/gameb.mp3'); 
+    const audio = createAudioSafely('/sounds/gameb.mp3');
+    if (!audio) {
+      bgMusicRef.current = null;
+      return undefined;
+    }
+
     audio.loop = true;
     bgMusicRef.current = audio;
 
@@ -61,9 +79,19 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const playSound = (soundFile: string) => {
     if (!hasInteracted) setHasInteracted(true); 
     if (isMuted) return;
-    const audio = new Audio(`/sounds/${soundFile}`);
-    audio.volume = volume / 100;
-    audio.play().catch(err => console.error("Error en sonido FX:", err));
+
+    const audio = createAudioSafely(`/sounds/${soundFile}`);
+    if (!audio) {
+      return;
+    }
+
+    try {
+      audio.volume = volume / 100;
+      const playPromise = audio.play();
+      playPromise?.catch(err => console.error("Error en sonido FX:", err));
+    } catch (error) {
+      console.error("Error en sonido FX:", error);
+    }
   };
 
   return (

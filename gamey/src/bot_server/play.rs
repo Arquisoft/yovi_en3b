@@ -1,4 +1,6 @@
-use crate::{Coordinates, GameY, YEN, check_api_version, error::ErrorResponse, state::AppState, Movement};
+use crate::{
+    Coordinates, GameY, Movement, YEN, check_api_version, error::ErrorResponse, state::AppState,
+};
 use axum::{
     Json,
     extract::{Query, State},
@@ -98,7 +100,7 @@ pub async fn play(
             "hard" => "llm-hard",
             _ => "llm-medium",
         },
-        "random" => "random",
+        "random" => "random_bot",
         _ => "llm-medium",
     };
 
@@ -131,7 +133,18 @@ pub async fn play(
     };
 
     // Apply the move to the game
-    let movement = Movement::Place(coords);
+    let player = match game_y.next_player() {
+        Some(player) => player,
+        None => {
+            return Err(Json(ErrorResponse::error(
+                "The game is already finished",
+                Some(params.api_version.clone()),
+                Some(bot_id.to_string()),
+            )));
+        }
+    };
+
+    let movement = Movement::Placement { player, coords };
     if let Err(err) = game_y.add_move(movement) {
         return Err(Json(ErrorResponse::error(
             &format!("Failed to apply move: {}", err),
@@ -141,16 +154,7 @@ pub async fn play(
     }
 
     // Convert back to YEN
-    let new_yen = match YEN::try_from(&game_y) {
-        Ok(yen) => yen,
-        Err(err) => {
-            return Err(Json(ErrorResponse::error(
-                &format!("Failed to convert game to YEN: {}", err),
-                Some(params.api_version.clone()),
-                Some(bot_id.to_string()),
-            )));
-        }
-    };
+    let new_yen: YEN = (&game_y).into();
 
     let response = PlayResponse {
         api_version: params.api_version,

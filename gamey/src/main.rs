@@ -15,8 +15,8 @@
 //! # Play against the random bot
 //! gamey --mode computer
 //!
-//! # Start the bot server on port 3000
-//! gamey --mode server --port 3000
+//! # Start the bot server on port 4000
+//! gamey --mode server --port 4000
 //! ```
 
 use clap::Parser;

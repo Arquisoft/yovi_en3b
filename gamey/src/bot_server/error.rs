@@ -71,7 +71,11 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        let err = ErrorResponse::error("Test error", Some("v1".to_string()), Some("bot1".to_string()));
+        let err = ErrorResponse::error(
+            "Test error",
+            Some("v1".to_string()),
+            Some("bot1".to_string()),
+        );
         let json = serde_json::to_string(&err).unwrap();
         assert!(json.contains("\"message\":\"Test error\""));
         assert!(json.contains("\"api_version\":\"v1\""));
