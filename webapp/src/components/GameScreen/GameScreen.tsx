@@ -253,27 +253,6 @@ const GameScreen: React.FC = () => {
         }, 1200);
     };
 
-    const handleUndo = () => {
-        if (history.length === 0 || botCooldown) return;
-
-        playSound('click.mp3');
-
-        // Get the previous save state
-        const previousState = history[history.length - 1];
-
-        // Update the board
-        setBoardState(previousState);
-
-        // Delete from the history that move
-        setHistory(prev => prev.slice(0, -1));
-
-        // Clean any pending move
-        setPendingMove(null);
-
-        // Blocks the button from being clicked on
-        setCanUndo(false);
-    }
-
     const restartGame = () => {
         playSound('click.mp3');
         setBoardState({});
