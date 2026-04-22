@@ -7,19 +7,19 @@ This section outlines the principal regulations, patterns, and solution ideas th
 
 image::crosscutting-concepts-map.jpg["YOVI Crosscutting Concepts Concept Map"]
 
-=== 8.1 Inter-Component Communication & YEN Notation
+=== Inter-Component Communication & YEN Notation
 Communication between the decoupled subsystems (YOVI Web Client, Users API, and GameY Service) relies entirely on lightweight, stateless REST APIs exchanging JSON payloads. 
 
 A core crosscutting domain concept is the **YEN (Y-Game Extended Notation)**. It is the standardized format for representing the game board, turn state, and player layout. 
 
 * **Impact:** The React frontend must serialize board states into YEN, the external bots must read/write YEN, and the Rust engine's `YEN Parser` must deserialize it to evaluate the core logic. Having a single source of truth for game notation ensures consistency across the TypeScript and Rust boundaries.
 
-=== 8.2 Microservices & Containerization Pattern
+=== Microservices & Containerization Pattern
 The system strictly follows a microservices architectural style to separate the high-performance CPU-bound tasks (GameY Service) from I/O-bound tasks (Users API).
 
 * **Impact:** To maintain consistency in deployment and operation, all core components are packaged into isolated Docker containers (WebApp, Users API, GameY Service, and PostgreSQL). This containerization concept simplifies deployment to the Docker Host Server and ensures uniform environment configurations across development, testing, and production.
 
-=== 8.3 Security & Authentication
+=== Security & Authentication
 Security is managed uniformly at the entry points of the system to protect user profiles and ensure fair play in the leaderboards.
 
 * **Human Players:** The `YOVI Web Client` communicates with the `Users API` to authenticate players (e.g., via JSON Web Tokens - JWT). This token is required for all state-altering requests, such as updating match history.
@@ -27,7 +27,7 @@ Security is managed uniformly at the entry points of the system to protect user 
 * **External Bots:** External scripts/applications interacting with the `External Bot API` must use bot-specific identifiers or API keys. This prevents system abuse and accurately tracks bot performance metrics.
 
 
-=== 8.4 User Experience (UX) & Internationalization (i18n)
+=== User Experience (UX) & Internationalization (i18n)
 To fulfill the optional system requirements, the presentation layer follows specific UX and localization patterns.
 
 * **Responsive Design:** The Web Client components are styled using responsive paradigms to support seamless gameplay on both PC and mobile devices.
@@ -36,7 +36,7 @@ To fulfill the optional system requirements, the presentation layer follows spec
 .Further Information
 
 See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
-****
+
 
 === Ranking System Concept
 
