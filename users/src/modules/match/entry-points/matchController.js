@@ -79,9 +79,18 @@ const evaluateBoard = async (req, res) => {
             req.body
         );
         */
+       // Validar estructura del payload (previene inyección desde datos de usuario)
+        const allowedKeys = ['size', 'turn', 'players', 'layout'];
+        const sanitizedPayload = {};
+        for (const key of allowedKeys) {
+            if (req.body[key] !== undefined) {
+                sanitizedPayload[key] = req.body[key];
+            }
+        }
+
         const rustResponse = await axios.post(
             `http://gamey:4000/v1/evaluate`,
-            req.body
+            sanitizedPayload
         );
 
         return res.status(200).json(rustResponse.data);
