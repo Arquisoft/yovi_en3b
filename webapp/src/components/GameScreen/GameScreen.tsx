@@ -1,19 +1,26 @@
 // UBICACIÓN: webapp/src/pages/GameScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
     Volume2, VolumeX
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
-import { checkWin } from './yGameLogic';
+import { checkWin, boardToYen } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { createMatch, finishMatch } from './game.api';
+import { createMatch, finishMatch, evaluateBoard } from './game.api';
 import TutorBot from '../TutorBox/TutorBox';
+import { MatchGraph } from './MatchGraph';
+
+export interface ScoreData {
+  turn: number;
+  blue: number;
+  red: number;
+}
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -47,7 +54,11 @@ const GameScreen: React.FC = () => {
     const [messages] = useState<{ sender: string, text: string }[]>([]);
     //const [inputValue, setInputValue] = useState('');
     const [matchId, setMatchId] = useState<string | null>(null);
-
+    const [isMatchCreating, setIsMatchCreating] = useState(false);
+    const [matchError, setMatchError] = useState<string | null>(null);
+    const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
+    const lastEvaluatedTurn = useRef(0);
+    
     // --- ESTADOS TUTOR ---
     const [tutorMessage, setTutorMessage] = useState<string | null>(null);
     const [turnStartTime, setTurnStartTime] = useState<number>(Date.now());
@@ -123,6 +134,70 @@ const GameScreen: React.FC = () => {
         }
     }, [gameResult, matchId, playSound]);
 
+    // Effect to evaluate board tension after every move
+    useEffect(() => {
+        const turnCount = Object.keys(boardState).length;
+        
+        // If the game just started or already ended, we dont sent anything
+        if (turnCount === 0 || gameResult) return;
+        // If we've already evaluated this turn, we dont send anything
+        if (lastEvaluatedTurn.current === turnCount) return;
+
+        // Mark this turn as evalueated...
+        lastEvaluatedTurn.current = turnCount;
+        // ...and then we evaluate it
+        const evaluateCurrentBoard = async () => {
+            try {
+                const yenLayoutString = boardToYen(boardState, size);
+                
+                const payload = {
+                    size: size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayoutString
+                };
+
+                const data = await evaluateBoard(payload);
+                
+                setScoreHistory(prev => [
+                    ...prev,
+                    { turn: turnCount, blue: data.blue_score, red: data.red_score }
+                ]);
+            } catch (error) {
+                console.error("Error evaluating board tension:", error);
+                // If something fails, we mark it as unchecked again
+                lastEvaluatedTurn.current = turnCount - 1; 
+            }
+        };
+
+        evaluateCurrentBoard();
+    }, [boardState, size, gameResult]);
+
+
+    const formatDisplayTime = (seconds: number | null) => {
+        if (seconds === null) return "∞";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+        playSound('click.mp3'); 
+        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        setInputValue('');
+    };
+
+    useEffect(() => {
+        if (timeLeft === null || gameResult) return;
+        if (timeLeft <= 0) {
+            setGameResult('lose');
+            return;
+        }
+        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft, gameResult]);
     // 4. Lógica de Deshacer (Undo)
     const handleUndo = () => {
         if (!canUndo || history.length === 0 || botCooldown || gameResult) return;
@@ -177,6 +252,20 @@ const GameScreen: React.FC = () => {
             setTurnStartTime(Date.now());
         }, 1200);
     };
+
+    const restartGame = () => {
+        playSound('click.mp3');
+        setBoardState({});
+        setHistory([]);
+        setGameResult(null);
+        setCurrentPlayer(1);
+        setTimeLeft(initialTime);
+        setMatchId(null); // Reset match ID for new game
+        lastEvaluatedTurn.current = 0;
+        navigate('/menu', { state: { openConfig: true } });
+    };
+
+    console.log("Historial de Tensión Actual:", scoreHistory);
 
     return (
         <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}>
@@ -283,12 +372,32 @@ const GameScreen: React.FC = () => {
             {/* MODALS */}
             {gameResult && (
                 <div className="modal-overlay">
+                    <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
+
+                        <MatchGraph data={scoreHistory} />
+
+                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
+                            {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
+                        </h2>
+                        <p className="result-modal-text">
+                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+                        </p>
+                        {matchError && (
+                            <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
+                                {matchError}
+                            </p>
+                        )}
+                        <div className="modal-buttons-column">
+                            <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
+                            <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
+                        </div>
+                    </div>
                     <div className="modal-content result-modal">
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>{gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}</h2>
                         <p>{gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}</p>
                         <button className="main-button btn-blue" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
                     </div>
-                </div>
+                </div>   
             )}
             {showExitConfirmation && (
                 <div className="modal-overlay">

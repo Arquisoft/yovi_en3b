@@ -25,6 +25,9 @@ pub mod error;
 pub mod state;
 pub mod version;
 pub mod hint;
+
+pub mod evaluator;
+
 use axum::response::IntoResponse;
 use std::sync::Arc;
 pub use choose::MoveResponse;
@@ -32,7 +35,7 @@ pub use error::ErrorResponse;
 pub use version::*;
 pub use hint::{HintResponse, generate_strategic_hint};
 
-use crate::{GameYError, RandomBot, YBotRegistry, state::AppState};
+use crate::{GameYError, RandomBot, EasyBot, MediumBot, HardBot, YBotRegistry, state::AppState};
 
 /// Creates the Axum router with the given state.
 ///
@@ -48,6 +51,7 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/hint",
             axum::routing::post(hint::get_hint),
         )
+        .route("/{api_version}/evaluate", axum::routing::post(evaluator::evaluate_handler))
         .with_state(state)
 }
 
@@ -55,7 +59,12 @@ pub fn create_router(state: AppState) -> axum::Router {
 ///
 /// The default state includes the `RandomBot` which selects moves randomly.
 pub fn create_default_state() -> AppState {
-    let bots = YBotRegistry::new().with_bot(Arc::new(RandomBot));
+    let bots = YBotRegistry::new()
+        .with_bot(Arc::new(RandomBot))
+        .with_bot(Arc::new(EasyBot))
+        .with_bot(Arc::new(MediumBot))
+        .with_bot(Arc::new(HardBot));
+    
     AppState::new(bots)
 }
 

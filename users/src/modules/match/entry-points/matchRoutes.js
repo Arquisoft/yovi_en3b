@@ -7,4 +7,6 @@ router.post('/finish', matchController.finishMatch);
 router.get('/history/:playerId', matchController.getPlayerMatchHistory);
 router.get('/user/:playerId', matchController.getPlayerMatches);
 
+router.post('/evaluate', matchController.evaluateBoard);
+
 module.exports = router;
