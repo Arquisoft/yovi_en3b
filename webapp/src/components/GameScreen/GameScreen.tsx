@@ -391,12 +391,13 @@ const GameScreen: React.FC = () => {
                             <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
                             <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
                         </div>
+                    </div>
                     <div className="modal-content result-modal">
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>{gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}</h2>
                         <p>{gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}</p>
                         <button className="main-button btn-blue" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
                     </div>
-                </div>
+                </div>   
             )}
             {showExitConfirmation && (
                 <div className="modal-overlay">
