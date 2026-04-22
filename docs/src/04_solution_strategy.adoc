@@ -42,8 +42,8 @@ endif::arc42help[]
 | A lightweight text chat is implemented to enhance social interaction between players without the technical overhead of video/audio streaming.
 
 | **Security**
-| **Hashing & Env Variables**
-| Encryption for passwords and environment variables for secrets to follow security best practices.
+| **Hashing, Token authentication & Env Variables**
+| Encryption for passwords and environment variables for secrets to follow security best practices. Usage of a token, retrieved in the login, in some critical operations. 
 
 | **Ranking System**
 | **Winrate Metric**
