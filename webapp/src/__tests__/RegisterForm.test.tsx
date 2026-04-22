@@ -50,6 +50,7 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
 describe('RegisterForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
         global.fetch = vi.fn();
     });
 
@@ -59,7 +60,7 @@ describe('RegisterForm', () => {
         // Click play without filling inputs
         const playBtn = screen.getByText(/PLAY/i);
         fireEvent.click(playBtn);
-        
+
         // Verify error message appears
         expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
     });
@@ -68,6 +69,7 @@ describe('RegisterForm', () => {
         // Mock a successful API response
         (global.fetch as any).mockResolvedValue({
             ok: true,
+            headers: { get: () => 'application/json' },
             json: async () => ({ token: 'fake-token' }),
         });
 
@@ -81,9 +83,23 @@ describe('RegisterForm', () => {
     });
 
     test('3. Shows error message on API failure', async () => {
-    (global.fetch as any).mockResolvedValue({
-        ok: false,
-        json: async () => ({ message: 'Invalid credentials' }),
+        (global.fetch as any).mockResolvedValue({
+            ok: false,
+            json: async () => ({ message: 'Invalid credentials' }),
+        });
+
+        renderWithProviders(<RegisterForm />);
+
+        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
+        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        fireEvent.click(screen.getByText(/PLAY/i));
+
+        // Usamos findByText que espera a que aparezca y devuelve el elemento
+        const errorMessage = await screen.findByText(/Invalid credentials/i);
+
+        // Verificamos que sea visible en el DOM usando propiedades nativas del nodo
+        expect(errorMessage).toBeDefined();
+        expect(errorMessage.style.display).not.toBe('none');
     });
 
     renderWithProviders(<RegisterForm />);
@@ -105,7 +121,7 @@ describe('RegisterForm', () => {
         
         const signUpBtn = screen.getByText(/SIGN UP/i);
         fireEvent.click(signUpBtn);
-        
+
         // Verify navigation to signup
         expect(mockNavigate).toHaveBeenCalledWith('/signup');
     });
@@ -117,7 +133,7 @@ describe('RegisterForm', () => {
         expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
 
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-        
+
         // Error should still be visible until both fields are filled
         expect(screen.queryByText(/Please fill in all fields/i)).toBeDefined();
     });
@@ -138,6 +154,7 @@ describe('RegisterForm', () => {
 
     test('7. Loading state is set while API is being called', async () => {
         let resolveResponse: any;
+
         const responsePromise = new Promise(resolve => {
             resolveResponse = resolve;
         });
@@ -148,15 +165,17 @@ describe('RegisterForm', () => {
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        
+
         const playBtn = screen.getByText(/PLAY/i) as HTMLButtonElement;
         fireEvent.click(playBtn);
 
         // Button should be disabled during loading
         expect(playBtn.disabled).toBe(true);
 
+        
         resolveResponse({
             ok: true,
+            headers: { get: () => 'application/json' },
             json: async () => ({ token: 'fake-token' }),
         });
 

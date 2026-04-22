@@ -95,7 +95,7 @@ const changePassword = async (req, res) => {
     //200: resource successfully updated
     //404: resource not found 
     //500: server error
-const changeNickname = async (req, res) => {
+const changeNicknameAndPhoto = async (req, res) => {
     try {
         const user =await userService.changeNickname(req.body);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));

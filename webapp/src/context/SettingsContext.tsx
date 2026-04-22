@@ -33,12 +33,18 @@ function createAudioSafely(src: string): HTMLAudioElement | null {
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brightness, setBrightness] = useState(100);
   const [colorBlindMode, setColorBlindMode] = useState(false);
-  const [neonMode, setNeonMode] = useState(false);
+  const [neonMode, setNeonMode] = useState(false); // Initialize neon state
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
+  const [confirmMove, setConfirmMove] = useState(false);
+  const [tutorEnabled, setTutorEnabled] = useState(true); // Default value is true
 
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
-  const [hasInteracted, setHasInteracted] = useState(false); 
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const toggleNeonMode = () => {
+    setNeonMode((prev) => !prev); 
+  };
 
   // --- EFECTO DE BRILLO ---
   useEffect(() => {
@@ -57,13 +63,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     audio.loop = true;
     bgMusicRef.current = audio;
-
-    return () => {
-      audio.pause();
-    };
+    return () => audio.pause();
   }, []);
 
-  // Sincronizar volumen y silencio
   useEffect(() => {
     if (bgMusicRef.current) {
       bgMusicRef.current.volume = volume / 100;
@@ -72,9 +74,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         bgMusicRef.current.play().catch(() => {});
       }
     }
-  }, [volume, isMuted, hasInteracted]);
+  }, [volume, isMuted]);
 
-  const toggleNeonMode = () => setNeonMode(!neonMode);
+  const startBackgroundMusic = () => {
+    if (bgMusicRef.current && !isMuted && volume > 0) {
+      bgMusicRef.current.play().catch(err => console.log("Audio blocked:", err));
+    }
+  };
 
   const playSound = (soundFile: string) => {
     if (!hasInteracted) setHasInteracted(true); 
@@ -95,13 +101,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <SettingsContext.Provider value={{ 
+    <SettingsContext.Provider value={{
       brightness, setBrightness,
       colorBlindMode, setColorBlindMode,
-      neonMode, toggleNeonMode,
+      neonMode, toggleNeonMode, 
       volume, setVolume,
       isMuted, setIsMuted,
-      playSound 
+      playSound,
+      startBackgroundMusic,
+      confirmMove, setConfirmMove,
+      tutorEnabled, setTutorEnabled, // Now TS is happy
     }}>
       {children}
     </SettingsContext.Provider>
@@ -110,6 +119,6 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useSettings = () => {
   const context = useContext(SettingsContext);
-  if (!context) throw new Error("useSettings debe usarse dentro de SettingsProvider");
+  if (!context) throw new Error("useSettings must be used within SettingsProvider");
   return context;
 };

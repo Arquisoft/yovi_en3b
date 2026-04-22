@@ -1,53 +1,93 @@
 openapi: 3.0.0
 info:
-  title: User Service API
+  title: YOVI Project API
   version: 1.0.0
-  description: API for managing users
+  description: >
+    API documentation for the YOVI Game project. 
+    This service manages user authentication, match statistics, 
+    game state persistence, and provides an interface for AI competition.
+servers:
+  - url: http://localhost:3000
+    description: Development Server (Node.js API Gateway)
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
-  /createuser:
+  # --- BOTS API ---
+  /play:
+    get:
+      tags: [Bots]
+      summary: Get bot move for competition
+      description: >
+        Standardized endpoint for the final competition. Receives the board state 
+        in YEN notation via query parameters and returns the bot's calculated move.
+      parameters:
+        - name: position
+          in: query
+          required: true
+          description: "Current board state in YEN JSON format (size, turn, players, layout)."
+          schema:
+            type: string
+            example: '{"size":4,"turn":0,"players":["B","R"],"layout":"B/.B/RB./B..R"}'
+        - name: bot_id
+          in: query
+          required: false
+          description: "The identifier for the specific bot strategy (e.g., random_bot, easy_bot, hard_bot)."
+          schema:
+            type: string
+            example: "random_bot"
+      responses:
+        "200":
+          description: Successful move calculation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      coords:
+                        type: object
+                        properties:
+                          x: { type: integer, example: 1 }
+                          y: { type: integer, example: 2 }
+                          z: { type: integer, example: 0 }
+                  - type: object
+                    properties:
+                      action:
+                        type: string
+                        example: "swap"
+
+  # --- USER MANAGEMENT ---
+  /users/createuser:
     post:
       tags: [Users]
-      summary: Creates a new user
-      description: Creates a new user with the given nickname, username, email, password and photo.
+      summary: Register a new user
+      description: Create a new account providing a unique username, email, and password.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - nickname
-                - username
-                - email
-                - password
-                - photo
+              required: [username, nickname, email, password, photo]
               properties:
-                username:
+                username: { type: string, example: "john_doe" }
+                nickname: { type: string, example: "Johnny" }
+                email: { type: string, format: email, example: "john@example.com" }
+                password: 
                   type: string
-                  example: "testuser"
-                nickname:
-                  type: string
-                  example: "testuser"
-                email:
-                  type: string
-                  example: "testuser@testuser"
-                photo:
-                  type: string
-                  example: "photo"
-                password:
-                  type: string
-                  example: "123456"
+                  minLength: 8
+                  example: "securePass123"
+                  description: "Must be at least 8 characters long."
+                photo: { type: string, example: "avatar_01" }
       responses:
         "201":
-          description: User created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Welcome testuser"
+          description: User successfully created
         "400":
           description: Error creating user (some fields missing or there exist another user with that critical information)
         "500":
@@ -55,87 +95,177 @@ paths:
   /findUserByUsername:
     get:
       tags: [Users]
-      summary: Searches for a user
-      description: Searches for a user with that username and returns it
+      summary: Authenticate user
+      description: Logs in a user and returns a JWT in the 'Authorization' header.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - username
+              required: [username, password]
               properties:
-                username:
-                  type: string
-                  example: "testuser"
+                username: { type: string, example: "john_doe" }
+                password: { type: string, example: "securePass123" }
       responses:
         "200":
-          description: User found
-          content:
-            application/json:
+          description: Login successful. Token provided in headers.
+          headers:
+            Authorization:
+              description: Bearer token for authenticating subsequent requests.
               schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
-        "400":
-          description: The username is required
+                type: string
+                example: "Bearer eyJhbG..."
+        "401":
+          description: Invalid credentials
+
+  /users/findUserByUsername:
+    get:
+      tags: [Users]
+      summary: Find user by username
+      description: Retrieve public profile information for a specific username.
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "john_doe"
+      responses:
+        "200":
+          description: User data retrieved
         "404":
-          description: It did not find a user with that username
-        "500":
-          description: Database server error.
-  /loginUser:
+          description: User not found
+
+  /users/changePassword:
     post:
       tags: [Users]
-      summary: Log in of a user
-      description: It compares the credentials passed to give access to the application
+      summary: Update user password
+      security:
+        - bearerAuth: []
+      description: Change the current password. Requires a valid JWT.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - username
-                - password
+              required: [currentPassword, newPassword]
               properties:
-                username:
+                currentPassword: { type: string, example: "securePass123" }
+                newPassword: 
                   type: string
-                  example: "testuser"
-                password:
-                  type: string
-                  example: "123456"
+                  minLength: 8
+                  example: "newSecurePass456"
       responses:
         "200":
-          description: User logged in
+          description: Password updated successfully
+        "401":
+          description: Unauthorized or incorrect current password
+
+  /users/changeNicknameAndPhoto:
+    post:
+      tags: [Users]
+      summary: Update profile details
+      security:
+        - bearerAuth: []
+      description: Change nickname or avatar. Requires a valid JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nickname, photo]
+              properties:
+                nickname: { type: string, example: "NewNickname" }
+                photo: { type: string, example: "avatar_05" }
+      responses:
+        "200":
+          description: Profile updated successfully
+
+  # --- MATCH MANAGEMENT ---
+  /matches/create:
+    post:
+      tags: [Matches]
+      summary: Create a new match record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bluePlayerId, redPlayerId, isBot, botDifficulty]
+              properties:
+                bluePlayerId: { type: string, format: uuid }
+                redPlayerId: { type: string, format: uuid }
+                isBot: { type: boolean }
+                botDifficulty: { type: integer }
+      responses:
+        "201":
+          description: Match created
+
+  /matches/finish:
+    post:
+      tags: [Matches]
+      summary: Mark a match as completed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [matchId, winnerId]
+              properties:
+                matchId: { type: string, format: uuid }
+                winnerId: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Match status updated and rankings calculated
+
+# --- MATCH ANALYSIS ---
+  /matches/evaluate:
+    post:
+      tags: [Matches]
+      summary: Evaluate board tension
+      description: >
+        Analyzes the current YEN board state to determine the tension (distance to win) for both players.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [size, turn, players, layout]
+              properties:
+                size: 
+                  type: integer
+                  example: 4
+                turn: 
+                  type: integer
+                  example: 5
+                players: 
+                  type: array
+                  items:
+                    type: string
+                  example: ["B", "R"]
+                layout: 
+                  type: string
+                  example: "B/.B/RB./B..R"
+      responses:
+        "200":
+          description: Tension scores calculated successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  username:
-                    type: string
-                    example: "testuser"
-                  nickname:
-                    type: string
-                    example: "testuser"
-                  email:
-                    type: string
-                    example: "testuser@testuser"
-                  photo:
-                    type: string
-                    example: "photo"
+                  blue_score: 
+                    type: integer
+                    example: 24
+                  red_score: 
+                    type: integer
+                    example: 22
         "400":
           description: Missing fields
         "401":

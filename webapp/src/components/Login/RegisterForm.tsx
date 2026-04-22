@@ -1,7 +1,7 @@
 // UBICACIÓN: webapp/src/components/Register/RegisterForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import { useSettings } from '../../context/SettingsContext'; // Import settings to use playSound
+import { useSettings } from '../../context/SettingsContext'; 
 import './RegisterForm.css'; 
 
 const RegisterForm: React.FC = () => {
@@ -10,11 +10,11 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate(); 
-  const { playSound } = useSettings(); // Access the sound player function
+  const { playSound, startBackgroundMusic } = useSettings(); // Usamos la nueva función explícita
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevents page refresh on form submission
-    playSound('click.mp3'); // Play click sound when submitting the form
+    event.preventDefault(); 
+    playSound('click.mp3'); // Sonido de feedback táctil corto (siempre suena)
     setError(null);
 
     if (!username.trim() || !password.trim()) {
@@ -34,7 +34,17 @@ const RegisterForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('token', data.token); // Save auth token to local storage
+        // 1. We get the header
+        const authHeader = res.headers.get('Authorization');
+        
+        // 2. We verify that the token arises an we isolate it (Bearer + XXXXXX)
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1]; 
+          // Save auth token to local storage
+          localStorage.setItem('token', token);
+        }
+        // --- ÉXITO: Iniciamos la música de fondo aquí ---
+        startBackgroundMusic(); 
         localStorage.setItem('username', username); // Save username for global reference
         localStorage.setItem('userId', data.id || ''); // Save user ID for match creation
         console.log('Login stored userId:', localStorage.getItem('userId'));
@@ -94,7 +104,7 @@ const RegisterForm: React.FC = () => {
               type="button" 
               className="auth-link" 
               onClick={() => {
-                playSound('click.mp3'); // Play click sound when navigating to signup
+                playSound('click.mp3'); 
                 navigate('/signup');
               }}
             > 

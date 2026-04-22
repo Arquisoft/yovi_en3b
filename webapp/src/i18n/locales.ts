@@ -1,3 +1,4 @@
+// UBICACIÓN: webapp/src/i18n/translations.ts (o donde guardes tus strings)
 
 export const translations = {
   es: {
@@ -5,7 +6,7 @@ export const translations = {
       play: 'JUGAR',
       howToPlay: 'CÓMO JUGAR',
       save: 'GUARDAR',
-      reset: 'RESETEAR',
+      reset: 'RESET',
       undo: 'DESHACER',
       hint: 'PISTA',
       confirm: 'CONFIRMAR',
@@ -23,7 +24,7 @@ export const translations = {
       logout: 'CERRAR SESIÓN',
       spanish: 'ESPAÑOL',
       english: 'INGLÉS',
-      turkish: 'TURCO', // Añadido para solucionar el error de TypeScript
+      turkish: 'TURCO',
       yesExitAndLose: 'SÍ, SALIR Y PERDER',
       backToGame: 'VOLVER AL JUEGO',
       playNow: 'JUGAR AHORA',
@@ -43,6 +44,7 @@ export const translations = {
       defeat: 'DERROTA',
     },
     labels: {
+      tutorEnabled: 'ASISTENTE DE JUEGO',
       volume: 'VOLUMEN',
       mute: 'MUTE',
       lastGame: 'ÚLTIMA PARTIDA',
@@ -68,7 +70,9 @@ export const translations = {
       uniqueIdCannotBeChanged: 'ID ÚNICO - NO SE PUEDE CAMBIAR',
       preview: 'PREVISUALIZACIÓN',
       timeLimit: 'TIEMPO LÍMITE',
-      opponent: 'OPONENTE',
+      opponent: 'JUGAR CONTRA',
+      computer: 'ORDENADOR',
+      ai: 'IA',
       difficulty: 'DIFICULTAD',
       boardSize: 'TAMAÑO DEL TABLERO',
       noLimit: 'SIN LÍMITE',
@@ -105,7 +109,7 @@ export const translations = {
       congrats: '¡Felicidades, has ganado!',
       nextTime: '¡Buen intento, pero has perdido esta vez!',
       winDetail: 'Has demostrado ser un gran estratega. ¡Sigue así para mantener tu racha ganadora!',
-      loseDetail: 'No te desanimes, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
+      loseDetail: 'No te desanimen, cada partida es una oportunidad para aprender y mejorar. ¡Inténtalo de nuevo!',
       logoutConfirmation: '¿Estás seguro de que quieres cerrar sesión?',
       passwordChangedSuccess: '¡Contraseña actualizada con éxito!',
       passwordsDoNotMatch: 'Las nuevas contraseñas no coinciden',
@@ -124,6 +128,22 @@ export const translations = {
       step2Text: 'En tu turno, coloca una pieza de tu color en cualquier intersección. Tu objetivo es crear una línea continua e ininterrumpida de tus piezas.',
       step3Title: 'El Objetivo "Y"',
       step3Text: 'Para ganar, tu camino debe conectar los tres lados del tablero triangular. ¡Las esquinas cuentan como parte de ambos lados que tocan!',
+    },
+    tutor: {
+      tips: [
+    "¡Intenta conectar los bordes del triángulo!",
+    "Las esquinas son clave para cerrar el paso al rival.",
+    "No pierdas de vista el centro del tablero.",
+    "¡Bloquea al robot antes de que conecte sus piezas!",
+    "Piensa dos pasos por delante, como un maestro.",
+    "Si controlas los bordes, controlas el juego.",
+    "Busca crear una 'V' para ramificar tus opciones.",
+    "No te centres solo en un lado, el tablero es traicionero.",
+    "A veces la mejor defensa es un buen ataque.",
+    "Recuerda que las esquinas cuentan para ambos lados.",
+    "Analiza bien el último movimiento del bot.",
+    "¡No te rindas! Cada pieza cuenta en la estrategia final."
+  ]
     }
   },
   en: {
@@ -169,6 +189,7 @@ export const translations = {
       defeat: 'DEFEAT',
     },
     labels: {
+      tutorEnabled: 'TUTOR ENABLED',
       volume: 'VOLUME',
       mute: 'MUTE',
       lastGame: 'LAST GAME',
@@ -194,7 +215,9 @@ export const translations = {
       uniqueIdCannotBeChanged: 'UNIQUE ID - CANNOT BE CHANGED',
       preview: 'PREVIEW',
       timeLimit: 'TIME LIMIT',
-      opponent: 'OPPONENT',
+      opponent: 'PLAY AGAINST',
+      computer: 'COMPUTER',
+      ai: 'AI',
       difficulty: 'DIFFICULTY',
       boardSize: 'BOARD SIZE',
       noLimit: 'NO LIMIT',
@@ -250,6 +273,22 @@ export const translations = {
       step2Text: 'On your turn, place one piece of your color on any intersection. Your goal is to create a single unbroken line of your pieces.',
       step3Title: 'The "Y" Goal',
       step3Text: 'To win, your path must connect all three sides of the triangular board. Corners count as part of both sides they touch!',
+    },
+    tutor: {
+     tips: [
+    "Try to connect the edges of the triangle!",
+    "Corners are key to blocking your opponent.",
+    "Don't lose sight of the center of the board.",
+    "Block the robot before it connects its pieces!",
+    "Think two steps ahead, like a master.",
+    "If you control the edges, you control the game.",
+    "Try creating a 'V' shape to branch out your options.",
+    "Don't just focus on one side; the board is tricky.",
+    "Sometimes the best defense is a good offense.",
+    "Remember, corners count for both sides they touch.",
+    "Analyze the bot's last move carefully.",
+    "Don't give up! Every piece matters in the end game."
+  ]
     }
   },
   tr: {
@@ -295,6 +334,7 @@ export const translations = {
       defeat: 'MAĞLUBİYET',
     },
     labels: {
+      tutorEnabled: 'OYUN ASİSTANI',
       volume: 'VOLUMEN',
       mute: 'SESSİZ',
       lastGame: 'SON OYUN',
@@ -321,6 +361,8 @@ export const translations = {
       preview: 'ÖNİZLEME',
       timeLimit: 'ZAMAN SINIRI',
       opponent: 'RAKİP',
+      computer: 'BILGISAYAR',
+      ai: 'YZ',
       difficulty: 'ZORLUK',
       boardSize: 'TAHTA BOYUTU',
       noLimit: 'SINIRSIZ',
@@ -375,7 +417,23 @@ export const translations = {
       step2Title: 'Bağlantı',
       step2Text: 'Sıranız geldiğinde, boş bir kesişim noktasına kendi renginizden bir taş yerleştirin. Amacınız kesintisiz bir hat oluşturmaktır.',
       step3Title: '"Y" Hedefi',
-      step3Text: 'Kazanmak için yolunuz üçgen tahtanın üç kenarını da birbirine bağlamalıdır. Köşeler her mi kenara da dahil sayılır!',
+      step3Text: 'Kazanmak için yolunuz üçgen tahtanın tres kenarını da birbirine bağlamalıdır. Köşeler her mi kenara da dahil sayılır!',
+    },
+    tutor: {
+     tips: [
+    "Üçgenin kenarlarını birleştirmeye çalışın!",
+    "Köşeler rakibi engellemek için anahtardır.",
+    "Tahtanın merkezini gözden kaçırmayın.",
+    "Robot taşlarını birleştirmeden onu engelleyin!",
+    "Bir usta gibi iki hamle sonrasını düşünün.",
+    "Kenarları kontrol ederseniz, oyunu kontrol edersiniz.",
+    "Seçeneklerinizi artırmak için 'V' şekli oluşturmayı deneyin.",
+    "Sadece bir tarafa odaklanmayın; tahta şaşırtıcı olabilir.",
+    "Bazen en iyi savunma iyi bir hucümdur.",
+    "Unutmayın, köşeler dokundukları her iki kenar için de sayılır.",
+    "Botun son hamlesini dikkatlice analiz edin.",
+    "Vazgeçmeyin! Son oyunda her parça önemlidir."
+  ]
     }
   }
 };

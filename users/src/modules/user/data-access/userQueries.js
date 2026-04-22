@@ -21,9 +21,9 @@ module.exports = {
     WHERE username = $2 
     RETURNING id, username, email, photo, nickname;
   `,
-  updateUserNickname: `
+  updateUserPhoto: `
     UPDATE users
-    SET nickname = $1
+    SET photo = $1
     WHERE username = $2 
     RETURNING id, username, email, photo, nickname;
   `,
