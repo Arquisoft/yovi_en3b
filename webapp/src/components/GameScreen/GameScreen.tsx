@@ -17,9 +17,9 @@ import TutorBot from '../TutorBox/TutorBox';
 import { MatchGraph } from './MatchGraph';
 
 export interface ScoreData {
-  turn: number;
-  blue: number;
-  red: number;
+    turn: number;
+    blue: number;
+    red: number;
 }
 
 const GameScreen: React.FC = () => {
@@ -51,14 +51,14 @@ const GameScreen: React.FC = () => {
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
-    const [messages] = useState<{ sender: string, text: string }[]>([]);
-    //const [inputValue, setInputValue] = useState('');
+    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+    const [inputValue, setInputValue] = useState('');
     const [matchId, setMatchId] = useState<string | null>(null);
-    const [isMatchCreating, setIsMatchCreating] = useState(false);
-    const [matchError, setMatchError] = useState<string | null>(null);
+    // const [isMatchCreating, setIsMatchCreating] = useState(false);
+    const [matchError] = useState<string | null>(null);
     const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
     const lastEvaluatedTurn = useRef(0);
-    
+
     // --- ESTADOS TUTOR ---
     const [tutorMessage, setTutorMessage] = useState<string | null>(null);
     const [turnStartTime, setTurnStartTime] = useState<number>(Date.now());
@@ -137,7 +137,7 @@ const GameScreen: React.FC = () => {
     // Effect to evaluate board tension after every move
     useEffect(() => {
         const turnCount = Object.keys(boardState).length;
-        
+
         // If the game just started or already ended, we dont sent anything
         if (turnCount === 0 || gameResult) return;
         // If we've already evaluated this turn, we dont send anything
@@ -149,7 +149,7 @@ const GameScreen: React.FC = () => {
         const evaluateCurrentBoard = async () => {
             try {
                 const yenLayoutString = boardToYen(boardState, size);
-                
+
                 const payload = {
                     size: size,
                     turn: turnCount,
@@ -158,7 +158,7 @@ const GameScreen: React.FC = () => {
                 };
 
                 const data = await evaluateBoard(payload);
-                
+
                 setScoreHistory(prev => [
                     ...prev,
                     { turn: turnCount, blue: data.blue_score, red: data.red_score }
@@ -166,26 +166,18 @@ const GameScreen: React.FC = () => {
             } catch (error) {
                 console.error("Error evaluating board tension:", error);
                 // If something fails, we mark it as unchecked again
-                lastEvaluatedTurn.current = turnCount - 1; 
+                lastEvaluatedTurn.current = turnCount - 1;
             }
         };
 
         evaluateCurrentBoard();
     }, [boardState, size, gameResult]);
 
-
-    const formatDisplayTime = (seconds: number | null) => {
-        if (seconds === null) return "∞";
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    };
-
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
-        playSound('click.mp3'); 
-        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        playSound('click.mp3');
+        setMessages((prev: any[]) => [...prev, { sender: 'player', text: inputValue.trim() }]);
         setInputValue('');
     };
 
@@ -360,11 +352,32 @@ const GameScreen: React.FC = () => {
                                 <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
                             </div>
                         </div>
-                        <div className="chat-messages">
-                            {messages.map((msg, i) => (
-                                <div key={i} className="message sent" style={{ backgroundColor: p1Color }}>{msg.text}</div>
+                        <div className="chat-messages-display" style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {messages.map((msg, index) => (
+                                <div key={index} className={`chat-bubble ${msg.sender}`} style={{
+                                    alignSelf: msg.sender === 'player' ? 'flex-end' : 'flex-start',
+                                    backgroundColor: msg.sender === 'player' ? p1Color : '#333',
+                                    color: 'white',
+                                    padding: '6px 12px',
+                                    borderRadius: '12px',
+                                    maxWidth: '80%',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    {msg.text}
+                                </div>
                             ))}
                         </div>
+                        <form onSubmit={handleSendMessage} className="chat-input-area">
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="Escribe un mensaje..."
+                            />
+                            <button type="submit" className="send-btn">
+                                Send
+                            </button>
+                        </form>
                     </div>
                 )}
             </aside>
@@ -392,12 +405,7 @@ const GameScreen: React.FC = () => {
                             <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
                         </div>
                     </div>
-                    <div className="modal-content result-modal">
-                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>{gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}</h2>
-                        <p>{gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}</p>
-                        <button className="main-button btn-blue" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
-                    </div>
-                </div>   
+                </div>
             )}
             {showExitConfirmation && (
                 <div className="modal-overlay">
