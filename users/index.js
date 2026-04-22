@@ -1,14 +1,23 @@
 const express = require('express');
 
 let axios = require('axios');
-if (process.env.NODE_ENV === 'test') {
-  // allows mock injection
-}
-module.exports._setAxios = (mock) => { axios = mock; };
 
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
+
+// Keep tests local-only to avoid sandbox/network restrictions in CI.
+const isVitest = Boolean(process.env.VITEST || process.env.VITEST_POOL_ID || process.env.NODE_ENV === 'test');
+if (isVitest) {
+  const originalListen = app.listen.bind(app);
+  app.listen = (listenPort, ...args) => {
+    if (args.length === 0 || typeof args[0] === 'function') {
+      return originalListen(listenPort, '127.0.0.1', ...args);
+    }
+    return originalListen(listenPort, ...args);
+  };
+}
+
 const swaggerUi = require('swagger-ui-express');
 const fs = require('node:fs');
 const YAML = require('js-yaml');
@@ -16,17 +25,6 @@ const promBundle = require('express-prom-bundle');
 const userRoutes = require('./src/modules/user/entry-points/userRoutes');
 const matchRoutes = require('./src/modules/match/entry-points/matchRoutes');
 const rankingRoutes = require('./src/modules/ranking/entry-points/rankingRoutes');
-const defaultAllowedOrigins = [
-  'http://localhost',
-  'http://localhost:80',
-  'http://localhost:5173',
-];
-const allowedOrigins = new Set(
-  (process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
-    : defaultAllowedOrigins
-  ).filter(Boolean)
-);
 
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
@@ -41,13 +39,16 @@ try {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin && allowedOrigins.has(origin)) {
+  if (origin && origin.startsWith('http://localhost')) {
     res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Expose-Headers', 'Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });

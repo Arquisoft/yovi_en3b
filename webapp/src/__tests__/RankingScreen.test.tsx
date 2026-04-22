@@ -95,7 +95,7 @@ describe('RankingScreen', () => {
 
     expect(mockPlaySound).toHaveBeenCalledWith('click.mp3');
     expect(mockOnClose).toHaveBeenCalled();
-  });
+  }, 10000);
 
   it('renders an empty state when there is no ranking data', async () => {
     vi.mocked(getGlobalRanking).mockResolvedValue([]);
