@@ -57,6 +57,32 @@
   font-family: 'Orbitron', sans-serif;
 }
 
+.bot-selector {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-end; /* Alinea los botones abajo */
+}
+
+.bot-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bot-label {
+  font-size: 0.7rem; /* Letra pequeña */
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.color-blind .bot-label {
+  color: #fff; /* O el color que prefieras para modo daltónico */
+}
+
 /* ===== Close button ===== */
 .preview-close-btn {
   position: absolute;
