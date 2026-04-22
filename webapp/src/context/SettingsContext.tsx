@@ -12,6 +12,11 @@ interface SettingsContextType {
   setVolume: (v: number) => void; 
   isMuted: boolean; 
   setIsMuted: (v: boolean) => void; 
+  confirmMove: boolean;
+  setConfirmMove: (v: boolean) => void;
+  tutorEnabled: boolean;
+  setTutorEnabled: (v: boolean) => void;
+  startBackgroundMusic: () => void;
   playSound: (sound: string) => void; 
 }
 

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { SettingsProvider } from '../context/SettingsContext';
@@ -101,20 +101,6 @@ describe('RegisterForm', () => {
         expect(errorMessage).toBeDefined();
         expect(errorMessage.style.display).not.toBe('none');
     });
-
-    renderWithProviders(<RegisterForm />);
-    
-    fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-    fireEvent.click(screen.getByText(/PLAY/i));
-
-    // Usamos findByText que espera a que aparezca y devuelve el elemento
-    const errorMessage = await screen.findByText(/Invalid credentials/i);
-    
-    // Verificamos que sea visible en el DOM usando propiedades nativas del nodo
-    expect(errorMessage).toBeDefined();
-    expect(errorMessage.style.display).not.toBe('none'); 
-});
 
     test('4. Navigates to signup on button click', async () => {
         renderWithProviders(<RegisterForm />);

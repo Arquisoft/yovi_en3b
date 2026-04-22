@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
-import { checkWin, boardToYen } from './yGameLogic';
+import { checkWin } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
@@ -30,7 +30,7 @@ const GameScreen: React.FC = () => {
     const { t } = useI18n();
     const {
         colorBlindMode, playSound, isMuted, setIsMuted,
-        confirmMove, tutorEnabled
+        confirmMove
     } = useSettings();
 
     const {
@@ -61,12 +61,6 @@ const GameScreen: React.FC = () => {
     const [matchError, setMatchError] = useState<string | null>(null);
     const chatMessagesRef = useRef<HTMLDivElement | null>(null);
     
-    // --- ESTADOS TUTOR ---
-    const [tutorMessage, setTutorMessage] = useState<string | null>(null);
-    const [turnStartTime, setTurnStartTime] = useState<number>(Date.now());
-    const [tutorMessagesCount, setTutorMessagesCount] = useState(0);
-    const [movesSinceLastTip, setMovesSinceLastTip] = useState(0);
-
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
@@ -235,6 +229,14 @@ const GameScreen: React.FC = () => {
     // 4. Lógica de Deshacer (Undo)
     const handleUndo = () => {
         if (!canUndo || history.length === 0 || botCooldown || gameResult) return;
+        playSound('click.mp3');
+
+        const previousState = history[history.length - 1];
+        setBoardState(previousState);
+        setHistory(prev => prev.slice(0, -1));
+        setPendingMove(null);
+        setCanUndo(false);
+    };
 
     useEffect(() => {
         const chatMessages = chatMessagesRef.current;
@@ -242,13 +244,6 @@ const GameScreen: React.FC = () => {
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }, [messages, isBotTyping]);
-
-    const handleClick = (cell: Cell) => {
-        const key = `${cell.x}-${cell.y}-${cell.z}`;
-        if (gameResult || botCooldown || boardState[key]) return;
-        playSound('click.mp3'); 
-        setPendingMove(cell);
-    };
 
     const executeMove = (cell: Cell) => {
         // Guardamos el estado actual en el historial antes de mover
@@ -258,9 +253,6 @@ const GameScreen: React.FC = () => {
         const key = `${cell.x}-${cell.y}-${cell.z}`;
         const newBoard = { ...boardState, [key]: 1 };
 
-        setMovesSinceLastTip(prev => prev + 1);
-        setTurnStartTime(Date.now());
-        setTutorMessage(null);
         setBoardState(newBoard);
         setPendingMove(null);
 
@@ -284,7 +276,6 @@ const GameScreen: React.FC = () => {
             }
             setCurrentPlayer(1);
             setBotCooldown(false);
-            setTurnStartTime(Date.now());
         }, 1200);
     };
 
@@ -309,8 +300,6 @@ const GameScreen: React.FC = () => {
         y: (size - 1) * 5 * (hexSize / 6),
     };
 
-    console.log("Historial de Tensión Actual:", scoreHistory);
-
     return (
         <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}>
             <div className="game-main-content">
@@ -319,7 +308,7 @@ const GameScreen: React.FC = () => {
                         {t.labels.player1}
                     </div>
                     <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`} style={{ borderColor: p1Color }}>
-                        <span className="timer-value" style={{ color: p1Color }}>{formatTime(timeLeft)}</span>
+                        <span className="timer-value" style={{ color: p1Color }}>{formatDisplayTime(timeLeft)}</span>
                     </div>
                     <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`} style={{ borderColor: currentPlayer === 2 ? p2Color : 'transparent' }}>
                         {t.labels.player2}
@@ -353,7 +342,6 @@ const GameScreen: React.FC = () => {
                             </Layout>
                         </HexGrid>
                     </div>
-                    <TutorBot message={tutorMessage} onClear={() => setTutorMessage(null)} />
                 </main>
 
                 <footer className="game-footer">
@@ -466,7 +454,6 @@ const GameScreen: React.FC = () => {
                 <div className="modal-overlay">
                     <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
 
-                        <MatchGraph data={scoreHistory} />
 
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
@@ -498,14 +485,6 @@ const GameScreen: React.FC = () => {
             <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
         </div>
     );
-};
-
-// Helper para formatear tiempo
-const formatTime = (s: number | null) => {
-    if (s === null) return "∞";
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
 };
 
 export default GameScreen;

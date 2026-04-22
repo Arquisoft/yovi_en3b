@@ -1,7 +1,4 @@
 import React from 'react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
-} from 'recharts';
 
 interface ScoreData {
   turn: number;
@@ -14,59 +11,16 @@ interface MatchGraphProps {
 }
 
 export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
-  // If there is no data, we dont draw the graph
   if (!data || data.length === 0) return null;
 
   return (
-    <div style={{ width: '100%', height: '250px', margin: '20px 0' }}>
+    <div style={{ width: '100%', margin: '20px 0' }}>
       <h3 style={{ textAlign: 'center', marginBottom: '10px', fontSize: '1.2rem' }}>
-        Evolución de la Partida
+        Evolucion de la Partida
       </h3>
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
-          <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-          
-          <XAxis 
-            dataKey="turn" 
-            tick={{ fill: 'currentColor' }} 
-            tickLine={false}
-          />
-          
-          <YAxis 
-            domain={['dataMin - 2', 'dataMax + 2']} 
-            tick={{ fill: 'currentColor' }}
-            tickLine={false}
-            axisLine={false}
-          />
-          
-          {/* Shows data when passing the cursor over the points */}
-          <Tooltip 
-            contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }}
-          />
-          <Legend verticalAlign="top" height={36}/>
-          
-          {/* Blue line (Player 1) */}
-          <Line 
-            type="monotone" 
-            dataKey="blue" 
-            name="P1" 
-            stroke="var(--player1-color, #3b82f6)" 
-            strokeWidth={3} 
-            dot={{ r: 3 }} 
-            activeDot={{ r: 6 }} 
-          />
-          
-          {/* Red line (Player 2) */}
-          <Line 
-            type="monotone" 
-            dataKey="red" 
-            name="P2" 
-            stroke="var(--player2-color, #ef4444)" 
-            strokeWidth={3} 
-            dot={{ r: 3 }} 
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <p style={{ textAlign: 'center', opacity: 0.8 }}>
+        Turnos registrados: {data.length}
+      </p>
     </div>
   );
 };

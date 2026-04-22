@@ -113,5 +113,5 @@ module.exports = {
     findUserByUsername,
     loginUser,
     changePassword,
-    changeNickname
+    changeNicknameAndPhoto
 };

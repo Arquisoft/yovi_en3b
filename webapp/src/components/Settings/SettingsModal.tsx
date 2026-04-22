@@ -9,6 +9,7 @@ interface SettingsModalProps {
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const { t } = useI18n();
+  const labels = t.labels as Record<string, string>;
   const {
     brightness, setBrightness,
     colorBlindMode, setColorBlindMode,
@@ -98,7 +99,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           {/* CONFIRM MOVE */}
           <div className="setting-item">
             <label className="modal-text">
-              {t.labels.confirmMove || 'CONFIRMAR MOVIMIENTO'}
+              {labels.confirmMove || 'CONFIRMAR MOVIMIENTO'}
             </label>
             <button
               className={`opt-btn ${confirmMove ? 'active' : ''}`}
@@ -111,7 +112,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           {/* TUTOR BOT ENABLE/DISABLE */}
           <div className="setting-item">
             <label className="modal-text">
-              {t.labels.tutorEnabled || 'ASISTENTE TUTOR'}
+              {labels.tutorEnabled || 'ASISTENTE TUTOR'}
             </label>
             <button
               className={`opt-btn ${tutorEnabled ? 'active' : ''}`}
