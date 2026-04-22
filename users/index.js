@@ -96,9 +96,17 @@ app.get('/play', async (req, res) => {
           rustPayload
       );
       */
+      const allowedKeys = ['size', 'turn', 'players', 'layout'];
+      const sanitizedPayload = {};
+      for (const key of allowedKeys) {
+          if (rustPayload[key] !== undefined) {
+              sanitizedPayload[key] = rustPayload[key];
+          }
+      }
+
       const rustResponse = await axios.post(
           `http://gamey:4000/v1/ybot/choose/${safeBotId}`,
-          rustPayload // FIX 1: Enviamos el JSON parseado
+          sanitizedPayload
       );
 
       // Return with the correct format
