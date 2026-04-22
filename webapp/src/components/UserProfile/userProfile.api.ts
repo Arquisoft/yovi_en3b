@@ -32,10 +32,11 @@ export async function getMyProfile(): Promise<UserProfile> {
 export async function updateMyProfile(patch: { displayName: string, avatarId: string }): Promise<UserProfile> {
   const username = localStorage.getItem('username');
 
-  const res = await fetch(`${API_URL}/users/changeNickname`, {
+  const res = await fetch(`${API_URL}/users/changeNicknameAndPhoto`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
     body: JSON.stringify({
       username: localStorage.getItem('username'),
@@ -80,6 +81,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
     body: JSON.stringify({ 
       username: username,

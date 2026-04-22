@@ -72,15 +72,18 @@ describe('userProfile API service', () => {
             (fetch as any).mockResolvedValue({
                 ok: true,
                 json: () => Promise.resolve(mockResponse),
-            });
+            }); 
 
             const result = await updateMyProfile(patch);
 
             expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/changeNickname`,
+                `${API_URL}/users/changeNicknameAndPhoto`,
                 expect.objectContaining({
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: expect.objectContaining({ 
+                        'Content-Type': 'application/json',
+                        'Authorization': expect.stringContaining('Bearer') 
+                    }),
                     body: JSON.stringify({
                         username: mockUsername,
                         nickname: patch.displayName,

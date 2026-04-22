@@ -157,7 +157,14 @@ jobs:
 
             #To crete the schema of the db in the cloud. 
             mkdir -p users/src/db
+            mkdir -p users/monitoring/prometheus
+            mkdir -p users/monitoring/grafana/provisioning
+
             wget https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/master/users/src/db/init.sql -O ./users/src/db/init.sql
+            wget https://raw.githubusercontent.com/${{ github.repository }}/master/users/monitoring/prometheus/prometheus.yml -O ./users/monitoring/prometheus/prometheus.yml
+            if [ -d "./users/monitoring/grafana" ]; then
+              sudo chown -R 472:472 ./users/monitoring/grafana
+            fi
 
             docker compose down
             docker compose up -d --pull always
