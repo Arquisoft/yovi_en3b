@@ -51,7 +51,7 @@ const TutorBot: React.FC<TutorBotProps> = ({ message, onClear }) => {
                 </div>
             )}
 
-            <div className="robot-icon-wrapper" onClick={toggleBubble}>
+            <div className="robot-icon-wrapper" onClick={toggleBubble} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBubble(); } }} role="button" tabIndex={0}>
                 <div className="robot-avatar">
                     <Bot size={30} /> {/* Robot icon */}
                 </div>

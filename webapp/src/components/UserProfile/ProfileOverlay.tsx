@@ -72,10 +72,18 @@ export const ProfileOverlay: React.FC<ProfileOverlayProps> = ({ open, onClose })
 
   if (!open) return null;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isEditing && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      playSound('click.mp3');
+      onClose();
+    }
+  };
+
   return (
-    <div className="profile-overlay-backdrop" onClick={isEditing ? undefined : () => { playSound('click.mp3'); onClose(); }}>
+    <div className="profile-overlay-backdrop" onClick={isEditing ? undefined : () => { playSound('click.mp3'); onClose(); }} onKeyDown={handleKeyDown} role="button" tabIndex={0}>
       {/* Added neon-mode class to the modal content */}
-      <div className={`profile-overlay-card profile-modal modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`profile-overlay-card profile-modal modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`} onClick={(e) => e.stopPropagation()} role="button" tabIndex={0} onKeyDown={(e) => e.stopPropagation()}>
 
         <button
           className="profile-close-btn"

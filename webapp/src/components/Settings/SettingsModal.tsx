@@ -27,11 +27,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
     action();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      playSound('click.mp3');
+      onClose();
+    }
+  };
+
   return (
-    <div className="modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
+    <div className="modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }} onKeyDown={handleKeyDown} role="button" tabIndex={0}>
       <div
         className={`modal-content ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`}
         onClick={(e) => e.stopPropagation()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <button className="boton-cerrar-fijo" onClick={() => { playSound('click.mp3'); onClose(); }}>&times;</button>
 
