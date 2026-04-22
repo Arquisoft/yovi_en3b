@@ -14,6 +14,15 @@ import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 import { requestBotChatReply, type GameChatMessage } from './gameyChat.api';
 import { createMatch, finishMatch } from './game.api';
+import { createMatch, finishMatch, evaluateBoard } from './game.api';
+import TutorBot from '../TutorBox/TutorBox';
+import { MatchGraph } from './MatchGraph';
+
+export interface ScoreData {
+    turn: number;
+    blue: number;
+    red: number;
+}
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -141,6 +150,50 @@ const GameScreen: React.FC = () => {
         const playerText = inputValue.trim();
         const nextMessages: GameChatMessage[] = [...messages, { sender: 'player', text: playerText }];
         setMessages(nextMessages);
+    // Effect to evaluate board tension after every move
+    useEffect(() => {
+        const turnCount = Object.keys(boardState).length;
+
+        // If the game just started or already ended, we dont sent anything
+        if (turnCount === 0 || gameResult) return;
+        // If we've already evaluated this turn, we dont send anything
+        if (lastEvaluatedTurn.current === turnCount) return;
+
+        // Mark this turn as evalueated...
+        lastEvaluatedTurn.current = turnCount;
+        // ...and then we evaluate it
+        const evaluateCurrentBoard = async () => {
+            try {
+                const yenLayoutString = boardToYen(boardState, size);
+
+                const payload = {
+                    size: size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayoutString
+                };
+
+                const data = await evaluateBoard(payload);
+
+                setScoreHistory(prev => [
+                    ...prev,
+                    { turn: turnCount, blue: data.blue_score, red: data.red_score }
+                ]);
+            } catch (error) {
+                console.error("Error evaluating board tension:", error);
+                // If something fails, we mark it as unchecked again
+                lastEvaluatedTurn.current = turnCount - 1;
+            }
+        };
+
+        evaluateCurrentBoard();
+    }, [boardState, size, gameResult]);
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+        playSound('click.mp3');
+        setMessages((prev: any[]) => [...prev, { sender: 'player', text: inputValue.trim() }]);
         setInputValue('');
 
         try {
@@ -362,6 +415,17 @@ const GameScreen: React.FC = () => {
                                     className={`message ${msg.sender === 'player' ? 'sent' : 'received'}`}
                                     style={msg.sender === 'player' ? { backgroundColor: p1Color } : undefined}
                                 >
+                        <div className="chat-messages-display" style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {messages.map((msg, index) => (
+                                <div key={index} className={`chat-bubble ${msg.sender}`} style={{
+                                    alignSelf: msg.sender === 'player' ? 'flex-end' : 'flex-start',
+                                    backgroundColor: msg.sender === 'player' ? p1Color : '#333',
+                                    color: 'white',
+                                    padding: '6px 12px',
+                                    borderRadius: '12px',
+                                    maxWidth: '80%',
+                                    fontSize: '0.9rem'
+                                }}>
                                     {msg.text}
                                 </div>
                             ))}
@@ -382,6 +446,15 @@ const GameScreen: React.FC = () => {
                                 style={{ backgroundColor: p1Color }}
                             >
                                 <CheckCircle2 size={18} />
+                        <form onSubmit={handleSendMessage} className="chat-input-area">
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="Escribe un mensaje..."
+                            />
+                            <button type="submit" className="send-btn">
+                                Send
                             </button>
                         </form>
                     </div>
@@ -411,12 +484,7 @@ const GameScreen: React.FC = () => {
                             <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
                         </div>
                     </div>
-                    <div className="modal-content result-modal">
-                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>{gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}</h2>
-                        <p>{gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}</p>
-                        <button className="main-button btn-blue" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
-                    </div>
-                </div>   
+                </div>
             )}
             {showExitConfirmation && (
                 <div className="modal-overlay">
