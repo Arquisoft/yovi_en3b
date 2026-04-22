@@ -25,6 +25,9 @@ pub mod error;
 pub mod state;
 pub mod version;
 pub mod hint;
+
+pub mod evaluator;
+
 use axum::response::IntoResponse;
 use std::sync::Arc;
 pub use choose::MoveResponse;
@@ -48,6 +51,7 @@ pub fn create_router(state: AppState) -> axum::Router {
             "/{api_version}/ybot/hint",
             axum::routing::post(hint::get_hint),
         )
+        .route("/{api_version}/evaluate", axum::routing::post(evaluator::evaluate_handler))
         .with_state(state)
 }
 

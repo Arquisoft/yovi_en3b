@@ -222,6 +222,54 @@ paths:
         "200":
           description: Match status updated and rankings calculated
 
+# --- MATCH ANALYSIS ---
+  /matches/evaluate:
+    post:
+      tags: [Matches]
+      summary: Evaluate board tension
+      description: >
+        Analyzes the current YEN board state to determine the tension (distance to win) for both players.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [size, turn, players, layout]
+              properties:
+                size: 
+                  type: integer
+                  example: 4
+                turn: 
+                  type: integer
+                  example: 5
+                players: 
+                  type: array
+                  items:
+                    type: string
+                  example: ["B", "R"]
+                layout: 
+                  type: string
+                  example: "B/.B/RB./B..R"
+      responses:
+        "200":
+          description: Tension scores calculated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blue_score: 
+                    type: integer
+                    example: 24
+                  red_score: 
+                    type: integer
+                    example: 22
+        "400":
+          description: Invalid YEN format provided
+        "500":
+          description: Internal server error (e.g., Rust engine unreachable)
+
   # --- RANKING ---
   /ranking/me:
     get:

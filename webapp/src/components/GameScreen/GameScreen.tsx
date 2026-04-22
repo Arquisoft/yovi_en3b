@@ -1,18 +1,25 @@
 // UBICACIÓN: webapp/src/pages/GameScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
     Volume2, VolumeX // Added volume icons
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
-import { checkWin } from './yGameLogic';
+import { checkWin, boardToYen } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { createMatch, finishMatch } from './game.api';
+import { createMatch, finishMatch, evaluateBoard } from './game.api';
+import { MatchGraph } from './MatchGraph';
+
+export interface ScoreData {
+  turn: number;
+  blue: number;
+  red: number;
+}
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -44,7 +51,8 @@ const GameScreen: React.FC = () => {
     const [matchId, setMatchId] = useState<string | null>(null);
     const [isMatchCreating, setIsMatchCreating] = useState(false);
     const [matchError, setMatchError] = useState<string | null>(null);
-    
+    const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
+    const lastEvaluatedTurn = useRef(0);
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
@@ -103,6 +111,46 @@ const GameScreen: React.FC = () => {
             finishGameMatch();
         }
     }, [gameResult, matchId, playSound]);
+
+    // Effect to evaluate board tension after every move
+    useEffect(() => {
+        const turnCount = Object.keys(boardState).length;
+        
+        // If the game just started or already ended, we dont sent anything
+        if (turnCount === 0 || gameResult) return;
+        // If we've already evaluated this turn, we dont send anything
+        if (lastEvaluatedTurn.current === turnCount) return;
+
+        // Mark this turn as evalueated...
+        lastEvaluatedTurn.current = turnCount;
+        // ...and then we evaluate it
+        const evaluateCurrentBoard = async () => {
+            try {
+                const yenLayoutString = boardToYen(boardState, size);
+                
+                const payload = {
+                    size: size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayoutString
+                };
+
+                const data = await evaluateBoard(payload);
+                
+                setScoreHistory(prev => [
+                    ...prev,
+                    { turn: turnCount, blue: data.blue_score, red: data.red_score }
+                ]);
+            } catch (error) {
+                console.error("Error evaluating board tension:", error);
+                // If something fails, we mark it as unchecked again
+                lastEvaluatedTurn.current = turnCount - 1; 
+            }
+        };
+
+        evaluateCurrentBoard();
+    }, [boardState, size, gameResult]);
+
 
     const formatDisplayTime = (seconds: number | null) => {
         if (seconds === null) return "∞";
@@ -207,8 +255,11 @@ const GameScreen: React.FC = () => {
         setCurrentPlayer(1);
         setTimeLeft(initialTime);
         setMatchId(null); // Reset match ID for new game
+        lastEvaluatedTurn.current = 0;
         navigate('/menu', { state: { openConfig: true } });
     };
+
+    console.log("Historial de Tensión Actual:", scoreHistory);
 
     return (
         <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}> 
@@ -324,6 +375,9 @@ const GameScreen: React.FC = () => {
             {gameResult && (
                 <div className="modal-overlay">
                     <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
+
+                        <MatchGraph data={scoreHistory} />
+
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>

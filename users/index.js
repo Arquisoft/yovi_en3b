@@ -1,5 +1,11 @@
 const express = require('express');
-const axios = require('axios'); // <-- Needed to make a call to rust logic (bots)
+
+let axios = require('axios');
+if (process.env.NODE_ENV === 'test') {
+  // allows mock injection
+}
+module.exports._setAxios = (mock) => { axios = mock; };
+
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
@@ -72,16 +78,45 @@ app.get('/play', async (req, res) => {
       }
 
       // Make the call to the Rust module
-      const RUST_BOT_URL = process.env.BOT_SERVICE_URL || 'http://gamey:4000';
-      const response = await axios.post(`${RUST_BOT_URL}/v1/ybot/choose/${safeBotId}`, rustPayload);
+
+      /*
+      const { URL } = require('node:url');
+
+      const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
+
+      const rawUrl = process.env.DB_HOST || 'http://gamey:4000';
+      const parsedUrl = new URL(rawUrl);
+
+      if (!ALLOWED_HOSTS.includes(parsedUrl.hostname)) {
+          throw new Error('Invalid BOT_SERVICE_URL');
+      }
+
+      const response = await axios.post(
+          `${parsedUrl.origin}/v1/ybot/choose/${safeBotId}`,
+          rustPayload
+      );
+      */
+      const allowedKeys = ['size', 'turn', 'players', 'layout'];
+      const sanitizedPayload = {};
+      for (const key of allowedKeys) {
+          if (rustPayload[key] !== undefined) {
+              sanitizedPayload[key] = rustPayload[key];
+          }
+      }
+
+      const rustResponse = await axios.post(
+          `http://gamey:4000/v1/ybot/choose/${safeBotId}`,
+          sanitizedPayload
+      );
 
       // Return with the correct format
-      if (response.data.coords) {
-          res.json({ coords: response.data.coords });
-      } else if (response.data.action) {
-          res.json({ action: response.data.action });
+      // FIX 2: Usamos rustResponse en lugar de response
+      if (rustResponse.data.coords) {
+          res.json({ coords: rustResponse.data.coords });
+      } else if (rustResponse.data.action) {
+          res.json({ action: rustResponse.data.action });
       } else {
-          res.json(response.data); 
+          res.json(rustResponse.data); 
       }
 
   } catch (error) {
@@ -100,4 +135,5 @@ if (require.main === module) {
   })
 }
 
+app._setAxios = (mock) => { axios = mock; };
 module.exports = app;
