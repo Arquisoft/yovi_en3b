@@ -16,6 +16,17 @@ const promBundle = require('express-prom-bundle');
 const userRoutes = require('./src/modules/user/entry-points/userRoutes');
 const matchRoutes = require('./src/modules/match/entry-points/matchRoutes');
 const rankingRoutes = require('./src/modules/ranking/entry-points/rankingRoutes');
+const defaultAllowedOrigins = [
+  'http://localhost',
+  'http://localhost:80',
+  'http://localhost:5173',
+];
+const allowedOrigins = new Set(
+  (process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
+    : defaultAllowedOrigins
+  ).filter(Boolean)
+);
 
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
@@ -30,16 +41,13 @@ try {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin && origin.startsWith('http://localhost')) {
+  if (origin && allowedOrigins.has(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Expose-Headers', 'Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
