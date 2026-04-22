@@ -91,7 +91,7 @@ const GameScreen: React.FC = () => {
             if (conditionMet) {
                 const tips = t.tutor.tips;
                 if (tips && tips.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * tips.length);
+                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % tips.length;
                     setTutorMessage(tips[randomIndex]);
                     setTutorMessagesCount(prev => prev + 1);
                     setMovesSinceLastTip(0);
@@ -164,7 +164,8 @@ const GameScreen: React.FC = () => {
         setTimeout(() => {
             const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
             if (available.length > 0) {
-                const botCell = available[Math.floor(Math.random() * available.length)];
+                const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
+                const botCell = available[randomIndex];
                 const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
                 const afterBot = { ...newBoard, [botKey]: 2 };
                 setBoardState(afterBot);
@@ -248,7 +249,7 @@ const GameScreen: React.FC = () => {
 
                     <button
                         className="icon-btn-global"
-                        title="Language"  
+                        title="Language"
                         onClick={() => setShowLanguageDialog(true)}
                     >
                         <Languages size={20} />
@@ -256,7 +257,7 @@ const GameScreen: React.FC = () => {
 
                     <button
                         className="icon-btn-global"
-                        title="Chat"     
+                        title="Chat"
                         onClick={() => setIsChatOpen(!isChatOpen)}
                     >
                         <MessageSquare size={20} />
