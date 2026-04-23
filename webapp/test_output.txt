@@ -1,0 +1,460 @@
+
+> webapp@0.0.0 test
+> vitest --run
+
+
+[1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp[39m
+
+ [32m✓[39m src/__tests__/userProfile.api.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 107[2mms[22m[39m
+ [32m✓[39m src/__tests__/useUserProfile.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 905[2mms[22m[39m
+     [33m[2m✓[22m[39m covers full lifecycle: loading, success, and saving [33m 349[2mms[22m[39m
+[90mstdout[2m | src/__tests__/RegisterForm.test.tsx[2m > [22m[2mRegisterForm[2m > [22m[2m2. Navigates on successful login
+[22m[39mLogin stored userId: 
+
+[90mstderr[2m | src/__tests__/RegisterForm.test.tsx[2m > [22m[2mRegisterForm[2m > [22m[2m6. Handles network error gracefully
+[22m[39mConnection error: Error: Network error
+    at [90m/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39msrc/__tests__/RegisterForm.test.tsx:128:49
+    at [90mfile:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:302:11
+    at [90mfile:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:1893:26
+    at [90mfile:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel [90m(file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:2313:10[90m)[39m
+    at [90mfile:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:2295:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:2262:10[90m)[39m
+    at [90mfile:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/[39mnode_modules/[4m@vitest/runner[24m/dist/chunk-artifact.js:2945:64
+
+[90mstdout[2m | src/__tests__/RegisterForm.test.tsx[2m > [22m[2mRegisterForm[2m > [22m[2m7. Loading state is set while API is being called
+[22m[39mLogin stored userId: 
+
+ [32m✓[39m src/__tests__/RegisterForm.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 1654[2mms[22m[39m
+     [33m[2m✓[22m[39m 1. Shows error when fields are empty [33m 710[2mms[22m[39m
+     [33m[2m✓[22m[39m 3. Shows error message on API failure [33m 369[2mms[22m[39m
+[90mstderr[2m | src/__tests__/ProfileOverlay.test.tsx[2m > [22m[2mProfileOverlay High Coverage Boost[2m > [22m[2m2. Successful password change flow
+[22m[39mWarning: An update to ProfileOverlay inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileOverlay (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/UserProfile/ProfileOverlay.tsx:24:27)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at MemoryRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6633:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 1: renders player cards
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 1: renders player cards
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+ [32m✓[39m src/__tests__/GamePreviewModal.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 4004[2mms[22m[39m
+     [33m[2m✓[22m[39m TEST 2: renders correctly when isOpen is true [33m 522[2mms[22m[39m
+     [33m[2m✓[22m[39m TEST 4: updates difficulty and time limit label via slider [33m 1306[2mms[22m[39m
+     [33m[2m✓[22m[39m TEST 5: board size stepper increases and decreases values [33m 348[2mms[22m[39m
+     [33m[2m✓[22m[39m TEST 10: difficulty 0 shows "No Limit" time format [33m 555[2mms[22m[39m
+[90mstderr[2m | src/__tests__/ProfileOverlay.test.tsx[2m > [22m[2mProfileOverlay High Coverage Boost[2m > [22m[2m2. Successful password change flow
+[22m[39mWarning: An update to ProfileOverlay inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileOverlay (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/UserProfile/ProfileOverlay.tsx:24:27)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at MemoryRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6633:3)
+Warning: An update to ProfileOverlay inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileOverlay (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/UserProfile/ProfileOverlay.tsx:24:27)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at MemoryRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6633:3)
+
+[90mstderr[2m | src/__tests__/ProfileOverlay.test.tsx[2m > [22m[2mProfileOverlay High Coverage Boost[2m > [22m[2m3. Catch block: Password change API error
+[22m[39mWarning: An update to ProfileOverlay inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileOverlay (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/UserProfile/ProfileOverlay.tsx:24:27)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at MemoryRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6633:3)
+
+[90mstdout[2m | src/__tests__/SignUpForm.test.tsx[2m > [22m[2mSignUpForm Component[2m > [22m[2m5. Successfully creates account and navigates
+[22m[39mSignup response: { message: [32m'User created'[39m }
+Stored userId: 
+
+[90mstderr[2m | src/__tests__/ProfileOverlay.test.tsx[2m > [22m[2mProfileOverlay High Coverage Boost[2m > [22m[2m4. Keyboard: Escape key to cancel editing
+[22m[39mWarning: An update to ProfileOverlay inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProfileOverlay (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/UserProfile/ProfileOverlay.tsx:24:27)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at MemoryRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6633:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 2: renders footer action buttons
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 2: renders footer action buttons
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+ [32m✓[39m src/__tests__/ProfileOverlay.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 7051[2mms[22m[39m
+     [33m[2m✓[22m[39m 1. Renders loading and error states (Branch Coverage) [33m 627[2mms[22m[39m
+     [33m[2m✓[22m[39m 2. Successful password change flow [33m 3550[2mms[22m[39m
+     [33m[2m✓[22m[39m 3. Catch block: Password change API error [33m 1016[2mms[22m[39m
+     [33m[2m✓[22m[39m 4. Keyboard: Escape key to cancel editing [33m 805[2mms[22m[39m
+     [33m[2m✓[22m[39m 5. Close button interaction when not editing [33m 528[2mms[22m[39m
+     [33m[2m✓[22m[39m 6. Reset and Save buttons when dirty [33m 454[2mms[22m[39m
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 3: confirm button is disabled when no cell is selected
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 3: confirm button is disabled when no cell is selected
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+ [32m✓[39m src/__tests__/SignUpForm.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 7971[2mms[22m[39m
+     [33m[2m✓[22m[39m 1. Renders all input fields and avatars [33m 3291[2mms[22m[39m
+     [33m[2m✓[22m[39m 2. Toggles password visibility [33m 983[2mms[22m[39m
+     [33m[2m✓[22m[39m 4. Selects an avatar from the grid [33m 604[2mms[22m[39m
+     [33m[2m✓[22m[39m 5. Successfully creates account and navigates [33m 350[2mms[22m[39m
+     [33m[2m✓[22m[39m 6. Shows error message on API failure [33m 473[2mms[22m[39m
+     [33m[2m✓[22m[39m 7. Handles server connection error (catch block) [33m 335[2mms[22m[39m
+     [33m[2m✓[22m[39m 9. Resets avatar selection correctly [33m 862[2mms[22m[39m
+     [33m[2m✓[22m[39m 10. Updates all form fields on change [33m 510[2mms[22m[39m
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 4: confirm button enables after clicking a hex cell
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 4: confirm button enables after clicking a hex cell
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 4: confirm button enables after clicking a hex cell
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 4: confirm button enables after clicking a hex cell
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 4: confirm button enables after clicking a hex cell
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+Warning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 5: confirm button disables again after confirming a move
+[22m[39mHistorial de Tensión Actual: [ { turn: [33m1[39m, blue: [33m20[39m, red: [33m18[39m } ]
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 6: turn switches from Player 1 to Player 2 after confirming
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 6: turn switches from Player 1 to Player 2 after confirming
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 6: turn switches from Player 1 to Player 2 after confirming
+[22m[39mHistorial de Tensión Actual: []
+
+[90mstderr[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 6: turn switches from Player 1 to Player 2 after confirming
+[22m[39mWarning: An update to GameScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at GameScreen (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/components/GameScreen/GameScreen.tsx:48:69)
+    at SettingsProvider (/home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/src/context/SettingsContext.tsx:8:29)
+    at Router (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:6717:13)
+    at BrowserRouter (file:///home/luis/Documentos/UNIOVI/ASW/Lab/yovi_local/yovi_en3b/webapp/node_modules/react-router/dist/development/chunk-UVKPFVEO.mjs:9982:3)
+
+[90mstdout[2m | src/__tests__/GameScreen.test.tsx[2m > [22m[2mGameScreen[2m > [22m[2mTEST 6: turn switches from Player 1 to Player 2 after confirming
+[22m[39mHistorial de Tensión Actual: []
+

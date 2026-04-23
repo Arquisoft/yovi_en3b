@@ -21,11 +21,22 @@ export const LanguageDialog: React.FC<LanguageDialogProps> = ({ open, onClose })
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      playSound('click.mp3');
+      onClose();
+    }
+  };
+
   return (
-    <div className="language-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
+    <div className="language-overlay" onClick={() => { playSound('click.mp3'); onClose(); }} onKeyDown={handleKeyDown} role="button" tabIndex={0}>
       <div 
         className={`language-modal ${colorBlindMode ? 'color-blind' : ''}`} 
         onClick={(e) => e.stopPropagation()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <button 
           className="close-x-lang" 

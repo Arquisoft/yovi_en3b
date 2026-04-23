@@ -1,5 +1,3 @@
-const { updateUserPhoto } = require("./userRepository");
-
 // File to write the queries required for the users management
 module.exports = {
   createUser: `

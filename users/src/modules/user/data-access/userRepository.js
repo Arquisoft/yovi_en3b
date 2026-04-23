@@ -32,7 +32,13 @@ const updateUserNicknameAndPhoto = async (username, nickname, photo) => {
     return result.rows[0];
 }
 
-//Searches a user with the username indicated in the parameter
+//Changes the photo of the user
+const updateUserPhoto = async (username, photo) => {
+    const result = await db.query(queries.updateUserPhoto, [photo, username]);
+    return result.rows[0];
+}
+
+//Searches a user with the id indicated in the parameter
 const findUserById = async (id) => {
     const result = await db.query(queries.findUserById, [id]);
     return result.rows[0];
@@ -43,4 +49,6 @@ module.exports = {
     findUserByEmail,
     updateUserPassword,
     updateUserNicknameAndPhoto,
+    updateUserPhoto,
+    findUserById,
 };
