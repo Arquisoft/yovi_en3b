@@ -35,7 +35,7 @@ const GameScreen: React.FC = () => {
         size = 5,
         time: initialTime = null,
         botType = 'robot',
-        difficulty = 1
+        difficulty = 0
     } = location.state || {};
 
     // --- ESTADOS PRINCIPALES ---
@@ -240,9 +240,9 @@ const GameScreen: React.FC = () => {
                 });
                 // Map difficulty to botId
                 let botId = 'random_bot';
-                if (difficulty === 1) botId = 'easy_bot';
-                else if (difficulty === 2) botId = 'medium_bot';
-                else if (difficulty === 3) botId = 'hard_bot';
+                if (difficulty === 0) botId = 'easy_bot';
+                else if (difficulty === 1) botId = 'medium_bot';
+                else if (difficulty === 2) botId = 'hard_bot';
                 const coords = await getBotMove(position, botId);
                 const botKey = `${coords.x}-${coords.y}-${coords.z}`;
                 const afterBot = { ...newBoard, [botKey]: 2 };
