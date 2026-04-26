@@ -1,7 +1,7 @@
 // UBICACIÓN: webapp/src/pages/HistoryPage/HistoryPage.tsx
 import React, { useEffect, useMemo, useState } from 'react'; 
 import { useNavigate } from 'react-router-dom'; 
-import { ArrowLeft, Trophy, XCircle, Calendar, Hash, Cpu, BarChart3, Target } from 'lucide-react'; 
+import { ArrowLeft, Trophy, XCircle, Calendar, Cpu, BarChart3, Target } from 'lucide-react'; 
 import { useSettings } from '../../context/SettingsContext'; 
 import { useI18n } from '../../i18n/useTranslation'; 
 import './HistoryPage.css'; 
@@ -17,63 +17,43 @@ const HistoryPage: React.FC = () => {
 
     useEffect(() => {
         let cancelled = false;
-
         (async () => {
             try {
                 setLoading(true);
-                setError(null);
                 const history = await getMyMatchHistory();
-
-                if (!cancelled) {
-                    setMatches(history);
-                }
+                if (!cancelled) setMatches(history);
             } catch (fetchError) {
-                if (!cancelled) {
-                    setError(fetchError instanceof Error ? fetchError.message : 'Could not load match history');
-                }
+                if (!cancelled) setError('Could not load history');
             } finally {
-                if (!cancelled) {
-                    setLoading(false);
-                }
+                if (!cancelled) setLoading(false);
             }
         })();
-
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, []);
 
-    const finishedMatches = useMemo(
-        () => matches.filter((match) => match.result === 'win' || match.result === 'lose'),
-        [matches],
-    );
-    const totalMatches = finishedMatches.length; 
-    const wins = finishedMatches.filter(m => m.result === 'win').length; 
+    // Lógica simplificada: si no es 'win', es 'lose' (por abandono o derrota real)
+    const processedMatches = useMemo(() => {
+        return matches.map(m => ({
+            ...m,
+            result: m.result === 'win' ? 'win' : 'lose'
+        }));
+    }, [matches]);
+
+    const totalMatches = processedMatches.length; 
+    const wins = processedMatches.filter(m => m.result === 'win').length; 
     const winRate = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0;
 
-    const formatMatchDate = (value: string) =>
-        new Date(value).toLocaleDateString('en-CA');
+    const formatMatchDate = (value: string) => new Date(value).toLocaleDateString('en-CA');
 
-    const formatBoardSize = (size: number | null) => (size ? `${size}x${size}` : '—');
-
-    const getResultLabel = (result: MatchHistoryEntry['result']) => {
-        if (result === 'win') return t.buttons.victory;
-        if (result === 'lose') return t.buttons.defeat;
-        if (result === 'abandoned') return 'ABANDONED';
-        return 'IN PROGRESS';
+    const getResultLabel = (result: string) => {
+        return result === 'win' ? t.buttons.victory : t.buttons.defeat;
     };
 
     return (
         <div className={`history-container ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`}>
             <header className="history-header">
                 <h1 className="title-game">{t.buttons.history}</h1>
-                <button 
-                    className="icon-btn-back" 
-                    onClick={() => {
-                        playSound('click.mp3'); // Reproduce el sonido antes de navegar
-                        navigate('/menu');
-                    }}
-                >
+                <button className="icon-btn-back" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>
                     <ArrowLeft size={35} /> 
                 </button>
             </header>
@@ -96,20 +76,20 @@ const HistoryPage: React.FC = () => {
                 <div className="stat-card-mini">
                     <Trophy size={20} className="stat-icon win" />
                     <div className="stat-info">
-                        <span className="stat-label">{t.labels.wins}</span>
+                        <span className="stat-label">{t.labels.victorias}</span>
                         <span className="stat-value">{wins}</span>
                     </div>
                 </div>
             </section>
 
             <main className="history-list">
-                {loading && <div className="history-feedback">Loading history...</div>}
+                {loading && <div className="history-feedback">{t.labels.loadingH}</div>}
                 {!loading && error && <div className="history-feedback history-feedback-error">{error}</div>}
-                {!loading && !error && matches.length === 0 && (
-                    <div className="history-feedback">No matches recorded yet.</div>
+                {!loading && !error && processedMatches.length === 0 && (
+                    <div className="history-feedback">{t.labels.noMatches}</div>
                 )}
 
-                {!loading && !error && matches.map((match) => (
+                {!loading && !error && processedMatches.map((match) => (
                     <div key={match.id} className={`history-card ${match.result}`}>
                         <div className="card-status-icon">
                             {match.result === 'win' ? 
@@ -128,9 +108,6 @@ const HistoryPage: React.FC = () => {
                         </div>
 
                         <div className="card-stats">
-                            <div className="stat-badge">
-                                <Hash size={14} /> {formatBoardSize(match.size)}
-                            </div>
                             <div className={`result-text ${match.result}`}>
                                 {getResultLabel(match.result)}
                             </div>

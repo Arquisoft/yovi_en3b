@@ -86,9 +86,12 @@ describe('LanguageDialog', () => {
   });
 
   test('closes when clicking the X button', () => {
-    renderWithProviders(<LanguageDialog open={true} onClose={mockOnClose} />);
+    const { container } = renderWithProviders(<LanguageDialog open={true} onClose={mockOnClose} />);
     
-    const closeBtn = screen.getByRole('button', { name: /×/i }); // Find close button (the X icon)
+    const modalContent = container.querySelector('.language-modal');
+    const closeBtn = modalContent?.querySelector('.close-x-lang') as HTMLButtonElement;
+    expect(closeBtn).toBeDefined();
+    
     fireEvent.click(closeBtn); // Trigger click
 
     expect(mockOnClose).toHaveBeenCalled(); // Should trigger onClose

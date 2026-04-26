@@ -32,7 +32,7 @@ export async function createMatch(
   };
 
   if (isBot) {
-    if (!difficulty) {
+    if (difficulty === undefined  || difficulty < 0 || difficulty > 2) {
       throw new Error("Bot difficulty is required for bot matches");
     }
     body.botDifficulty = difficulty;
@@ -57,7 +57,6 @@ export async function createMatch(
   }
 
   const data = await res.json();
-  console.log("Match created:", data.match);
   return data.match;
 }
 
@@ -93,6 +92,5 @@ export async function finishMatch(
   }
 
   const data = await res.json();
-  console.log("Match finished:", data.match);
   return data.match;
 }

@@ -200,6 +200,16 @@
 .history-feedback-error {
     color: #f87171;
 }
+.difficulty-text.easy { color: #4ade80; font-weight: bold; } /* Green for easy */
+.difficulty-text.medium { color: #fbbf24; font-weight: bold; } /* Amber for medium */
+.difficulty-text.hard { color: #f87171; font-weight: bold; } /* Red for hard */
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2px;
+}
 
 @media (max-width: 56rem) {
     .history-card {

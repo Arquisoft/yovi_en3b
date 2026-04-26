@@ -9,6 +9,8 @@ info:
 servers:
   - url: http://localhost:3000
     description: Development Server (Node.js API Gateway)
+  - url: http://20.199.16.53:3000
+    description: Production Environment (Azure)
 
 components:
   securitySchemes:

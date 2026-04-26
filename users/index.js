@@ -1,14 +1,23 @@
 const express = require('express');
 
 let axios = require('axios');
-if (process.env.NODE_ENV === 'test') {
-  // allows mock injection
-}
-module.exports._setAxios = (mock) => { axios = mock; };
 
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
+
+// Keep tests local-only to avoid sandbox/network restrictions in CI.
+const isVitest = Boolean(process.env.VITEST || process.env.VITEST_POOL_ID || process.env.NODE_ENV === 'test');
+if (isVitest) {
+  const originalListen = app.listen.bind(app);
+  app.listen = (listenPort, ...args) => {
+    if (args.length === 0 || typeof args[0] === 'function') {
+      return originalListen(listenPort, '127.0.0.1', ...args);
+    }
+    return originalListen(listenPort, ...args);
+  };
+}
+
 const swaggerUi = require('swagger-ui-express');
 const fs = require('node:fs');
 const YAML = require('js-yaml');
@@ -135,6 +144,5 @@ if (require.main === module) {
   })
 }
 
-module.exports = app
-
-
+app._setAxios = (mock) => { axios = mock; };
+module.exports = app;

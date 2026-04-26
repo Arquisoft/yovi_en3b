@@ -365,8 +365,10 @@
 
 .result-modal {
     text-align: center !important;
-    padding: 3.125rem !important;
-    border: 0.1875rem solid #60a5fa !important; /* Borde neón */
+    padding: 2rem !important;
+    border: 0.1875rem solid #60a5fa !important;
+    max-height: 90dvh;                 /* nunca más alto que la pantalla */
+    overflow-y: auto;                  /* scroll si no cabe */
 }
 
 .text-win {

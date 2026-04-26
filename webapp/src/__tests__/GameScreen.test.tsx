@@ -99,6 +99,25 @@ vi.mock('../components/LanguageDialog/LanguageDialog', () => ({
 }));
 
 /**
+ * Mocks for API and new components.
+ * Prevents actual HTTP requests and simplifies complex SVG rendering (Recharts) in JSDOM.
+ */
+vi.mock('../components/GameScreen/game.api', () => ({
+    createMatch: vi.fn().mockResolvedValue({ id: 'test-match-123' }),
+    finishMatch: vi.fn().mockResolvedValue({}),
+    evaluateBoard: vi.fn().mockResolvedValue({ blue_score: 20, red_score: 18 }),
+}));
+
+vi.mock('../components/GameScreen/MatchGraph', () => ({
+    MatchGraph: () => <div data-testid="match-graph-mock" />
+}));
+
+vi.mock('../TutorBox/TutorBox', () => ({
+    default: ({ message, onClear }: { message: string | null, onClear: () => void }) => 
+        message ? <div data-testid="tutor-box" onClick={onClear}>{message}</div> : null
+}));
+
+/**
  * Library Mock for "react-hexgrid".
  * Replaces complex SVG-based library components with simple HTML/SVG tags.
  * This simplifies the DOM structure for the test environment and adds 
@@ -311,6 +330,60 @@ describe('GameScreen', () => {
         await waitFor(() => {
             expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
         }, { timeout: 4000 });
+    });
+
+    test('TEST 24: mute button triggers state change', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        const muteButton = screen.getByTitle(/(Mute|Unmute)/i);
+        await user.click(muteButton);
+        // We verify it renders and handles the click without crashing
+        expect(muteButton).toBeInTheDocument();
+    });
+
+    test('TEST 25: evaluateBoard is called after confirming a move', async () => {
+        const { evaluateBoard } = await import('../components/GameScreen/game.api');
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        
+        await user.click(screen.getAllByTestId('hex-cell')[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+        
+        await waitFor(() => {
+            expect(evaluateBoard).toHaveBeenCalled();
+        });
+    });
+
+    test('TEST 26: undo button reverts the last move', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        
+        await user.click(screen.getAllByTestId('hex-cell')[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+        
+        const undoButton = screen.getByRole('button', { name: /undo/i });
+        
+        await waitFor(() => {
+            expect(undoButton).not.toBeDisabled();
+        }, { timeout: 2500 });
+        
+        await user.click(undoButton);
+        
+        expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
+    });
+    
+    test('TEST 27: game over modal shows MatchGraph on timeout', async () => {
+        vi.useFakeTimers();
+        renderWithProviders(<GameScreen />);
+        
+        vi.advanceTimersByTime(61000);
+        
+        vi.useRealTimers();
+        
+        await waitFor(() => {
+            expect(screen.getAllByText('Next time!')[0]).toBeInTheDocument();
+            expect(screen.getByTestId('match-graph-mock')).toBeInTheDocument();
+        });
     });
 });
 

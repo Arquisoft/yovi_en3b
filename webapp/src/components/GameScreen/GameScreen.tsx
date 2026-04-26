@@ -66,29 +66,49 @@ const GameScreen: React.FC = () => {
 
     // Effect to create match on component mount
     useEffect(() => {
-        if (isMatchCreating || matchId) return;
-        if (!localStorage.getItem('userId')) return;
-        
-        const createGameMatch = async () => {
-            setIsMatchCreating(true);
-            try {
-                const match = await createMatch(
-                    true, // isBot=true (playing against bot)
-                    difficulty || 1 // use the actual difficulty (1=easy, 2=medium, 3=hard)
-                );
-                setMatchId(match.id);
-                setMatchError(null);
-            } catch (error) {
-                const msg = error instanceof Error ? error.message : 'Failed to create match';
-                console.error('Match creation error:', msg);
-                setMatchError(msg);
-            } finally {
-                setIsMatchCreating(false);
+        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return;
+
+        const tutorTimer = setInterval(() => {
+            const secondsSinceTurnStart = (Date.now() - turnStartTime) / 1000;
+            let conditionMet = false;
+
+            if (tutorMessagesCount === 0) {
+                if (secondsSinceTurnStart >= 4) conditionMet = true;
+            } else if (tutorMessagesCount === 1) {
+                if (movesSinceLastTip >= 1 && secondsSinceTurnStart >= 6) conditionMet = true;
+            } else if (tutorMessagesCount === 2) {
+                if (movesSinceLastTip >= 2 && secondsSinceTurnStart >= 6) conditionMet = true;
+            } else {
+                if (secondsSinceTurnStart >= 6) conditionMet = true;
             }
-        };
-        
-        createGameMatch();
-    }, [difficulty]);
+
+            if (conditionMet) {
+                const tips = t.tutor.tips;
+                if (tips && tips.length > 0) {
+                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % tips.length;
+                    setTutorMessage(tips[randomIndex]);
+                    setTutorMessagesCount(prev => prev + 1);
+                    setMovesSinceLastTip(0);
+                    playSound('notification.mp3');
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(tutorTimer);
+    }, [currentPlayer, turnStartTime, tutorMessage, gameResult, t.tutor.tips, tutorMessagesCount, movesSinceLastTip, tutorEnabled, playSound]);
+
+    // 3. API Handlers (Init & Finish)
+useEffect(() => {
+    const initMatch = async () => {
+        try {
+            // Asegúrate de que difficulty tenga un valor por defecto si es undefined
+            const diffValue = difficulty !== undefined ? difficulty : 1; 
+            const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
+            setMatchId(m.id);
+        } catch (e) { console.error(e); }
+    };
+    initMatch();
+}, [difficulty]);
 
     // Effect to trigger game over sounds and finish match
     useEffect(() => {
@@ -458,9 +478,6 @@ const GameScreen: React.FC = () => {
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>
-                        <p className="result-modal-text">
-                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
-                        </p>
                         {matchError && (
                             <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
                                 {matchError}

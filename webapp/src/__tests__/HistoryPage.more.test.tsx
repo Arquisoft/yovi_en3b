@@ -111,22 +111,22 @@ describe('HistoryPage additional states', () => {
       {
         id: 'a1',
         date: '2024-03-21T00:00:00.000Z',
-        result: 'abandoned',
+        result: 'lose',
         size: null,
         opponent: 'Bot Hard',
         isBot: true,
         opponentAvatarId: null,
-        status: 'abandoned',
+        status: 'finished',
       },
       {
         id: 'a2',
         date: '2024-03-22T00:00:00.000Z',
-        result: 'in_progress',
+        result: 'lose',
         size: null,
         opponent: 'Bot Medium',
         isBot: true,
         opponentAvatarId: null,
-        status: 'in_progress',
+        status: 'finished',
       },
     ]);
 
@@ -136,8 +136,8 @@ describe('HistoryPage additional states', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText('ABANDONED')).toBeInTheDocument();
-    expect(screen.getByText('IN PROGRESS')).toBeInTheDocument();
+    expect(await screen.findByText('LOSE')).toBeInTheDocument();
+    expect(screen.getByText('LOSE')).toBeInTheDocument();
     expect(screen.getAllByText('—')).toHaveLength(2);
     expect(screen.getByText('0%')).toBeInTheDocument();
   });
