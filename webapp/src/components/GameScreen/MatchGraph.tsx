@@ -17,8 +17,6 @@ export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
   // If there is no data, we dont draw the graph
   if (!data || data.length === 0) return null;
 
-  // CHIVATO: Si las líneas siguen sin salir, abre la consola (F12) y mira esto.
-  // Si dice "blue: undefined", el problema está en lo que devuelve la API.
   console.log("Datos pintando la gráfica:", data);
 
   return (
@@ -37,7 +35,6 @@ export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
           />
           
           <YAxis 
-            // CAMBIO 1: Quitamos las matemáticas del domain para que no explote si hay un dato nulo
             domain={['auto', 'auto']} 
             tick={{ fill: 'currentColor' }}
             tickLine={false}
@@ -48,9 +45,7 @@ export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
             contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }}
           />
           <Legend verticalAlign="top" height={36}/>
-          
-          {/* CAMBIO 2: isAnimationActive={false} arregla el bug de líneas invisibles en Modales */}
-          {/* CAMBIO 3: Colores fijos crudos. A veces los var(--color) fallan en los SVG de Recharts */}
+
           <Line 
             isAnimationActive={false}
             type="monotone" 

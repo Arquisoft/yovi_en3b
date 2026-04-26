@@ -32,7 +32,7 @@ export async function createMatch(
   };
 
   if (isBot) {
-    if (!difficulty) {
+    if (difficulty === undefined  || difficulty < 0 || difficulty > 2) {
       throw new Error("Bot difficulty is required for bot matches");
     }
     body.botDifficulty = difficulty;

@@ -115,15 +115,17 @@ const GameScreen: React.FC = () => {
     }, [currentPlayer, turnStartTime, tutorMessage, gameResult, t.tutor.tips, tutorMessagesCount, movesSinceLastTip, tutorEnabled, playSound]);
 
     // 3. API Handlers (Init & Finish)
-    useEffect(() => {
-        const initMatch = async () => {
-            try {
-                const m = await createMatch(true, difficulty);
-                setMatchId(m.id);
-            } catch (e) { console.error(e); }
-        };
-        initMatch();
-    }, [difficulty]);
+useEffect(() => {
+    const initMatch = async () => {
+        try {
+            // Asegúrate de que difficulty tenga un valor por defecto si es undefined
+            const diffValue = difficulty !== undefined ? difficulty : 1; 
+            const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
+            setMatchId(m.id);
+        } catch (e) { console.error(e); }
+    };
+    initMatch();
+}, [difficulty]);
 
     useEffect(() => {
         if (gameResult && matchId) {
@@ -392,9 +394,6 @@ const GameScreen: React.FC = () => {
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>
-                        <p className="result-modal-text">
-                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
-                        </p>
                         {matchError && (
                             <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
                                 {matchError}
