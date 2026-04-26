@@ -37,7 +37,7 @@ describe('SettingsContext', () => {
 
   it('throws when useSettings is called outside the provider', () => {
     expect(() => renderHook(() => useSettings())).toThrow(
-      'useSettings debe usarse dentro de SettingsProvider'
+      'useSettings must be used within SettingsProvider'
     );
   });
 

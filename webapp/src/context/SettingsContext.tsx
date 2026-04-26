@@ -21,7 +21,7 @@ interface SettingsContextType {
   setTutorEnabled: (v: boolean) => void; 
 }
 
-const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+export const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brightness, setBrightness] = useState(100);
