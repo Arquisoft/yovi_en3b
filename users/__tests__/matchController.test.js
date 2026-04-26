@@ -1,7 +1,16 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createRequire } from 'node:module';
 
+vi.mock('axios', () => {
+  return {
+    default: { post: () => {} },
+    post: () => {}
+  };
+});
+
 const require = createRequire(import.meta.url);
+const axios = require('axios');
+
 const matchService = require('../src/modules/match/domain/matchService.js');
 const matchController = require('../src/modules/match/entry-points/matchController.js');
 
@@ -13,6 +22,13 @@ const makeRes = () => {
 };
 
 describe('matchController', () => {
+  // beforeEach(() => {
+  //   // FORCE OVERRIDE: Since createRequire bypasses Vitest's vi.mock,
+  //   // we directly mutate the cached axios object. 
+  //   // Now matchController will use this dummy function.
+  //   axios.post = vi.fn();
+  // });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -298,6 +314,58 @@ describe('matchController', () => {
         false,
         undefined
       );
+    });
+  });
+
+  // --- TUS TESTS PARA evaluateBoard ---
+  describe('evaluateBoard', () => {
+    it('returns 200 and scores when Rust engine resolves successfully', async () => {
+      const req = { body: { size: 4, turn: 5, players: ['B', 'R'], layout: "..." } };
+      const res = makeRes();
+      const mockScores = { blue_score: 24, red_score: 22 };
+
+      // Creamos el espía justo aquí para que Vitest lo reconozca
+      const postSpy = vi.spyOn(axios, 'post').mockResolvedValue({ data: mockScores });
+
+      await matchController.evaluateBoard(req, res);
+
+      expect(postSpy).toHaveBeenCalledWith('http://gamey:4000/v1/evaluate', req.body);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockScores);
+    });
+
+    it('returns Rust HTTP error status and data when engine rejects (e.g. Invalid YEN format)', async () => {
+      const req = { body: { layout: 'invalid_yen' } };
+      const res = makeRes();
+
+      const mockAxiosError = new Error('Bad Request');
+      mockAxiosError.response = {
+        status: 400,
+        data: { error: 'Invalid YEN format' }
+      };
+
+      vi.spyOn(axios, 'post').mockRejectedValue(mockAxiosError);
+
+      await matchController.evaluateBoard(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid YEN format' });
+    });
+
+    it('returns 500 when there is a critical network failure connecting to Rust engine', async () => {
+      const req = { body: { layout: '...' } };
+      const res = makeRes();
+
+      const mockNetworkError = new Error('Connection Refused');
+
+      vi.spyOn(axios, 'post').mockRejectedValue(mockNetworkError);
+
+      await matchController.evaluateBoard(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ 
+        error: "Internal server error connecting to game engine" 
+      });
     });
   });
 

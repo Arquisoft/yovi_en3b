@@ -1,27 +1,34 @@
 // UBICACIÓN: webapp/src/pages/GameScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
     Volume2, VolumeX
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
-import { checkWin } from './yGameLogic';
+import { checkWin, boardToYen } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { createMatch, finishMatch } from './game.api';
-import TutorBot from '../TutorBox/TutorBox'; 
+import { createMatch, finishMatch, evaluateBoard } from './game.api';
+import TutorBot from '../TutorBox/TutorBox';
+import { MatchGraph } from './MatchGraph';
+
+export interface ScoreData {
+    turn: number;
+    blue: number;
+    red: number;
+}
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useI18n();
-    const { 
-        colorBlindMode, playSound, isMuted, setIsMuted, 
-        confirmMove, tutorEnabled 
+    const {
+        colorBlindMode, playSound, isMuted, setIsMuted,
+        confirmMove, tutorEnabled
     } = useSettings();
 
     const {
@@ -44,35 +51,39 @@ const GameScreen: React.FC = () => {
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
-    const [messages] = useState<{ sender: string, text: string }[]>([]);
-    //const [inputValue, setInputValue] = useState('');
+    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+    const [inputValue, setInputValue] = useState('');
     const [matchId, setMatchId] = useState<string | null>(null);
-    
+    // const [isMatchCreating, setIsMatchCreating] = useState(false);
+    const [matchError] = useState<string | null>(null);
+    const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
+    const lastEvaluatedTurn = useRef(0);
+
     // --- ESTADOS TUTOR ---
     const [tutorMessage, setTutorMessage] = useState<string | null>(null);
     const [turnStartTime, setTurnStartTime] = useState<number>(Date.now());
-    const [tutorMessagesCount, setTutorMessagesCount] = useState(0); 
-    const [movesSinceLastTip, setMovesSinceLastTip] = useState(0); 
+    const [tutorMessagesCount, setTutorMessagesCount] = useState(0);
+    const [movesSinceLastTip, setMovesSinceLastTip] = useState(0);
 
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
     // 1. Temporizador del juego
     useEffect(() => {
-        if (timeLeft === null || gameResult) return; 
+        if (timeLeft === null || gameResult) return;
         if (timeLeft <= 0) {
-            setGameResult('lose'); 
+            setGameResult('lose');
             return;
         }
         const timer = setInterval(() => {
-            setTimeLeft(prev => (prev !== null ? prev - 1 : null)); 
+            setTimeLeft(prev => (prev !== null ? prev - 1 : null));
         }, 1000);
-        return () => clearInterval(timer); 
+        return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
 
     // 2. Lógica del Tutor con Progresión Inteligente
     useEffect(() => {
-        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return; 
+        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return;
 
         const tutorTimer = setInterval(() => {
             const secondsSinceTurnStart = (Date.now() - turnStartTime) / 1000;
@@ -91,10 +102,10 @@ const GameScreen: React.FC = () => {
             if (conditionMet) {
                 const tips = t.tutor.tips;
                 if (tips && tips.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * tips.length);
+                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % tips.length;
                     setTutorMessage(tips[randomIndex]);
                     setTutorMessagesCount(prev => prev + 1);
-                    setMovesSinceLastTip(0); 
+                    setMovesSinceLastTip(0);
                     playSound('notification.mp3');
                 }
             }
@@ -107,7 +118,7 @@ const GameScreen: React.FC = () => {
     useEffect(() => {
         const initMatch = async () => {
             try {
-                const m = await createMatch(true, difficulty); 
+                const m = await createMatch(true, difficulty);
                 setMatchId(m.id);
             } catch (e) { console.error(e); }
         };
@@ -117,24 +128,80 @@ const GameScreen: React.FC = () => {
     useEffect(() => {
         if (gameResult && matchId) {
             const userId = localStorage.getItem('userId') || 'player';
-            finishMatch(matchId, gameResult === 'win' ? userId : 'bot'); 
+            finishMatch(matchId, gameResult === 'win' ? userId : 'bot');
             if (gameResult === 'win') playSound('win.mp3');
             else playSound('gameover.mp3');
         }
     }, [gameResult, matchId, playSound]);
 
+    // Effect to evaluate board tension after every move
+    useEffect(() => {
+        const turnCount = Object.keys(boardState).length;
+
+        // If the game just started or already ended, we dont sent anything
+        if (turnCount === 0 || gameResult) return;
+        // If we've already evaluated this turn, we dont send anything
+        if (lastEvaluatedTurn.current === turnCount) return;
+
+        // Mark this turn as evalueated...
+        lastEvaluatedTurn.current = turnCount;
+        // ...and then we evaluate it
+        const evaluateCurrentBoard = async () => {
+            try {
+                const yenLayoutString = boardToYen(boardState, size);
+
+                const payload = {
+                    size: size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayoutString
+                };
+
+                const data = await evaluateBoard(payload);
+
+                setScoreHistory(prev => [
+                    ...prev,
+                    { turn: turnCount, blue: data.blue_score, red: data.red_score }
+                ]);
+            } catch (error) {
+                console.error("Error evaluating board tension:", error);
+                // If something fails, we mark it as unchecked again
+                lastEvaluatedTurn.current = turnCount - 1;
+            }
+        };
+
+        evaluateCurrentBoard();
+    }, [boardState, size, gameResult]);
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+        playSound('click.mp3');
+        setMessages((prev: any[]) => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        setInputValue('');
+    };
+
+    useEffect(() => {
+        if (timeLeft === null || gameResult) return;
+        if (timeLeft <= 0) {
+            setGameResult('lose');
+            return;
+        }
+        const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft, gameResult]);
     // 4. Lógica de Deshacer (Undo)
     const handleUndo = () => {
         if (!canUndo || history.length === 0 || botCooldown || gameResult) return;
 
         playSound('click.mp3');
         const previousState = history[history.length - 1]; // Recuperamos el último estado guardado
-        
+
         setBoardState(previousState); // Revertimos el tablero
         setHistory(prev => prev.slice(0, -1)); // Eliminamos el último del historial
-        
+
         if (history.length <= 1) setCanUndo(false);
-        
+
         setPendingMove(null);
         setTutorMessage(null);
         setTurnStartTime(Date.now()); // Reiniciamos reloj para el tutor
@@ -147,15 +214,15 @@ const GameScreen: React.FC = () => {
 
         const key = `${cell.x}-${cell.y}-${cell.z}`;
         const newBoard = { ...boardState, [key]: 1 };
-        
-        setMovesSinceLastTip(prev => prev + 1); 
-        setTurnStartTime(Date.now()); 
-        setTutorMessage(null); 
+
+        setMovesSinceLastTip(prev => prev + 1);
+        setTurnStartTime(Date.now());
+        setTutorMessage(null);
         setBoardState(newBoard);
         setPendingMove(null);
 
         if (checkWin(newBoard, 1, size, cells)) {
-            setGameResult('win'); 
+            setGameResult('win');
             return;
         }
 
@@ -164,18 +231,33 @@ const GameScreen: React.FC = () => {
         setTimeout(() => {
             const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
             if (available.length > 0) {
-                const botCell = available[Math.floor(Math.random() * available.length)];
+                const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
+                const botCell = available[randomIndex];
                 const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
                 const afterBot = { ...newBoard, [botKey]: 2 };
                 setBoardState(afterBot);
                 playSound('place-tile.mp3');
-                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose'); 
+                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
             }
             setCurrentPlayer(1);
             setBotCooldown(false);
-            setTurnStartTime(Date.now()); 
+            setTurnStartTime(Date.now());
         }, 1200);
     };
+
+    const restartGame = () => {
+        playSound('click.mp3');
+        setBoardState({});
+        setHistory([]);
+        setGameResult(null);
+        setCurrentPlayer(1);
+        setTimeLeft(initialTime);
+        setMatchId(null); // Reset match ID for new game
+        lastEvaluatedTurn.current = 0;
+        navigate('/menu', { state: { openConfig: true } });
+    };
+
+    console.log("Historial de Tensión Actual:", scoreHistory);
 
     return (
         <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}>
@@ -238,9 +320,29 @@ const GameScreen: React.FC = () => {
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button className="icon-btn-global" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}</button>
-                    <button className="icon-btn-global" onClick={() => setShowLanguageDialog(true)}><Languages size={20} /></button>
-                    <button className="icon-btn-global" onClick={() => setIsChatOpen(!isChatOpen)}><MessageSquare size={20} /></button>
+                    <button
+                        className="icon-btn-global"
+                        title="Mute" // Opcional para otros tests
+                        onClick={() => setIsMuted(!isMuted)}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    <button
+                        className="icon-btn-global"
+                        title="Language"
+                        onClick={() => setShowLanguageDialog(true)}
+                    >
+                        <Languages size={20} />
+                    </button>
+
+                    <button
+                        className="icon-btn-global"
+                        title="Chat"
+                        onClick={() => setIsChatOpen(!isChatOpen)}
+                    >
+                        <MessageSquare size={20} />
+                    </button>
                 </div>
                 {isChatOpen && (
                     <div className="chat-container">
@@ -250,11 +352,32 @@ const GameScreen: React.FC = () => {
                                 <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
                             </div>
                         </div>
-                        <div className="chat-messages">
-                            {messages.map((msg, i) => (
-                                <div key={i} className="message sent" style={{ backgroundColor: p1Color }}>{msg.text}</div>
+                        <div className="chat-messages-display" style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {messages.map((msg, index) => (
+                                <div key={index} className={`chat-bubble ${msg.sender}`} style={{
+                                    alignSelf: msg.sender === 'player' ? 'flex-end' : 'flex-start',
+                                    backgroundColor: msg.sender === 'player' ? p1Color : '#333',
+                                    color: 'white',
+                                    padding: '6px 12px',
+                                    borderRadius: '12px',
+                                    maxWidth: '80%',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    {msg.text}
+                                </div>
                             ))}
                         </div>
+                        <form onSubmit={handleSendMessage} className="chat-input-area">
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="Escribe un mensaje..."
+                            />
+                            <button type="submit" className="send-btn">
+                                Send
+                            </button>
+                        </form>
                     </div>
                 )}
             </aside>
@@ -262,10 +385,25 @@ const GameScreen: React.FC = () => {
             {/* MODALS */}
             {gameResult && (
                 <div className="modal-overlay">
-                    <div className="modal-content result-modal">
-                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>{gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}</h2>
-                        <p>{gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}</p>
-                        <button className="main-button btn-blue" onClick={() => navigate('/menu')}>{t.buttons.mainMenu}</button>
+                    <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
+
+                        <MatchGraph data={scoreHistory} />
+
+                        <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
+                            {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
+                        </h2>
+                        <p className="result-modal-text">
+                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+                        </p>
+                        {matchError && (
+                            <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
+                                {matchError}
+                            </p>
+                        )}
+                        <div className="modal-buttons-column">
+                            <button className={`main-button ${colorBlindMode ? 'btn-orange' : 'btn-blue'}`} onClick={restartGame}>{t.buttons.playAgain}</button>
+                            <button className="main-button btn-red-outline" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.mainMenu}</button>
+                        </div>
                     </div>
                 </div>
             )}

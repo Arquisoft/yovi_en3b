@@ -91,8 +91,8 @@ const MainMenu: React.FC = () => {
         <LanguageDialog open={languageOpen} onClose={() => setLanguageOpen(false)} />
 
         {showLogoutConfirm && (
-          <div className="modal-overlay" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))}>
-            <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div className="modal-overlay" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleMenuAction(() => setShowLogoutConfirm(false)); } }} role="button" tabIndex={0}>
+            <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''}`} onClick={(e) => e.stopPropagation()} role="button" tabIndex={0} onKeyDown={(e) => e.stopPropagation()}>
               <button className="boton-cerrar-fijo" onClick={() => handleMenuAction(() => setShowLogoutConfirm(false))}>&times;</button>
               <h2 className="modal-title">{t.buttons.logout}</h2>
               <p className="modal-text">

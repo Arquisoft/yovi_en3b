@@ -27,7 +27,7 @@ image::03_1-business-context.png[]
 | * Petitions through play() 
 | * Answer with the next movement (in YEN notation), obtained by querying Claude AI
 
-| External bot (Minimax)
+| Internal bot (Minimax)
 | * Petitions through play() 
 | * Answer with the next movement (in YEN notation), obtained by applying minimax algorithm
 |===

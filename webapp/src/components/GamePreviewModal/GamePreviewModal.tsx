@@ -51,11 +51,22 @@ const GamePreviewModal: React.FC<GamePreviewProps> = ({ isOpen, onClose, onStart
     return <div className="triangle-wrapper">{rows}</div>;
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      playSound('click.mp3');
+      onClose();
+    }
+  };
+
   return (
-    <div className="preview-modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }}>
+    <div className="preview-modal-overlay" onClick={() => { playSound('click.mp3'); onClose(); }} onKeyDown={handleKeyDown} role="button" tabIndex={0}>
       <div 
         className={`preview-modal-content preview-modal-wide ${colorBlindMode ? 'color-blind' : ''}`} 
         onClick={(e) => e.stopPropagation()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <button className="preview-close-btn" onClick={() => { playSound('click.mp3'); onClose(); }}>&times;</button>
         <h2 className="preview-modal-title modal-title h2-preview-title">{t.labels.preview}</h2>

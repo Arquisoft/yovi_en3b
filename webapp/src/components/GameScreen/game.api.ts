@@ -57,7 +57,6 @@ export async function createMatch(
   }
 
   const data = await res.json();
-  console.log("Match created:", data.match);
   return data.match;
 }
 
@@ -93,6 +92,33 @@ export async function finishMatch(
   }
 
   const data = await res.json();
-  console.log("Match finished:", data.match);
   return data.match;
+}
+
+
+/**
+ * Evaluate the board tension by asking the Node/Rust backend
+ * @param boardPayload - The JSON representation of the YEN board
+ * @returns The blue and red scores
+ */
+export async function evaluateBoard(boardPayload: any): Promise<{blue_score: number, red_score: number}> {
+  const res = await fetch(`${API_URL}/matches/evaluate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(boardPayload),
+  });
+
+  if (!res.ok) {
+    let error: any;
+    try {
+      error = await res.json();
+    } catch {
+      error = { error: `${res.status} ${res.statusText}` };
+    }
+    throw new Error(error.error || `Failed to evaluate board (${res.status})`);
+  }
+
+  return await res.json();
 }

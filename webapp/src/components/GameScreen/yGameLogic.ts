@@ -55,3 +55,37 @@ export const checkWin = (boardState: Record<string, number>, player: number, siz
 
     return false; // No group connects all three sides
 };
+
+
+/**
+ * Convierte el estado interno del tablero de React al formato string YEN
+ * @param boardState - Diccionario de fichas puestas { "x-y-z": jugador }
+ * @param size - Tamaño del tablero
+ * @returns String en notación YEN (ej: "B/.B/R.B/...")
+ */
+export const boardToYen = (boardState: Record<string, number>, size: number): string => {
+  const targetSum = size - 1;
+  const rows: string[] = [];
+
+  // Recorremos el tablero exactamente igual que en gridUtils.tsx
+  // x es la fila (del pico x=size-1 a la base x=0)
+  for (let x = targetSum; x >= 0; x--) {
+    let rowStr = "";
+    const rowLength = targetSum - x;
+    
+    // y recorre las celdas dentro de esa fila
+    for (let y = 0; y <= rowLength; y++) {
+      const z = targetSum - x - y;
+      const key = `${x}-${y}-${z}`;
+      const owner = boardState[key];
+      
+      if (owner === 1) rowStr += "B";      // Jugador 1 -> Blue
+      else if (owner === 2) rowStr += "R"; // Jugador 2 -> Red
+      else rowStr += ".";                  // Vacío
+    }
+    rows.push(rowStr);
+  }
+
+  // Unimos las filas con barras inclinadas
+  return rows.join("/");
+};

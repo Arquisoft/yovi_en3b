@@ -13,50 +13,103 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(() => ({
     load: vi.fn(),
 })));
 
-// 2. MOCK DE APIS (game.api.ts)
-vi.mock('./game.api', () => ({
-    createMatch: vi.fn().mockResolvedValue({ id: '123' }),
-    finishMatch: vi.fn().mockResolvedValue({}),
-}));
+/**
+ * Partial mock of 'react-router-dom'.
+ * It preserves the original library functionality (...actual) but overrides 
+ * 'useNavigate' and 'useLocation' with custom mocks.
+ * This allows the test to verify navigation calls and simulate 
+ * specific route states (like board size or game time).
+ */
+vi.mock('react-router-dom', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('react-router-dom')>();
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+        useLocation: () => mockLocation,
+    };
+});
 
-// 3. MOCK DE TRADUCCIONES (Ajustado a tu useI18n)
-vi.mock('../../i18n/useTranslation', () => ({
+vi.mock('../i18n/useTranslation', () => ({
     useI18n: () => ({
         t: {
-            labels: { player1: 'JUGADOR 1', player2: 'JUGADOR 2' },
-            buttons: { undo: 'DESHACER', confirm: 'CONFIRMAR', exit: 'SALIR', mainMenu: 'MENÚ', yesExitAndLose: 'SÍ', backToGame: 'VOLVER' },
-            messages: { areYouSure: '¿Estás seguro?', congrats: '¡Felicidades!', nextTime: 'Suerte' },
-            tutor: { tips: ['Tip 1'] }
-        }
+            labels: {
+                player1: 'Player 1',
+                player2: 'Player 2',
+                typeMessage: 'Type a message...'
+            },
+            buttons: {
+                undo: 'Undo',
+                confirm: 'Confirm',
+                exit: 'Exit',
+                playAgain: 'Play Again',
+                mainMenu: 'Main Menu',
+                yesExitAndLose: 'Yes, Exit',
+                backToGame: 'Back to Game'
+            },
+            messages: {
+                areYouSure: 'Are you sure?',
+                congrats: 'Congratulations!',
+                nextTime: 'Next time!'
+            },
+        },
     }),
 }));
 
-// 4. INTERFAZ PARA RENDERIZADO
-interface RenderOptions {
-    confirmMove?: boolean;
-    tutorEnabled?: boolean;
-}
+/**
+ * Component Mocking.
+ * Replaces the real 'LanguageDialog' with a simplified version.
+ * This isolates the test to 'GameScreen' logic, preventing side effects 
+ * from the dialog's internal code while still allowing us to verify 
+ * if the dialog is being triggered (via data-testid).
+ */
+vi.mock('../components/LanguageDialog/LanguageDialog', () => ({
+    LanguageDialog: ({ open }: { open: boolean }) => (open ? <div data-testid="language-dialog" /> : null)
+}));
 
-const renderComponent = ({ confirmMove = false, tutorEnabled = true }: RenderOptions = {}) => {
-    const mockSettings = {
-        colorBlindMode: false,
-        isMuted: false,
-        confirmMove: confirmMove, // Aquí controlamos el botón
-        tutorEnabled: tutorEnabled,
-        setIsMuted: vi.fn(),
-        playSound: vi.fn(),
-        setConfirmMove: vi.fn(),
-        setTutorEnabled: vi.fn(),
-    };
+/**
+ * Library Mock for "react-hexgrid".
+ * Replaces complex SVG-based library components with simple HTML/SVG tags.
+ * This simplifies the DOM structure for the test environment and adds 
+ * "data-testid" to hexagons, making them easy to find and click during tests.
+ */
+vi.mock('react-hexgrid', () => ({
+    HexGrid: ({ children }: any) => <svg>{children}</svg>,
+    Layout: ({ children }: any) => <g>{children}</g>,
+    Hexagon: ({ children, onClick, className }: any) => (
+        <g className={className} onClick={onClick} data-testid="hex-cell">
+            {children}
+        </g>
+    ),
+}));
 
-    return render(
-        <MemoryRouter initialEntries={[{ state: { size: 5, time: 60 } }]}>
-            <SettingsContext.Provider value={mockSettings as any}>
-                <GameScreen />
-            </SettingsContext.Provider>
-        </MemoryRouter>
-    );
-};
+/** Visual Layout (Size 2 Example):
+ * [ 0 ]             <-- (x:1, y:0, z:0) Top Cell
+ * /   \
+ * [ 1 ]---[ 2 ]        <-- (x:0, y:1, z:0) and (x:0, y:0, z:1)
+ * * * Cubic representation (x, y, z):
+ * x = Row (height), y = Left diagonal, z = Right diagonal
+ * x + y + z = size - 1
+ */
+vi.mock('../components/GameScreen/gridUtils', () => ({
+    generateBoard: (size: number) => {
+        if (size === 2) {
+            return [
+                { x: 1, y: 0, z: 0, q: 0, r: -1, s: 1 },
+                { x: 0, y: 1, z: 0, q: -1, r: 0, s: 1 },
+                { x: 0, y: 0, z: 1, q: 0, r: 0, s: 0 },
+            ];
+        }
+        // Default size 3 mock for integration tests
+        return [
+            { x: 2, y: 0, z: 0, q: 0, r: -2, s: 2 },
+            { x: 1, y: 1, z: 0, q: -1, r: -1, s: 2 },
+            { x: 1, y: 0, z: 1, q: 0, r: -1, s: 1 },
+            { x: 0, y: 2, z: 0, q: -2, r: 0, s: 2 },
+            { x: 0, y: 1, z: 1, q: -1, r: 0, s: 1 },
+            { x: 0, y: 0, z: 2, q: 0, r: 0, s: 0 },
+        ];
+    },
+}));
 
 describe('GameScreen - Full Suite (19 Tests)', () => {
     beforeEach(() => {
@@ -167,14 +220,14 @@ describe('GameScreen - Full Suite (19 Tests)', () => {
         expect(screen.queryByText('PLAYER 2')).not.toBeInTheDocument();
     });
 
-    // --- GRUPO 4: LÓGICA DE JUEGO (Tests 15-19) ---
-    test('TEST 15: selected cell gets correct class', async () => {
-        renderComponent();
+    test('TEST 18: allows user to type and send a message in chat', async () => {
+        renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
         const cell = document.querySelectorAll('.hex-cell')[0];
         await user.click(cell);
         expect(cell).toHaveClass('p1-selected');
     });
+    */
 
     test('TEST 16: bot performs a move automatically', async () => {
         renderComponent();
@@ -186,10 +239,18 @@ describe('GameScreen - Full Suite (19 Tests)', () => {
             expect(p1Card).toHaveClass('active');
         }, { timeout: 3000 });
     });
+});
 
-    test('TEST 17: bot status tag says Online', () => {
-        renderComponent();
-        expect(screen.getByText('Online')).toBeInTheDocument();
+describe('yGameLogic - checkWin', () => {
+    const allCells = [
+        { x: 2, y: 0, z: 0, q: 0, r: -2, s: 2 },
+        { x: 1, y: 1, z: 0, q: -1, r: -1, s: 2 },
+        { x: 0, y: 2, z: 0, q: -2, r: 0, s: 2 },
+    ];
+
+    test('TEST 20: returns false if player has fewer pieces than board size', () => {
+        const boardState = { "2-0-0": 1 };
+        expect(checkWin(boardState, 1, 3, allCells)).toBe(false);
     });
 
     test('TEST 18: layout has color-blind class when active', () => {
