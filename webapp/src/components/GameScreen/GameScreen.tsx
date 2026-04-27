@@ -115,22 +115,23 @@ const GameScreen: React.FC = () => {
     }, [currentPlayer, turnStartTime, tutorMessage, gameResult, t.tutor.tips, tutorMessagesCount, movesSinceLastTip, tutorEnabled, playSound]);
 
     // 3. API Handlers (Init & Finish)
-useEffect(() => {
-    const initMatch = async () => {
-        try {
-            // Asegúrate de que difficulty tenga un valor por defecto si es undefined
-            const diffValue = difficulty !== undefined ? difficulty : 1; 
-            const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
-            setMatchId(m.id);
-        } catch (e) { console.error(e); }
-    };
-    initMatch();
-}, [difficulty]);
+    useEffect(() => {
+        const initMatch = async () => {
+            try {
+                // Asegúrate de que difficulty tenga un valor por defecto si es undefined
+                const diffValue = difficulty !== undefined ? difficulty : 1;
+                const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
+                setMatchId(m.id);
+            } catch (e) { console.error(e); }
+        };
+        initMatch();
+    }, [difficulty]);
 
     useEffect(() => {
         if (gameResult && matchId) {
             const userId = localStorage.getItem('userId') || 'player';
-            finishMatch(matchId, gameResult === 'win' ? userId : 'bot');
+            const winnerId = gameResult === 'win' ? userId : null; // null = bot ganó
+            finishMatch(matchId, winnerId);
             if (gameResult === 'win') playSound('win.mp3');
             else playSound('gameover.mp3');
         }
