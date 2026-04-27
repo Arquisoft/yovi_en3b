@@ -36,8 +36,9 @@ describe('POST /users/createuser', () => {
             .mockResolvedValueOnce({ rows: [] }) 
             .mockResolvedValueOnce({ rows: [] })
             .mockResolvedValueOnce({
-                rows: [{username: testName, nickname: testName, email: 'pablo@test.com', password: 'password123', photo: "photo"}]
-            });
+                rows: [{id: 1, username: testName, nickname: testName, email: 'pablo@test.com', password: 'password123', photo: "photo"}]            })
+            .mockResolvedValueOnce({
+                rows: [{id: 1, user_id: 1, total_matches: 0, win_matches: 0, score: 0}]            })
 
         const res = await request(app)
             .post('/users/createuser')
@@ -292,7 +293,7 @@ describe('POST /users/loginUser', () => {
     it('returns 200 and user data without password if credentials are correct', async () => {
         const testName = 'Pablo'
         db.query.mockResolvedValue({
-            rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+            rows: [{id: 1, username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
         });
         vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true);
         const res = await request(app)
@@ -327,7 +328,7 @@ describe('POST /users/loginUser', () => {
     })
     // PASSWORD IS INCORRECT
     it('returns 401 if the password is incorrect', async () => {
-        const testUser = { username: testName, password: 'password123' }
+        const testUser = { id: 1, username: testName, password: 'password123' }
         
         db.query.mockResolvedValueOnce({
             rows: [testUser]
@@ -489,10 +490,10 @@ describe('POST /users/changeNicknameAndPhoto', () => {
         const testName = 'Pablo'
         db.query
             .mockResolvedValueOnce({
-                rows: [{username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
+                rows: [{id: 1, username: testName, nickname: testName, password: "password123", photo: "photo", email: 'pablo@test.com' }]
             })
             .mockResolvedValueOnce({
-                rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
+                rows: [{id: 1, username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
             });;
 
 
@@ -576,6 +577,28 @@ describe('Edge Cases and Additional Coverage', () => {
         expect(res.body.error).toBe("Missing fields")
     })
 
+    it('returns 400 if both username and password are missing in login', async () => {
+        const res = await request(app)
+            .post('/users/loginUser')
+            .send({})
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("Missing fields")
+    })
+
+    it('returns 400 if only password is missing in login', async () => {
+        const res = await request(app)
+            .post('/users/loginUser')
+            .send({ 
+                username: 'Fantasma',
+            })
+            .set('Accept', 'application/json')
+
+        expect(res.status).toBe(400)
+        expect(res.body.error).toBe("Missing fields")
+    })
+
     it('returns 500 if bcrypt fails during password hashing', async () => {
         vi.spyOn(db, 'query')
             .mockResolvedValueOnce({ rows: [] })
@@ -599,7 +622,7 @@ describe('Edge Cases and Additional Coverage', () => {
 
     it('returns 500 if bcrypt compare fails during login', async () => {
         vi.spyOn(db, 'query').mockResolvedValueOnce({
-            rows: [{username: testName, password: 'hash123', nickname: testName, photo: 'photo', email: 'pablo@test.com'}]
+            rows: [{id: 1, username: testName, password: 'hash123', nickname: testName, photo: 'photo', email: 'pablo@test.com'}]
         });
         vi.spyOn(bcrypt, 'compare').mockRejectedValueOnce(new Error('Bcrypt compare error'));
 
@@ -654,7 +677,7 @@ describe('Edge Cases and Additional Coverage', () => {
     it('returns user data without password in findUserByUsername', async () => {
         const testName = 'Pablo'
         vi.spyOn(db, 'query').mockResolvedValue({
-            rows: [{username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com', password: 'hashed123' }]
+            rows: [{id: 1, username: testName, nickname: testName, photo: "photo", email: 'pablo@test.com' }]
         });
 
         const res = await request(app)
