@@ -83,24 +83,25 @@ async function getMatchHistoryForPlayer(playerId) {
 
 const finishMatch = async (matchId, winnerId) => {
     const match = await matchRepository.finishMatch(matchId, winnerId);
-
     if (!match) {
         throw new Error('Match not found');
     }
 
-    if (winnerId !== match.blue_player_id && winnerId !== match.red_player_id) {
+    const bluePlayerId = match.blue_player_id;
+    const redPlayerId = match.red_player_id;
+
+    if (winnerId !== null && winnerId !== bluePlayerId && winnerId !== redPlayerId) {
         throw new Error('Winner ID is not a player in this match');
     }
 
-    const bluePlayerId = match.blue_player_id;
-    const redPlayerId = match.red_player_id;
-    const isBlueWinner = winnerId === bluePlayerId;
-    const loser = isBlueWinner ? redPlayerId : bluePlayerId;
-
-    await rankingService.updateOrInitializeRanking(winnerId, 1, 1);
-
-    if (loser) {
-        await rankingService.updateOrInitializeRanking(loser, 1, 0);
+    if (winnerId === null) {
+        await rankingService.updateOrInitializeRanking(bluePlayerId, 1, 0);
+    } else {
+        const loser = winnerId === bluePlayerId ? redPlayerId : bluePlayerId;
+        await rankingService.updateOrInitializeRanking(winnerId, 1, 1);
+        if (loser) {
+            await rankingService.updateOrInitializeRanking(loser, 1, 0); 
+        }
     }
 
     return match;
