@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import HistoryPage from '../components/HistoryPage/HistoryPage';
 import { getMyMatchHistory } from '../components/HistoryPage/history.api';
+import { SettingsProvider } from '../context/SettingsContext';
 
 const mockNavigate = vi.fn();
 const mockPlaySound = vi.fn();
@@ -22,9 +23,13 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('../context/SettingsContext', () => ({
-  useSettings: () => mockSettings,
-}));
+vi.mock('../context/SettingsContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useSettings: () => mockSettings,
+  };
+});
 
 vi.mock('../i18n/useTranslation', () => ({
   useI18n: () => ({
@@ -45,6 +50,19 @@ vi.mock('../components/HistoryPage/history.api', () => ({
   getMyMatchHistory: vi.fn(),
 }));
 
+/**
+ * Wraps the component in the necessary Context Providers.
+ */
+const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+        <MemoryRouter>
+            <SettingsProvider>
+                {ui}
+            </SettingsProvider>
+        </MemoryRouter>
+    );
+};
+
 describe('HistoryPage additional states', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -55,11 +73,7 @@ describe('HistoryPage additional states', () => {
   it('shows the loading state with the enabled visual modes', () => {
     vi.mocked(getMyMatchHistory).mockReturnValue(new Promise(() => {}));
 
-    const { container, unmount } = render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    const { container, unmount } = renderWithProviders(<HistoryPage />);
 
     expect(screen.getByText('Loading history...')).toBeInTheDocument();
     expect(container.querySelector('.history-container')).toHaveClass('color-blind');
@@ -71,11 +85,7 @@ describe('HistoryPage additional states', () => {
   it('renders the backend error message when loading fails with an Error', async () => {
     vi.mocked(getMyMatchHistory).mockRejectedValueOnce(new Error('Broken history'));
 
-    render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    renderWithProviders(<HistoryPage />);
 
     expect(await screen.findByText('Broken history')).toBeInTheDocument();
   });
@@ -83,11 +93,7 @@ describe('HistoryPage additional states', () => {
   it('falls back to the default error message for non-Error failures', async () => {
     vi.mocked(getMyMatchHistory).mockRejectedValueOnce('boom');
 
-    render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    renderWithProviders(<HistoryPage />);
 
     expect(await screen.findByText('Could not load match history')).toBeInTheDocument();
   });
@@ -95,11 +101,7 @@ describe('HistoryPage additional states', () => {
   it('shows the empty state and zeroed statistics when there are no matches', async () => {
     vi.mocked(getMyMatchHistory).mockResolvedValueOnce([]);
 
-    render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    renderWithProviders(<HistoryPage />);
 
     expect(await screen.findByText('No matches recorded yet.')).toBeInTheDocument();
     expect(screen.getByText('0%')).toBeInTheDocument();
@@ -130,11 +132,7 @@ describe('HistoryPage additional states', () => {
       },
     ]);
 
-    render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    renderWithProviders(<HistoryPage />);
 
     expect(await screen.findByText('LOSE')).toBeInTheDocument();
     expect(screen.getByText('LOSE')).toBeInTheDocument();
@@ -183,11 +181,7 @@ describe('HistoryPage additional states', () => {
 
     vi.mocked(getMyMatchHistory).mockReturnValueOnce(historyPromise as ReturnType<typeof getMyMatchHistory>);
 
-    const { unmount } = render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    const { unmount } = renderWithProviders(<HistoryPage />);
 
     unmount();
 

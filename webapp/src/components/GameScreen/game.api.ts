@@ -122,3 +122,28 @@ export async function evaluateBoard(boardPayload: any): Promise<{blue_score: num
 
   return await res.json();
 }
+
+/**
+ * Get the bot's next move
+ * @param position - JSON string of the board state
+ * @param botId - The bot identifier
+ * @returns The coordinates for the bot's move
+ */
+export async function getBotMove(position: string, botId: string): Promise<{x: number, y: number, z: number}> {
+  const res = await fetch(`${API_URL}/play?position=${encodeURIComponent(position)}&bot_id=${botId}`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    let error: any;
+    try {
+      error = await res.json();
+    } catch {
+      error = { error: `${res.status} ${res.statusText}` };
+    }
+    throw new Error(error.error || `Failed to get bot move (${res.status})`);
+  }
+
+  const data = await res.json();
+  return data.coords;
+}
