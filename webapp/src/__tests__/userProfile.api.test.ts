@@ -61,6 +61,7 @@ describe('userProfile API service', () => {
         it('should send a POST request to change the nickname', async () => {
             const mockUsername = 'testuser';
             localStorage.setItem('username', mockUsername);
+            localStorage.setItem('token', 'fake-token');
             const patch = { displayName: 'NewNickname', avatarId: 'avatar_02' };
 
             const mockResponse = {
@@ -77,10 +78,13 @@ describe('userProfile API service', () => {
             const result = await updateMyProfile(patch);
 
             expect(fetch).toHaveBeenCalledWith(
-                `${API_URL}/users/changeNickname`,
+                `${API_URL}/users/changeNicknameAndPhoto`,
                 expect.objectContaining({
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer fake-token'
+                    },
                     body: JSON.stringify({
                         username: mockUsername,
                         nickname: patch.displayName,

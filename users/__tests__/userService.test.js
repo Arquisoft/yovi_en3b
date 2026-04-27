@@ -8,15 +8,15 @@ vi.mock('../src/db/db.js', () => ({
     query: vi.fn()
 }));
 
-vi.mock('../src/db/db.js', () => ({
-    query: vi.fn()
-}));
-
 const require = createRequire(import.meta.url);
 import app from '../index.js'
-import test from 'node:test';
 
 const db = require('../src/db/db.js');
+const TEST_JWT_SECRET = 'test-secret';
+
+process.env.JWT_SECRET = TEST_JWT_SECRET;
+
+const createAuthToken = (username = 'Pablo') => jwt.sign({ id: 1, username }, TEST_JWT_SECRET);
 
 beforeEach(() => {
     db.query = vi.fn();
@@ -381,6 +381,8 @@ describe('POST /users/loginUser', () => {
 
 ///////////////////////////////////////////////////////////CHANGE USER PASSWORD TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('POST /users/changePassword', () => {
+    const token = createAuthToken();
+
     afterEach(() => {
         vi.restoreAllMocks()
     })
@@ -399,6 +401,7 @@ describe('POST /users/changePassword', () => {
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: testName,
                 currentPassword: "password123",
@@ -425,6 +428,7 @@ describe('POST /users/changePassword', () => {
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Pablo',
                 currentPassword: 'WRONG_PASSWORD',
@@ -443,6 +447,7 @@ describe('POST /users/changePassword', () => {
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 currentPassword: 'password123',
@@ -459,6 +464,7 @@ describe('POST /users/changePassword', () => {
 
         const res = await request(app)
             .post('/users/changePassword')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
                 currentPassword: 'password123',
@@ -472,7 +478,9 @@ describe('POST /users/changePassword', () => {
 })
 
 ///////////////////////////////////////////////////////////CHANGE USER NICKNAME TESTS//////////////////////////////////////////////////////////////////////////////////////////////
-describe('POST /users/changeNickname', () => {
+describe('POST /users/changeNicknameAndPhoto', () => {
+    const token = createAuthToken();
+
     afterEach(() => {
         vi.restoreAllMocks()
     })
@@ -489,10 +497,12 @@ describe('POST /users/changeNickname', () => {
 
 
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: testName,
-                nickname: testName
+                nickname: testName,
+                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -511,10 +521,12 @@ describe('POST /users/changeNickname', () => {
         });
 
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
-                nickname: 'Ghost'
+                nickname: 'Ghost',
+                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -526,10 +538,12 @@ describe('POST /users/changeNickname', () => {
         db.query.mockRejectedValueOnce(new Error("Database connection failed"));
 
         const res = await request(app)
-            .post('/users/changeNickname')
+            .post('/users/changeNicknameAndPhoto')
+            .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
-                nickname: 'Ghost'
+                nickname: 'Ghost',
+                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -539,20 +553,22 @@ describe('POST /users/changeNickname', () => {
 })
 ///////////////////////////////////////////////////////////ADDITIONAL EDGE CASE TESTS//////////////////////////////////////////////////////////////////////////////////////////////
 describe('Edge Cases and Additional Coverage', () => {
+    const testName = 'Pablo';
+    const token = createAuthToken(testName);
+
     afterEach(() => {
         vi.restoreAllMocks()
     })
 
     it('returns 400 if password is empty string in createuser', async () => {
-        vi.spyOn(db, 'query').mockResolvedValueOnce({ rows: [] });
-
         const res = await request(app)
-            .post('/users/changePassword')
-            .set('Authorization', `Bearer ${token}`)
+            .post('/users/createuser')
             .send({ 
                 username: testName,
-                password: "password123",
-                newPassword: "password123456789"
+                nickname: testName,
+                email: 'pablo@test.com',
+                password: "",
+                photo: "photo"
             })
             .set('Accept', 'application/json');
 
@@ -583,22 +599,20 @@ describe('Edge Cases and Additional Coverage', () => {
 
     it('returns 500 if bcrypt compare fails during login', async () => {
         vi.spyOn(db, 'query').mockResolvedValueOnce({
-            rows: [{username: 'Pablo', password: 'hash123', nickname: 'Pablo'}]
+            rows: [{username: testName, password: 'hash123', nickname: testName, photo: 'photo', email: 'pablo@test.com'}]
         });
-        vi.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
+        vi.spyOn(bcrypt, 'compare').mockRejectedValueOnce(new Error('Bcrypt compare error'));
 
         const res = await request(app)
-            .post('/users/changePassword')
-            .set('Authorization', `Bearer ${token}`)
+            .post('/users/loginUser')
             .send({ 
                 username: testName,
                 password: 'WRONG_PASSWORD',
-                newPassword: 'password123456'  
             })
             .set('Accept', 'application/json')
 
-        expect(res.status).toBe(401)
-        expect(res.body.error).toBe("Invalid username or password")
+        expect(res.status).toBe(500)
+        expect(res.body.error).toBe("Internal server error")
     })
     // USER NOT EXISTS WITH THAT USERNAME
     it('returns 401 if the user does not exist', async () => {
@@ -611,7 +625,7 @@ describe('Edge Cases and Additional Coverage', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
-                password: 'password123',
+                currentPassword: 'password123',
                 newPassword: 'password123'
             })
             .set('Accept', 'application/json')
@@ -628,7 +642,8 @@ describe('Edge Cases and Additional Coverage', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ 
                 username: 'Fantasma',
-                password: 'password123'
+                currentPassword: 'password123',
+                newPassword: 'password123456'
             })
             .set('Accept', 'application/json')
 
@@ -644,10 +659,8 @@ describe('Edge Cases and Additional Coverage', () => {
 
         const res = await request(app)
             .get('/users/findUserByUsername')
-            .send({ 
+            .query({
                 username: testName,
-                nickname: testName,
-                photo: 'photo'
             })
             .set('Accept', 'application/json')
 
@@ -661,12 +674,8 @@ describe('Edge Cases and Additional Coverage', () => {
 
     it('returns 400 if both username and password are missing', async () => {
         const res = await request(app)
-            .post('/users/changeNicknameAndPhoto')
-            .set('Authorization', `Bearer ${token}`)
-            .send({ 
-                username: 'Fantasma',
-                nickname: 'Ghost'
-            })
+            .post('/users/loginUser')
+            .send({})
             .set('Accept', 'application/json')
 
         expect(res.status).toBe(400)
@@ -675,11 +684,9 @@ describe('Edge Cases and Additional Coverage', () => {
 
     it('returns 400 if only password is missing in login', async () => {
         const res = await request(app)
-            .post('/users/changeNicknameAndPhoto')
-            .set('Authorization', `Bearer ${token}`)
+            .post('/users/loginUser')
             .send({ 
                 username: 'Fantasma',
-                nickname: 'Ghost'
             })
             .set('Accept', 'application/json')
 

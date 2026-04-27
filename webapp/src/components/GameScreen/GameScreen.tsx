@@ -2,113 +2,86 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Languages, Undo2, CheckCircle2, LogOut, MessageSquare, Cpu, Bot,
-    Volume2, VolumeX
+    Volume2, VolumeX // Added volume icons
 } from 'lucide-react';
 import './GameScreen.css';
 import { generateBoard, type Cell } from './gridUtils';
-import { checkWin } from './yGameLogic';
+import { checkWin, boardToYen } from './yGameLogic';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { requestBotChatReply, type GameChatMessage } from './gameyChat.api';
-import { createMatch, finishMatch } from './game.api';
 import { createMatch, finishMatch, evaluateBoard } from './game.api';
-import TutorBot from '../TutorBox/TutorBox';
 import { MatchGraph } from './MatchGraph';
 
 export interface ScoreData {
-    turn: number;
-    blue: number;
-    red: number;
+  turn: number;
+  blue: number;
+  red: number;
 }
 
 const GameScreen: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useI18n();
-    const {
-        colorBlindMode, playSound, isMuted, setIsMuted,
-        confirmMove
-    } = useSettings();
+    const { colorBlindMode, playSound, isMuted, setIsMuted } = useSettings(); // Added isMuted and setIsMuted
 
     const {
         size = 5,
         time: initialTime = null,
         botType = 'robot',
-        difficulty = 1
+        difficulty = 1  // Add difficulty extraction
     } = location.state || {};
 
-    // --- ESTADOS PRINCIPALES ---
     const [timeLeft, setTimeLeft] = useState<number | null>(initialTime);
     const [cells] = useState(generateBoard(size));
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
     const [showLanguageDialog, setShowLanguageDialog] = useState(false);
     const [boardState, setBoardState] = useState<Record<string, number>>({});
-    const [history, setHistory] = useState<Record<string, number>[]>([]);
-    const [canUndo, setCanUndo] = useState(false);
+    const [history, setHistory] = useState<Record<string, number>[]>([]);  // History for "Undo" button
+    const [canUndo, setCanUndo] = useState(false);  // To deactivate the undo button once it is clicked
     const [currentPlayer, setCurrentPlayer] = useState(1);
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
-    const [messages, setMessages] = useState<GameChatMessage[]>([]);
+    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
     const [inputValue, setInputValue] = useState('');
-    const [isBotTyping, setIsBotTyping] = useState(false);
     const [matchId, setMatchId] = useState<string | null>(null);
     const [isMatchCreating, setIsMatchCreating] = useState(false);
     const [matchError, setMatchError] = useState<string | null>(null);
-    const chatMessagesRef = useRef<HTMLDivElement | null>(null);
-    
+    const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
+    const lastEvaluatedTurn = useRef(0);
+
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
     // Effect to create match on component mount
     useEffect(() => {
-        if (!tutorEnabled || currentPlayer !== 1 || gameResult || tutorMessage) return;
-
-        const tutorTimer = setInterval(() => {
-            const secondsSinceTurnStart = (Date.now() - turnStartTime) / 1000;
-            let conditionMet = false;
-
-            if (tutorMessagesCount === 0) {
-                if (secondsSinceTurnStart >= 4) conditionMet = true;
-            } else if (tutorMessagesCount === 1) {
-                if (movesSinceLastTip >= 1 && secondsSinceTurnStart >= 6) conditionMet = true;
-            } else if (tutorMessagesCount === 2) {
-                if (movesSinceLastTip >= 2 && secondsSinceTurnStart >= 6) conditionMet = true;
-            } else {
-                if (secondsSinceTurnStart >= 6) conditionMet = true;
+        if (isMatchCreating || matchId) return;
+        if (!localStorage.getItem('userId')) return;
+        
+        const createGameMatch = async () => {
+            setIsMatchCreating(true);
+            try {
+                const match = await createMatch(
+                    true, // isBot=true (playing against bot)
+                    difficulty || 1 // use the actual difficulty (1=easy, 2=medium, 3=hard)
+                );
+                setMatchId(match.id);
+                setMatchError(null);
+            } catch (error) {
+                const msg = error instanceof Error ? error.message : 'Failed to create match';
+                console.error('Match creation error:', msg);
+                setMatchError(msg);
+            } finally {
+                setIsMatchCreating(false);
             }
-
-            if (conditionMet) {
-                const tips = t.tutor.tips;
-                if (tips && tips.length > 0) {
-                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % tips.length;
-                    setTutorMessage(tips[randomIndex]);
-                    setTutorMessagesCount(prev => prev + 1);
-                    setMovesSinceLastTip(0);
-                    playSound('notification.mp3');
-                }
-            }
-        }, 1000);
-
-        return () => clearInterval(tutorTimer);
-    }, [currentPlayer, turnStartTime, tutorMessage, gameResult, t.tutor.tips, tutorMessagesCount, movesSinceLastTip, tutorEnabled, playSound]);
-
-    // 3. API Handlers (Init & Finish)
-useEffect(() => {
-    const initMatch = async () => {
-        try {
-            // Asegúrate de que difficulty tenga un valor por defecto si es undefined
-            const diffValue = difficulty !== undefined ? difficulty : 1; 
-            const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
-            setMatchId(m.id);
-        } catch (e) { console.error(e); }
-    };
-    initMatch();
-}, [difficulty]);
+        };
+        
+        createGameMatch();
+    }, [difficulty]);
 
     // Effect to trigger game over sounds and finish match
     useEffect(() => {
@@ -139,47 +112,23 @@ useEffect(() => {
         }
     }, [gameResult, matchId, playSound]);
 
-    const formatDisplayTime = (seconds: number | null) => {
-        if (seconds === null) return "∞";
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    };
-
-    const mapDifficulty = (level: number): 'easy' | 'medium' | 'hard' => {
-        if (level <= 0) return 'easy';
-        if (level >= 2) return 'hard';
-        return 'medium';
-    };
-
-    const mapBotId = (_type: string): string => {
-        // Map frontend bot types to backend bot IDs
-        return 'llm_bot'; // Use the registered llm_bot for all bot types
-    };
-
-    const handleSendMessage = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!inputValue.trim()) return;
-        playSound('click.mp3'); 
-        const playerText = inputValue.trim();
-        const nextMessages: GameChatMessage[] = [...messages, { sender: 'player', text: playerText }];
-        setMessages(nextMessages);
     // Effect to evaluate board tension after every move
     useEffect(() => {
         const turnCount = Object.keys(boardState).length;
-
-        // If the game just started or already ended, we dont sent anything
+        
+        // 1. Si el tablero está vacío o el juego terminó, paramos.
         if (turnCount === 0 || gameResult) return;
-        // If we've already evaluated this turn, we dont send anything
+        
+        // 2. EL CANDADO: Si ya hemos evaluado este turno exacto, paramos.
         if (lastEvaluatedTurn.current === turnCount) return;
 
-        // Mark this turn as evalueated...
+        // 3. Cerramos el candado para este turno
         lastEvaluatedTurn.current = turnCount;
-        // ...and then we evaluate it
+
         const evaluateCurrentBoard = async () => {
             try {
                 const yenLayoutString = boardToYen(boardState, size);
-
+                
                 const payload = {
                     size: size,
                     turn: turnCount,
@@ -188,53 +137,35 @@ useEffect(() => {
                 };
 
                 const data = await evaluateBoard(payload);
-
+                
                 setScoreHistory(prev => [
                     ...prev,
                     { turn: turnCount, blue: data.blue_score, red: data.red_score }
                 ]);
             } catch (error) {
                 console.error("Error evaluating board tension:", error);
-                // If something fails, we mark it as unchecked again
-                lastEvaluatedTurn.current = turnCount - 1;
+                // Si falla, abrimos el candado para que pueda reintentarlo luego
+                lastEvaluatedTurn.current = turnCount - 1; 
             }
         };
 
         evaluateCurrentBoard();
     }, [boardState, size, gameResult]);
 
+
+    const formatDisplayTime = (seconds: number | null) => {
+        if (seconds === null) return "∞";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
-        playSound('click.mp3');
-        setMessages((prev: any[]) => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        playSound('click.mp3'); 
+        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
         setInputValue('');
-
-        try {
-            setIsBotTyping(true);
-            const reply = await requestBotChatReply({
-                size,
-                currentPlayer,
-                boardState,
-                messages: nextMessages,
-                difficulty: mapDifficulty(difficulty),
-                botId: mapBotId(botType),
-            });
-            const replyText = typeof reply === 'string' && reply.trim().length > 0
-                ? reply.trim()
-                : 'I cannot answer right now. Try again in a moment.';
-            setMessages(prev => [...prev, { sender: 'bot', text: replyText }]);
-        } catch (error) {
-            const fallbackMessage = 'I cannot answer right now. Try again in a moment.';
-            const errorMessage = error instanceof Error ? error.message.trim() : '';
-
-            setMessages(prev => [
-                ...prev,
-                { sender: 'bot', text: errorMessage || fallbackMessage },
-            ]);
-        } finally {
-            setIsBotTyping(false);
-        }
     };
 
     useEffect(() => {
@@ -246,37 +177,31 @@ useEffect(() => {
         const timer = setInterval(() => setTimeLeft(prev => (prev !== null ? prev - 1 : null)), 1000);
         return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
-    // 4. Lógica de Deshacer (Undo)
-    const handleUndo = () => {
-        if (!canUndo || history.length === 0 || botCooldown || gameResult) return;
-        playSound('click.mp3');
 
-        const previousState = history[history.length - 1];
-        setBoardState(previousState);
-        setHistory(prev => prev.slice(0, -1));
-        setPendingMove(null);
-        setCanUndo(false);
+    const handleClick = (cell: Cell) => {
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
+        if (gameResult || botCooldown || boardState[key]) return;
+        playSound('click.mp3'); 
+        setPendingMove(cell);
     };
 
-    useEffect(() => {
-        const chatMessages = chatMessagesRef.current;
-        if (!chatMessages) return;
+    const handleConfirm = () => {
+        if (!pendingMove || gameResult) return;
+        playSound('place-tile.mp3'); 
 
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, [messages, isBotTyping]);
-
-    const executeMove = (cell: Cell) => {
-        // Guardamos el estado actual en el historial antes de mover
+        // Saves in the history of moves (for the undo)
         setHistory(prev => [...prev, boardState]);
+
+        // Allows the undo button from being pressed
         setCanUndo(true);
 
-        const key = `${cell.x}-${cell.y}-${cell.z}`;
-        const newBoard = { ...boardState, [key]: 1 };
+        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
 
-        setBoardState(newBoard);
+        const newBoardState = { ...boardState, [key]: 1 };
+        setBoardState(newBoardState);
         setPendingMove(null);
 
-        if (checkWin(newBoard, 1, size, cells)) {
+        if (checkWin(newBoardState, 1, size, cells)) {
             setGameResult('win');
             return;
         }
@@ -284,20 +209,44 @@ useEffect(() => {
         setCurrentPlayer(2);
         setBotCooldown(true);
         setTimeout(() => {
-            const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
-            if (available.length > 0) {
-                const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
-                const botCell = available[randomIndex];
-                const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
-                const afterBot = { ...newBoard, [botKey]: 2 };
-                setBoardState(afterBot);
-                playSound('place-tile.mp3');
-                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
+            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]);
+            if (availableCells.length > 0) {
+                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
+                const stateAfterBot = { ...newBoardState, [botKey]: 2 };
+                
+                playSound('place-tile.mp3'); 
+                setBoardState(stateAfterBot);
+
+                if (checkWin(stateAfterBot, 2, size, cells)) {
+                    setGameResult('lose');
+                }
             }
             setCurrentPlayer(1);
             setBotCooldown(false);
         }, 1200);
     };
+
+    const handleUndo = () => {
+        if (history.length === 0 || botCooldown) return;
+
+        playSound('click.mp3');
+
+        // Get the previous save state
+        const previousState = history[history.length - 1];
+
+        // Update the board
+        setBoardState(previousState);
+
+        // Delete from the history that move
+        setHistory(prev => prev.slice(0, -1));
+
+        // Clean any pending move
+        setPendingMove(null);
+
+        // Blocks the button from being clicked on
+        setCanUndo(false);
+    }
 
     const restartGame = () => {
         playSound('click.mp3');
@@ -307,42 +256,34 @@ useEffect(() => {
         setCurrentPlayer(1);
         setTimeLeft(initialTime);
         setMatchId(null); // Reset match ID for new game
+        lastEvaluatedTurn.current = 0;
         navigate('/menu', { state: { openConfig: true } });
     };
 
-    // Keep the board visible for all configured board sizes (3..10)
-    // by scaling the SVG viewBox and hex size with `size`.
-    const gridViewSize = Math.max(100, size * 24);
-    const gridViewStart = -gridViewSize / 2;
-    const hexSize = Math.max(3, Math.min(6, 30 / size));
-    const gridOrigin = {
-        x: size * 4.75 * (hexSize / 6),
-        y: (size - 1) * 5 * (hexSize / 6),
-    };
+    console.log("Historial de Tensión Actual:", scoreHistory);
 
     return (
-        <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}>
+        <div className={`game-layout ${colorBlindMode ? 'color-blind' : ''}`}> 
             <div className="game-main-content">
                 <header className="game-header">
-                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`} style={{ borderColor: currentPlayer === 1 ? p1Color : 'transparent' }}>
+                    <div className={`player-card p1 ${currentPlayer === 1 ? 'active' : ''}`} 
+                         style={{ borderColor: currentPlayer === 1 ? p1Color : 'transparent' }}>
                         {t.labels.player1}
                     </div>
-                    <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`} style={{ borderColor: p1Color }}>
+                    <div className={`game-timer-wrapper ${timeLeft !== null && timeLeft < 20 ? 'timer-low' : ''}`}
+                         style={{ borderColor: p1Color }}>
                         <span className="timer-value" style={{ color: p1Color }}>{formatDisplayTime(timeLeft)}</span>
                     </div>
-                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`} style={{ borderColor: currentPlayer === 2 ? p2Color : 'transparent' }}>
+                    <div className={`player-card p2 ${currentPlayer === 2 ? 'active' : ''}`}
+                         style={{ borderColor: currentPlayer === 2 ? p2Color : 'transparent' }}>
                         {t.labels.player2}
                     </div>
                 </header>
 
-                <main className="board-area" style={{ position: 'relative' }}>
+                <main className="board-area">
                     <div className="triangle-board">
-                        <HexGrid
-                            width="100%"
-                            height="100%"
-                            viewBox={`${gridViewStart} ${gridViewStart} ${gridViewSize} ${gridViewSize}`}
-                        >
-                            <Layout size={{ x: hexSize, y: hexSize }} flat={false} spacing={1.08} origin={gridOrigin}>
+                        <HexGrid width="100%" height="100%" viewBox="-50 -50 100 100">
+                            <Layout size={{ x: 6, y: 6 }} flat={false} spacing={1.08} origin={{ x: size * 4.75, y: (size - 1) * 5 }}>
                                 {cells.map((cell) => {
                                     const key = `${cell.x}-${cell.y}-${cell.z}`;
                                     const owner = boardState[key];
@@ -351,11 +292,11 @@ useEffect(() => {
                                         <Hexagon
                                             key={key} q={cell.q} r={cell.r} s={cell.s}
                                             className={`hex-cell ${owner === 1 ? 'p1-selected' : ''} ${owner === 2 ? 'p2-selected' : ''} ${isSelected ? 'pending-selection' : ''}`}
-                                            onClick={() => {
-                                                if (gameResult || botCooldown || boardState[key]) return;
-                                                if (confirmMove) { setPendingMove(cell); playSound('click.mp3'); }
-                                                else { executeMove(cell); playSound('place-tile.mp3'); }
+                                            style={{
+                                                fill: owner === 1 ? p1Color : (owner === 2 ? p2Color : ''),
+                                                stroke: isSelected ? p1Color : ''
                                             }}
+                                            onClick={() => handleClick(cell)}
                                         />
                                     );
                                 })}
@@ -365,79 +306,56 @@ useEffect(() => {
                 </main>
 
                 <footer className="game-footer">
-                    <button className="game-action-btn" onClick={handleUndo} disabled={!canUndo || botCooldown}>
-                        <Undo2 size={18} />
-                        <span>{t.buttons.undo}</span>
+                    <button 
+                        className="game-action-btn" 
+                        onClick={handleUndo}
+                        disabled ={history.length === 0 || botCooldown || !canUndo}
+                        >
+                            <Undo2 size={18} /> 
+                            <span>{t.buttons.undo}</span>
                     </button>
-                    {confirmMove && (
-                        <button className="game-action-btn btn-confirm-action" onClick={() => executeMove(pendingMove!)} disabled={!pendingMove || botCooldown}>
-                            <CheckCircle2 size={18} />
-                            <span>{t.buttons.confirm}</span>
-                        </button>
-                    )}
-                    <button className="game-action-btn btn-exit-footer" onClick={() => setShowExitConfirmation(true)}>
-                        <LogOut size={18} />
-                        <span>{t.buttons.exit}</span>
+                    <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
+                        <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
+                    </button>
+                    <button className="game-action-btn btn-exit-footer" onClick={() => { playSound('click.mp3'); setShowExitConfirmation(true); }}>
+                        <LogOut size={18} /> <span>{t.buttons.exit}</span>
                     </button>
                 </footer>
             </div>
 
             <aside className="game-sidebar">
                 <div className="global-settings-bar">
-                    <button
-                        className="icon-btn-global"
-                        title="Mute" // Opcional para otros tests
-                        onClick={() => setIsMuted(!isMuted)}
+                    {/* New Mute/Unmute button for background music */}
+                    <button 
+                        title={isMuted ? "Unmute" : "Mute"} 
+                        className="icon-btn-global" 
+                        onClick={() => {
+                            playSound('click.mp3'); // UI feedback still plays
+                            setIsMuted(!isMuted); // Toggle global music mute
+                        }}
                     >
                         {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                     </button>
-
-                    <button
-                        className="icon-btn-global"
-                        title="Language"
-                        onClick={() => setShowLanguageDialog(true)}
-                    >
-                        <Languages size={20} />
-                    </button>
-
-                    <button
-                        className="icon-btn-global"
-                        title="Chat"
-                        onClick={() => setIsChatOpen(!isChatOpen)}
-                    >
-                        <MessageSquare size={20} />
-                    </button>
+                    <button title="Language" className="icon-btn-global" onClick={() => { playSound('click.mp3'); setShowLanguageDialog(true); }}><Languages size={20} /></button>
+                    <button title="Chat" className="icon-btn-global" onClick={() => { playSound('click.mp3'); setIsChatOpen(!isChatOpen); }}><MessageSquare size={20} /></button>
                 </div>
                 {isChatOpen && (
                     <div className="chat-container">
                         <div className="chat-header">
                             <div className="bot-profile-badge">
-                                <div className="bot-avatar-circle">{botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}</div>
-                                <div className="bot-info-text"><span className="bot-name-chat">PLAYER 2</span><span className="bot-status-tag">Online</span></div>
+                                <div className="bot-avatar-circle" style={{ borderColor: p1Color, color: p1Color }}>
+                                    {botType === 'chip' ? <Cpu size={20} /> : <Bot size={20} />}
+                                </div>
+                                <div className="bot-info-text">
+                                    <span className="bot-name-chat">PLAYER 2</span>
+                                    <span className="bot-status-tag">Online</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="chat-messages" ref={chatMessagesRef}>
+                        <div className="chat-messages">
                             {messages.map((msg, index) => (
-                                <div
-                                    key={index}
-                                    className={`message ${msg.sender === 'player' ? 'sent' : 'received'}`}
-                                    style={msg.sender === 'player' ? { backgroundColor: p1Color } : undefined}
-                                >
-                        <div className="chat-messages-display" style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {messages.map((msg, index) => (
-                                <div key={index} className={`chat-bubble ${msg.sender}`} style={{
-                                    alignSelf: msg.sender === 'player' ? 'flex-end' : 'flex-start',
-                                    backgroundColor: msg.sender === 'player' ? p1Color : '#333',
-                                    color: 'white',
-                                    padding: '6px 12px',
-                                    borderRadius: '12px',
-                                    maxWidth: '80%',
-                                    fontSize: '0.9rem'
-                                }}>
-                                    {msg.text}
-                                </div>
+                                <div key={index} className="message sent" style={{ backgroundColor: p1Color }}>{msg.text}</div>
                             ))}
-                            {isBotTyping && <div className="message received">...</div>}
                         </div>
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
                             <input
@@ -446,38 +364,27 @@ useEffect(() => {
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                             />
-                            <button
-                                type="submit"
-                                className="send-btn"
-                                data-testid="chat-send-button"
-                                disabled={!inputValue.trim() || isBotTyping}
-                                style={{ backgroundColor: p1Color }}
-                            >
+                            <button type="submit" className="send-btn" disabled={!inputValue.trim()} style={{ backgroundColor: p1Color }}>
                                 <CheckCircle2 size={18} />
-                        <form onSubmit={handleSendMessage} className="chat-input-area">
-                            <input
-                                type="text"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Escribe un mensaje..."
-                            />
-                            <button type="submit" className="send-btn">
-                                Send
                             </button>
                         </form>
                     </div>
                 )}
             </aside>
 
-            {/* MODALS */}
+            {/* RESULT MODAL */}
             {gameResult && (
                 <div className="modal-overlay">
                     <div className={`modal-content result-modal ${colorBlindMode ? 'color-blind' : ''}`}>
 
+                        <MatchGraph data={scoreHistory} />
 
                         <h2 className={gameResult === 'win' ? 'text-win' : 'text-lose'}>
                             {gameResult === 'win' ? t.messages.congrats : t.messages.nextTime}
                         </h2>
+                        <p className="result-modal-text">
+                            {gameResult === 'win' ? t.messages.winDetail : t.messages.loseDetail}
+                        </p>
                         {matchError && (
                             <p style={{ color: '#ef4444', fontSize: '0.9rem', marginTop: '1rem' }}>
                                 {matchError}
@@ -490,16 +397,20 @@ useEffect(() => {
                     </div>
                 </div>
             )}
+
+            {/* EXIT MODAL */}
             {showExitConfirmation && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className={`modal-content ${colorBlindMode ? 'color-blind' : ''}`}>
                         <h2>{t.messages.areYouSure}</h2>
-                        <button className="main-button btn-red" onClick={() => navigate('/menu')}>{t.buttons.yesExitAndLose}</button>
-                        <button className="main-button btn-blue-outline" onClick={() => setShowExitConfirmation(false)}>{t.buttons.backToGame}</button>
+                        <div className="modal-buttons-column">
+                            <button className="main-button btn-red" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>{t.buttons.yesExitAndLose}</button>
+                            <button className={`main-button ${colorBlindMode ? 'btn-orange-outline' : 'btn-blue-outline'}`} onClick={() => { playSound('click.mp3'); setShowExitConfirmation(false); }}>{t.buttons.backToGame}</button>
+                        </div>
                     </div>
                 </div>
             )}
-            <LanguageDialog open={showLanguageDialog} onClose={() => setShowLanguageDialog(false)} />
+            <LanguageDialog open={showLanguageDialog} onClose={() => { playSound('click.mp3'); setShowLanguageDialog(false); }} />
         </div>
     );
 };

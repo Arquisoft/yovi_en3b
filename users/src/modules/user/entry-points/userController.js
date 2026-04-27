@@ -1,5 +1,6 @@
 const userService = require('../domain/userService');
 const userDto = require('../domain/userDTO');
+const authutils = require('../../../auth/authUtils');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
@@ -56,7 +57,12 @@ const findUserByUsername = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const user =await userService.loginUser(req.body);
-        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
+        const token = authutils.generateUserToken(user);
+        res
+            .set('Authorization', `Bearer ${token}`)
+            .type('application/json')
+            .status(200)
+            .send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields") {

@@ -35,6 +35,11 @@ vi.mock('../i18n/useTranslation', () => ({
         defeat: 'DEFEAT',
       },
       labels: {
+        loadingH: 'Loading history...',
+        noMatches: 'No matches recorded yet.',
+        partidas: 'MATCHES',
+        winRate: 'WIN RATE',
+        victorias: 'WINS',
         vs: 'vs',
       },
     },
@@ -136,9 +141,9 @@ describe('HistoryPage additional states', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText('LOSE')).toBeInTheDocument();
-    expect(screen.getByText('LOSE')).toBeInTheDocument();
-    expect(screen.getAllByText('—')).toHaveLength(2);
+    expect(await screen.findAllByText('DEFEAT')).toHaveLength(2);
+    expect(screen.getByText(/vs Bot Hard/i)).toBeInTheDocument();
+    expect(screen.getByText(/vs Bot Medium/i)).toBeInTheDocument();
     expect(screen.getByText('0%')).toBeInTheDocument();
   });
 

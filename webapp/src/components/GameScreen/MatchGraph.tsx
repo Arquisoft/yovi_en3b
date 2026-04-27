@@ -1,4 +1,14 @@
 import React from 'react';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 interface ScoreData {
   turn: number;
@@ -13,12 +23,10 @@ interface MatchGraphProps {
 export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
   if (!data || data.length === 0) return null;
 
-  console.log("Datos pintando la gráfica:", data);
-
   return (
     <div style={{ width: '100%', height: '180px', margin: '10px 0', minWidth: '200px' }}>
       <h3 style={{ textAlign: 'center', marginBottom: '10px', fontSize: '1.2rem' }}>
-        Evolucion de la Partida
+        Evolución de la Partida
       </h3>
       <ResponsiveContainer width="100%" height={180} minWidth={200}>
         <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
