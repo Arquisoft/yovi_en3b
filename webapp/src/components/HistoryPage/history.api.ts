@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 export type MatchHistoryEntry = {
   id: string;
   date: string;
-  result: "win" | "lose" | "in_progress" | "abandoned";
+  result: "win" | "lose";
   size: number | null;
   opponent: string;
   isBot: boolean;
