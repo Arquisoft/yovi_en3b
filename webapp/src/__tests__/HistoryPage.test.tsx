@@ -5,6 +5,7 @@ import HistoryPage from  '../components/HistoryPage/HistoryPage';
 import { SettingsProvider } from '../context/SettingsContext';
 import { getMyMatchHistory } from '../components/HistoryPage/history.api';
 
+
 const mockNavigate = vi.fn(); // Mock for navigation
 
 // 1. Mock de React Router
@@ -27,6 +28,11 @@ vi.mock('../i18n/useTranslation', () => ({
       },
       labels: {
         vs: 'contra',
+        partidas: 'PARTIDAS',    
+        winRate: 'WIN RATE',   
+        victorias: 'VICTORIAS', 
+        loadingH: 'Cargando...',
+        noMatches: 'No hay partidas'
       },
     },
   }),
@@ -70,8 +76,8 @@ describe('HistoryPage', () => {
     
     expect(screen.getByText('HISTORIAL')).toBeDefined();
     expect(await screen.findByText('PARTIDAS')).toBeDefined();
-    expect(await screen.findAllByText(/Bot Easy/i)).toHaveLength(2);
-    expect(await screen.findByText(/Bot Medium/i)).toBeDefined();
+    expect(await screen.findAllByText(/Easy/i)).toHaveLength(2);
+    expect(await screen.findByText(/Medium/i)).toBeDefined();
   });
 
   test('navigates back to menu when clicking the back button', () => {

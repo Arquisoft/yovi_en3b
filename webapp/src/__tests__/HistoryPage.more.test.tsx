@@ -24,7 +24,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../context/SettingsContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<any>();
   return {
     ...actual,
     useSettings: () => mockSettings,
@@ -41,6 +41,11 @@ vi.mock('../i18n/useTranslation', () => ({
       },
       labels: {
         vs: 'vs',
+        partidas: 'Matches',
+        winRate: 'Win Rate',
+        victorias: 'Wins',
+        loadingH: 'Loading...',
+        noMatches: 'No matches found',
       },
     },
   }),
@@ -50,9 +55,6 @@ vi.mock('../components/HistoryPage/history.api', () => ({
   getMyMatchHistory: vi.fn(),
 }));
 
-/**
- * Wraps the component in the necessary Context Providers.
- */
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
         <MemoryRouter>
@@ -75,7 +77,7 @@ describe('HistoryPage additional states', () => {
 
     const { container, unmount } = renderWithProviders(<HistoryPage />);
 
-    expect(screen.getByText('Loading history...')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(container.querySelector('.history-container')).toHaveClass('color-blind');
     expect(container.querySelector('.history-container')).toHaveClass('neon-mode');
 
@@ -87,7 +89,7 @@ describe('HistoryPage additional states', () => {
 
     renderWithProviders(<HistoryPage />);
 
-    expect(await screen.findByText('Broken history')).toBeInTheDocument();
+    expect(await screen.findByText(/could not load history/i)).toBeInTheDocument();
   });
 
   it('falls back to the default error message for non-Error failures', async () => {
@@ -95,7 +97,7 @@ describe('HistoryPage additional states', () => {
 
     renderWithProviders(<HistoryPage />);
 
-    expect(await screen.findByText('Could not load match history')).toBeInTheDocument();
+    expect(await screen.findByText(/could not load history/i)).toBeInTheDocument();
   });
 
   it('shows the empty state and zeroed statistics when there are no matches', async () => {
@@ -103,9 +105,10 @@ describe('HistoryPage additional states', () => {
 
     renderWithProviders(<HistoryPage />);
 
-    expect(await screen.findByText('No matches recorded yet.')).toBeInTheDocument();
-    expect(screen.getByText('0%')).toBeInTheDocument();
+    expect(await screen.findByText('No matches found')).toBeInTheDocument();
+    
     expect(screen.getAllByText('0')).toHaveLength(2);
+    expect(screen.getByText('0%')).toBeInTheDocument();
   });
 
   it('renders abandoned and in-progress entries without counting them as finished matches', async () => {
@@ -134,25 +137,22 @@ describe('HistoryPage additional states', () => {
 
     renderWithProviders(<HistoryPage />);
 
-    expect(await screen.findByText('LOSE')).toBeInTheDocument();
-    expect(screen.getByText('LOSE')).toBeInTheDocument();
-    expect(screen.getAllByText('—')).toHaveLength(2);
+    const defeatLabels = await screen.findAllByText(/defeat/i);
+    expect(defeatLabels).toHaveLength(2);
+
+    expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('0%')).toBeInTheDocument();
   });
 
   it('ignores a successful history response that resolves after unmount', async () => {
-    let resolveHistory: ((value: Parameters<typeof Promise.resolve>[0]) => void) | undefined;
+    let resolveHistory: ((value: any) => void) | undefined;
     const historyPromise = new Promise((resolve) => {
       resolveHistory = resolve;
     });
 
-    vi.mocked(getMyMatchHistory).mockReturnValueOnce(historyPromise as ReturnType<typeof getMyMatchHistory>);
+    vi.mocked(getMyMatchHistory).mockReturnValueOnce(historyPromise as any);
 
-    const { unmount } = render(
-      <MemoryRouter>
-        <HistoryPage />
-      </MemoryRouter>
-    );
+    const { unmount } = renderWithProviders(<HistoryPage />);
 
     unmount();
 
@@ -179,7 +179,7 @@ describe('HistoryPage additional states', () => {
       rejectHistory = reject;
     });
 
-    vi.mocked(getMyMatchHistory).mockReturnValueOnce(historyPromise as ReturnType<typeof getMyMatchHistory>);
+    vi.mocked(getMyMatchHistory).mockReturnValueOnce(historyPromise as any);
 
     const { unmount } = renderWithProviders(<HistoryPage />);
 

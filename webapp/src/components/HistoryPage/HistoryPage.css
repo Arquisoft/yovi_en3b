@@ -222,3 +222,25 @@
         text-align: left;
     }
 }
+
+.difficulty-badge {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.diff-easy {
+    color: #4ade80; /* Verde brillante */
+}
+
+.diff-medium {
+    color: #fb923c; /* Naranja */
+}
+
+.diff-hard {
+    color: #ef4444; /* Rojo */
+}
+
+/* Opcional: Si quieres que resalte más con el modo neón */
+.neon-mode .diff-easy { text-shadow: 0 0 5px #4ade80; }
+.neon-mode .diff-medium { text-shadow: 0 0 5px #fb923c; }
+.neon-mode .diff-hard { text-shadow: 0 0 5px #ef4444; }
