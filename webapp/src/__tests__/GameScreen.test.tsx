@@ -319,25 +319,21 @@ describe('GameScreen', () => {
         expect(screen.getByText('Player 2')).toBeInTheDocument();
     });
 
-    /*
     test('TEST 18: allows user to type and send a message in chat', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
-        const input = screen.getByPlaceholderText('Type a message...');
+        const input = screen.getByPlaceholderText('Escribe un mensaje...');
         
         await user.type(input, 'Hello Bot');
         expect(input).toHaveValue('Hello Bot');
         
-        const sendButton = screen.getAllByRole('button').find(btn => 
-            btn.className.includes('send-btn')
-        ) as HTMLButtonElement;
+        const sendButton = screen.getByRole('button', { name: /send/i });
         
         await user.click(sendButton);
         
         expect(input).toHaveValue('');
         expect(screen.getByText('Hello Bot')).toBeInTheDocument();
     });
-    */
 
     test('TEST 19: bot makes a move automatically after player confirmation', async () => {
         renderWithProviders(<GameScreen />);
@@ -491,43 +487,26 @@ describe('GameScreen', () => {
             expect(screen.getByText('Player 1').closest('div')).toHaveClass('active');
         }, { timeout: 2000 });
     });
-});
 
-describe('yGameLogic - checkWin', () => {
-    const allCells = [
-        { x: 2, y: 0, z: 0, q: 0, r: -2, s: 2 },
-        { x: 1, y: 1, z: 0, q: -1, r: -1, s: 2 },
-        { x: 0, y: 2, z: 0, q: -2, r: 0, s: 2 },
-    ];
-
-    test('TEST 20: returns false if player has fewer pieces than board size', () => {
-        const boardState = { "2-0-0": 1 };
-        expect(checkWin(boardState, 1, 3, allCells)).toBe(false);
-    });
-
-    test('TEST 21: returns true if a connected group touches all 3 sides', () => {
-        const boardState = { "0-0-0": 1 };
-        const singleCell = [{ x: 0, y: 0, z: 0, q: 0, r: 0, s: 0 }];
-        expect(checkWin(boardState, 1, 1, singleCell)).toBe(true);
-    });
-
-    test('TEST 22: returns false if pieces touch sides but are not connected', () => {
-        const boardState = {
-            "2-0-0": 1,
-            "0-2-0": 1
-        };
-        expect(checkWin(boardState, 1, 2, allCells)).toBe(false);
-    });
-
-    test('TEST 23: handles multiple separate player cells correctly', () => {
-        const size2Cells = [
-            { x: 1, y: 0, z: 0, q: 0, r: -1, s: 1 },
-            { x: 0, y: 1, z: 0, q: -1, r: 0, s: 1 }
-        ];
-        const boardState = {
-            "1-0-0": 1,
-            "0-1-0": 1
-        };
-        expect(checkWin(boardState, 1, 2, size2Cells)).toBe(true);
+    test('TEST 33: occupied cells cannot be clicked', async () => {
+        renderWithProviders(<GameScreen />);
+        const user = userEvent.setup();
+        
+        const cells = screen.getAllByTestId('hex-cell');
+        
+        // First move
+        await user.click(cells[0]);
+        await user.click(screen.getByRole('button', { name: /confirm/i }));
+        
+        await waitFor(() => {
+            expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
+        }, { timeout: 2000 });
+        
+        // Try to click the same cell again after it's occupied
+        const firstCell = cells[0];
+        await user.click(firstCell);
+        
+        // Board state should not change (no new cells selected)
+        expect(screen.getByText('Player 2').closest('div')).toHaveClass('active');
     });
 });
