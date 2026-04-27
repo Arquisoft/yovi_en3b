@@ -12,7 +12,8 @@ import { LanguageDialog } from '../LanguageDialog/LanguageDialog';
 import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { createMatch, finishMatch, evaluateBoard } from './game.api';
+import { createMatch, finishMatch, evaluateBoard, getBotMove } from './game.api';
+import TutorBot from '../TutorBox/TutorBox';
 import { MatchGraph } from './MatchGraph';
 
 export interface ScoreData {
@@ -31,7 +32,7 @@ const GameScreen: React.FC = () => {
         size = 5,
         time: initialTime = null,
         botType = 'robot',
-        difficulty = 1  // Add difficulty extraction
+        difficulty = 0
     } = location.state || {};
 
     const [timeLeft, setTimeLeft] = useState<number | null>(initialTime);
@@ -208,18 +209,39 @@ const GameScreen: React.FC = () => {
 
         setCurrentPlayer(2);
         setBotCooldown(true);
-        setTimeout(() => {
-            const availableCells = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]);
-            if (availableCells.length > 0) {
-                const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
-                const botKey = `${randomCell.x}-${randomCell.y}-${randomCell.z}`;
-                const stateAfterBot = { ...newBoardState, [botKey]: 2 };
-                
-                playSound('place-tile.mp3'); 
-                setBoardState(stateAfterBot);
-
-                if (checkWin(stateAfterBot, 2, size, cells)) {
-                    setGameResult('lose');
+        setTimeout(async () => {
+            try {
+                const yenLayout = boardToYen(newBoard, size);
+                const turnCount = Object.keys(newBoard).length;
+                const position = JSON.stringify({
+                    size,
+                    turn: turnCount,
+                    players: ["B", "R"],
+                    layout: yenLayout
+                });
+                // Map difficulty to botId
+                let botId = 'random_bot';
+                if (difficulty === 0) botId = 'easy_bot';
+                else if (difficulty === 1) botId = 'medium_bot';
+                else if (difficulty === 2) botId = 'hard_bot';
+                const coords = await getBotMove(position, botId);
+                const botKey = `${coords.x}-${coords.y}-${coords.z}`;
+                const afterBot = { ...newBoard, [botKey]: 2 };
+                setBoardState(afterBot);
+                playSound('place-tile.mp3');
+                if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
+            } catch (error) {
+                console.error("Error getting bot move:", error);
+                // Fallback to random
+                const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
+                if (available.length > 0) {
+                    const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
+                    const botCell = available[randomIndex];
+                    const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
+                    const afterBot = { ...newBoard, [botKey]: 2 };
+                    setBoardState(afterBot);
+                    playSound('place-tile.mp3');
+                    if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
                 }
             }
             setCurrentPlayer(1);
