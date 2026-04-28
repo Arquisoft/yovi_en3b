@@ -65,3 +65,67 @@ impl YBot for EasyBot {
         Some(Coordinates::from_index(*cell, board_size))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{GameY, Movement, Coordinates};
+
+    #[test]
+    fn test_easy_bot_name() {
+        // Test de cortesía súper rápido para asegurar que el nombre es correcto 
+        // (y rascar un poco más de % de cobertura gratis)
+        let bot = EasyBot;
+        assert_eq!(bot.name(), "easy_bot");
+    }
+
+    #[test]
+    fn test_easy_bot_first_move() {
+        // 1. Empezamos una partida nueva (tablero vacío)
+        let board = GameY::new(4); // Puedes cambiar el 4 por el tamaño por defecto que uséis
+        let bot = EasyBot;
+
+        // 2. Le pedimos al bot que mueva
+        let chosen_move = bot.choose_move(&board);
+        
+        // 3. Comprobamos que sabe qué hacer y devuelve una coordenada válida
+        assert!(chosen_move.is_some());
+    }
+
+    #[test]
+    fn test_easy_bot_mid_game() {
+        // 1. Creamos la partida y el bot
+        let mut board = GameY::new(4);
+        let bot = EasyBot;
+
+        // 2. Simulamos que ya se han puesto un par de fichas en el tablero.
+        // Cogemos las dos primeras celdas libres para no tener que inventar coordenadas.
+        let available = board.available_cells();
+        let first_cell = Coordinates::from_index(available[0], board.board_size());
+        let second_cell = Coordinates::from_index(available[1], board.board_size());
+
+        // Mueve el Jugador 0
+        let p0 = board.next_player().unwrap();
+        board.add_move(Movement::Placement {
+            player: p0,
+            coords: first_cell.clone(),
+        }).unwrap();
+
+        // Mueve el Jugador 1
+        let p1 = board.next_player().unwrap();
+        board.add_move(Movement::Placement {
+            player: p1,
+            coords: second_cell.clone(),
+        }).unwrap();
+
+        // 3. Le toca al bot elegir su movimiento
+        let chosen_move = bot.choose_move(&board);
+        assert!(chosen_move.is_some());
+
+        // 4. Comprobación vital: El bot NO debe intentar poner su ficha 
+        // encima de las que ya pusimos en los pasos anteriores.
+        let chosen_coords = chosen_move.unwrap();
+        assert_ne!(chosen_coords, first_cell);
+        assert_ne!(chosen_coords, second_cell);
+    }
+}

@@ -263,63 +263,50 @@ fn shortest_paths(board: &GameY, player: PlayerId, side: u8) -> Vec<u32> {
 
 
 // TESTS:
-/*
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{GameY, GameStatus, Movement, PlayerId, RandomBot};
+    use crate::{GameY, Movement, PlayerId};
 
     #[test]
-    fn test_hard_bot_beats_random_bot_full_game() {
-        // Creamos un tablero de tamaño 5 (ni muy grande ni muy pequeño)
-        let mut game = GameY::new(5);
-        
+    fn test_hard_bot_does_not_panic_on_empty_board() {
+        // Comprobamos que el bot sabe hacer el primer movimiento sin colapsar
+        let game = GameY::new(5);
         let hard_bot = HardBot;
-        let random_bot = RandomBot;
 
-        // HardBot será el jugador 0 (Azul), RandomBot será el jugador 1 (Rojo)
-        let hard_player_id = PlayerId::new(0);
-        let random_player_id = PlayerId::new(1);
+        // Le pedimos un movimiento en un tablero totalmente vacío
+        let result = hard_bot.choose_move(&game);
 
-        println!("Empezando simulación: HardBot vs RandomBot...");
+        // Aseguramos de que devuelva ALGO y no haya hecho panic en el Minimax
+        assert!(
+            result.is_some(), 
+            "El HardBot debería devolver un movimiento en el turno 1"
+        );
+    }
 
-        // Bucle principal de la partida
-        while !game.check_game_over() {
-            let current_player = game.next_player().unwrap();
-            
-            // Decidimos qué bot debe jugar este turno
-            let coords = if current_player == hard_player_id {
-                hard_bot.choose_move(&game).expect("HardBot no encontró movimiento")
-            } else {
-                random_bot.choose_move(&game).expect("RandomBot no encontró movimiento")
-            };
+    #[test]
+    fn test_hard_bot_does_not_panic_mid_game() {
+        // Comprobamos que el algoritmo de Dijkstra y Minimax funcionan con fichas en el tablero
+        let mut game = GameY::new(5);
+        let hard_bot = HardBot;
+        
+        let player0 = PlayerId::new(0);
+        let player1 = PlayerId::new(1);
 
-            // Aplicamos el movimiento al tablero
-            game.add_move(Movement::Placement {
-                player: current_player,
-                coords,
-            }).unwrap();
-        }
+        // Forzamos un par de movimientos manuales para "ensuciar" el tablero
+        // Usamos from_index asumiendo que 0 y 1 son índices válidos en un tablero de 5
+        let coords1 = Coordinates::from_index(0, 5);
+        let coords2 = Coordinates::from_index(1, 5);
 
-        // La partida ha terminado. Comprobamos quién es el ganador.
-        if let GameStatus::Finished { winner } = game.status() {
-            // Imprimimos el tablero final en la consola para verlo si falla
-            println!("Estado final del tablero:");
-            let options = crate::RenderOptions {
-                show_3d_coords: false,
-                show_idx: false,
-                show_colors: false,
-            };
-            println!("{}", game.render(&options));
+        game.add_move(Movement::Placement { player: player0, coords: coords1 }).unwrap();
+        game.add_move(Movement::Placement { player: player1, coords: coords2 }).unwrap();
 
-            // ¡El test solo pasará (verde) si el ganador es nuestro HardBot!
-            assert_eq!(
-                *winner, hard_player_id, 
-                "¡Desastre! El HardBot ha perdido contra el RandomBot."
-            );
-        } else {
-            panic!("La partida terminó pero no hay un ganador claro.");
-        }
+        // Ahora le toca al bot decidir en un tablero a medias
+        let result = hard_bot.choose_move(&game);
+
+        assert!(
+            result.is_some(),
+            "El HardBot no debería petar ni devolver None a mitad de partida"
+        );
     }
 }
-*/
