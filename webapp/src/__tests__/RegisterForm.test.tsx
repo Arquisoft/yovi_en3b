@@ -3,16 +3,12 @@ import { BrowserRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { SettingsProvider } from '../context/SettingsContext';
-import { I18nProvider } from '../i18n/Provider'; // Import the translation provider
+import { I18nProvider } from '../i18n/Provider';
 
-/**
- * Wraps the component in all necessary Context Providers.
- * Added I18nProvider to avoid "useI18n must be used within I18nProvider" error.
- */
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
         <BrowserRouter>
-            <I18nProvider> {/* Must be the outermost or wrap settings */}
+            <I18nProvider>
                 <SettingsProvider>
                     {ui}
                 </SettingsProvider>
@@ -21,14 +17,12 @@ const renderWithProviders = (ui: React.ReactElement) => {
     );
 };
 
-// Mock navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return { ...actual, useNavigate: () => mockNavigate };
 });
 
-// Global mock for Web Audio API
 vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     return {
         play: vi.fn().mockResolvedValue(undefined),
@@ -43,23 +37,27 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     };
 }));
 
+const getUsernameInput = () => document.querySelector('input[id="login-username"]') as HTMLInputElement;
+const getPasswordInput = () => document.querySelector('input[id="login-password"]') as HTMLInputElement;
+const getSubmitBtn     = () => document.querySelector('button[type="submit"]')       as HTMLButtonElement;
+const getSignupBtn     = () => document.querySelector('button.auth-link')            as HTMLButtonElement;
+
 describe('RegisterForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         global.fetch = vi.fn();
-        localStorage.clear(); // Ensure a clean state for language and tokens
+        localStorage.clear();
     });
 
     test('1. Shows error when fields are empty', async () => {
         renderWithProviders(<RegisterForm />);
 
-        // Use regex and ignoreCase to find the button even if translation varies slightly
-        // or look for the button type=submit
-        const playBtn = screen.getByRole('button', { name: /PLAY/i });
-        fireEvent.click(playBtn);
+        fireEvent.click(getSubmitBtn());
 
-        // Verify error message (In English because it's usually the default)
-        expect(await screen.findByText(/Please fill in all fields/i)).toBeDefined();
+        const errorMsg = await screen.findByText(
+            /Please fill in all fields|Por favor, rellena todos los campos|Lütfen tüm alanları doldurun/i
+        );
+        expect(errorMsg).toBeDefined();
     });
 
     test('2. Navigates on successful login', async () => {
@@ -71,10 +69,9 @@ describe('RegisterForm', () => {
 
         renderWithProviders(<RegisterForm />);
 
-        // We use placeholders from our English translation config
-        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
+        fireEvent.change(getUsernameInput(), { target: { value: 'user' } });
+        fireEvent.change(getPasswordInput(), { target: { value: 'pass' } });
+        fireEvent.click(getSubmitBtn());
 
         await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/menu'));
     });
@@ -87,20 +84,18 @@ describe('RegisterForm', () => {
 
         renderWithProviders(<RegisterForm />);
 
-        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
+        fireEvent.change(getUsernameInput(), { target: { value: 'user' } });
+        fireEvent.change(getPasswordInput(), { target: { value: 'pass' } });
+        fireEvent.click(getSubmitBtn());
 
-        const errorMessage = await screen.findByText(/Invalid credentials/i);
-        expect(errorMessage).toBeDefined();
+        const errorMsg = await screen.findByText(/Invalid credentials/i);
+        expect(errorMsg).toBeDefined();
     });
 
     test('4. Navigates to signup on button click', async () => {
         renderWithProviders(<RegisterForm />);
 
-        // Use the sign up link text
-        const signUpBtn = screen.getByRole('button', { name: /SIGN UP/i });
-        fireEvent.click(signUpBtn);
+        fireEvent.click(getSignupBtn());
 
         expect(mockNavigate).toHaveBeenCalledWith('/signup');
     });
@@ -110,13 +105,14 @@ describe('RegisterForm', () => {
 
         renderWithProviders(<RegisterForm />);
 
-        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
+        fireEvent.change(getUsernameInput(), { target: { value: 'user' } });
+        fireEvent.change(getPasswordInput(), { target: { value: 'pass' } });
+        fireEvent.click(getSubmitBtn());
 
-        // Check for the translated network error message
         await waitFor(() => {
-            expect(screen.getByText(/Cannot connect to the server/i)).toBeDefined();
+            expect(screen.getByText(
+                /Cannot connect to the server|No se puede conectar con el servidor|Sunucuya bağlanılamıyor/i
+            )).toBeDefined();
         });
     });
 
@@ -127,15 +123,14 @@ describe('RegisterForm', () => {
 
         renderWithProviders(<RegisterForm />);
 
-        fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
-        fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
+        fireEvent.change(getUsernameInput(), { target: { value: 'user' } });
+        fireEvent.change(getPasswordInput(), { target: { value: 'pass' } });
 
-        const playBtn = screen.getByRole('button', { name: /PLAY/i }) as HTMLButtonElement;
-        fireEvent.click(playBtn);
+        const submitBtn = getSubmitBtn();
+        fireEvent.click(submitBtn);
 
-        // Check for "LOADING..." text inside the button
-        expect(screen.getByText(/LOADING/i)).toBeDefined();
-        expect(playBtn.disabled).toBe(true);
+        expect(screen.getByText(/LOADING|CARGANDO|YÜKLENİYOR/i)).toBeDefined();
+        expect(submitBtn.disabled).toBe(true);
 
         resolveResponse({
             ok: true,

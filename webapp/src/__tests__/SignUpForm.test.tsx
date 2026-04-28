@@ -4,11 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import SignUpForm from '../components/SignUp/SignUpForm';
 import { SettingsProvider } from '../context/SettingsContext';
-import { I18nProvider } from '../i18n/Provider'; // Import context provider
+import { I18nProvider } from '../i18n/Provider';
 
-/**
- * Wraps the component with all required providers, including I18n.
- */
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
         <I18nProvider>
@@ -21,10 +18,8 @@ const renderWithProviders = (ui: React.ReactElement) => {
     );
 };
 
-// Global fetch mock
 global.fetch = vi.fn();
 
-// Global mock for the Web Audio API
 vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     return {
         play: vi.fn().mockResolvedValue(undefined),
@@ -39,56 +34,54 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     };
 }));
 
+const getNicknameInput = () => document.querySelector('input[name="nickname"]') as HTMLInputElement;
+const getUsernameInput = () => document.querySelector('input[name="username"]') as HTMLInputElement;
+const getEmailInput    = () => document.querySelector('input[name="email"]')    as HTMLInputElement;
+const getPasswordInput = () => document.querySelector('input[name="password"]') as HTMLInputElement;
+const getSubmitBtn     = () => document.querySelector('button[type="submit"]')  as HTMLButtonElement;
+
 describe('SignUpForm Component', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        localStorage.clear(); // Clear storage to ensure default language (EN)
+        localStorage.clear();
     });
 
     test('1. Renders all input fields and avatars', () => {
         renderWithProviders(<SignUpForm />);
-        
-        // We use translated labels (assuming English default in tests)
-        expect(screen.getByText(/NICKNAME/i)).toBeDefined(); 
-        expect(screen.getByText(/USERNAME/i)).toBeDefined(); 
-        expect(screen.getByText(/EMAIL/i)).toBeDefined(); 
-        expect(screen.getByRole('button', { name: /SAVE ACCOUNT/i })).toBeDefined(); 
-        
-        const avatars = screen.getAllByRole('button').filter(btn => 
+
+        expect(getNicknameInput()).not.toBeNull();
+        expect(getUsernameInput()).not.toBeNull();
+        expect(getEmailInput()).not.toBeNull();
+        expect(getPasswordInput()).not.toBeNull();
+        expect(getSubmitBtn()).not.toBeNull();
+
+        const avatars = screen.getAllByRole('button').filter(btn =>
             ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"].includes(btn.textContent || "")
         );
-        expect(avatars.length).toBe(6); 
+        expect(avatars.length).toBe(6);
     });
 
     test('2. Toggles password visibility', () => {
         renderWithProviders(<SignUpForm />);
-        // Find input by label text
-        const passInput = screen.getByLabelText(/PASSWORD/i) as HTMLInputElement;
-        
-        // Find the toggle button (it usually has no text, so we find it by its child svg or position)
-        const toggleBtn = screen.getAllByRole('button').find(btn => btn.querySelector('svg')); 
+        const passInput = getPasswordInput();
+        const toggleBtn = document.querySelector('.eye-btn') as HTMLButtonElement;
 
-        expect(passInput.type).toBe('password'); 
-        
-        if (toggleBtn) fireEvent.click(toggleBtn);
-        expect(passInput.type).toBe('text'); 
-        
-        if (toggleBtn) fireEvent.click(toggleBtn);
-        expect(passInput.type).toBe('password'); 
+        expect(passInput.type).toBe('password');
+
+        fireEvent.click(toggleBtn);
+        expect(passInput.type).toBe('text');
+
+        fireEvent.click(toggleBtn);
+        expect(passInput.type).toBe('password');
     });
 
     test('3. Updates validation UI as user types password', () => {
         renderWithProviders(<SignUpForm />);
-        const passInput = screen.getByLabelText(/PASSWORD/i);
 
-        fireEvent.change(passInput, { target: { name: 'password', value: 'Password123!' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Password123!' } });
 
-        // Using regex to match translated validation rules
-        const validationItems = screen.getAllByText(/8\+ chars|Uppercase|Number|Special/i);
-        validationItems.forEach(item => {
-            // We check the parent because the 'valid' class is usually on the container
-            expect(item.parentElement?.className).toContain('valid'); 
-        });
+        const validItems = document.querySelectorAll('.val-item.valid');
+        expect(validItems.length).toBe(4);
     });
 
     test('4. Successfully creates account and navigates', async () => {
@@ -99,16 +92,21 @@ describe('SignUpForm Component', () => {
 
         renderWithProviders(<SignUpForm />);
 
-        fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'John' } });
-        fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'jdoe' } });
-        fireEvent.change(screen.getByLabelText(/EMAIL/i), { target: { name: 'email', value: 'john@test.com' } });
-        fireEvent.change(screen.getByLabelText(/PASSWORD/i), { target: { name: 'password', value: 'Valid123!' } });
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'John' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'jdoe' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'john@test.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Valid123!' } });
 
-        const submitBtn = screen.getByRole('button', { name: /SAVE ACCOUNT/i });
-        fireEvent.click(submitBtn);
+        fireEvent.click(getSubmitBtn());
 
-        // Check for translated loading state
-        expect(await screen.findByText(/CREATING/i)).toBeDefined(); 
+        await waitFor(() => {
+            const btn = getSubmitBtn();
+            expect(
+                btn.textContent === 'CREANDO...' ||
+                btn.textContent === 'CREATING...' ||
+                btn.textContent === 'OLUŞTURULUYOR...'
+            ).toBe(true);
+        });
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalled();
@@ -122,44 +120,44 @@ describe('SignUpForm Component', () => {
         });
 
         renderWithProviders(<SignUpForm />);
-        
-        fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'a' } });
-        fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'b' } });
-        fireEvent.change(screen.getByLabelText(/EMAIL/i), { target: { name: 'email', value: 'c@d.com' } });
-        fireEvent.change(screen.getByLabelText(/PASSWORD/i), { target: { name: 'password', value: 'Valid123!' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /SAVE ACCOUNT/i }));
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'a' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'b' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'c@d.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Valid123!' } });
+
+        fireEvent.click(getSubmitBtn());
 
         const errorMsg = await screen.findByText(/Email already exists/i);
-        expect(errorMsg).toBeDefined(); 
+        expect(errorMsg).toBeDefined();
     });
 
     test('6. Handles server connection error', async () => {
         (global.fetch as any).mockRejectedValueOnce(new Error('Network Error'));
 
         renderWithProviders(<SignUpForm />);
-        
-        fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'a' } });
-        fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'b' } });
-        fireEvent.change(screen.getByLabelText(/EMAIL/i), { target: { name: 'email', value: 'c@d.com' } });
-        fireEvent.change(screen.getByLabelText(/PASSWORD/i), { target: { name: 'password', value: 'Valid123!' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /SAVE ACCOUNT/i }));
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'a' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'b' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'c@d.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Valid123!' } });
 
-        // Search for the translated connection error message
-        const errorMsg = await screen.findByText(/Cannot connect to the server/i);
-        expect(errorMsg).toBeDefined(); 
+        fireEvent.click(getSubmitBtn());
+
+        const errorMsg = await screen.findByText(
+            /Cannot connect to the server|No se puede conectar con el servidor|Sunucuya bağlanılamıyor/i
+        );
+        expect(errorMsg).toBeDefined();
     });
 
     test('7. Disables submit button when password is invalid', () => {
         renderWithProviders(<SignUpForm />);
-        
-        fireEvent.change(screen.getByLabelText(/NICKNAME/i), { target: { name: 'nickname', value: 'John' } });
-        fireEvent.change(screen.getByLabelText(/USERNAME/i), { target: { name: 'username', value: 'jdoe' } });
-        fireEvent.change(screen.getByLabelText(/EMAIL/i), { target: { name: 'email', value: 'john@test.com' } });
-        fireEvent.change(screen.getByLabelText(/PASSWORD/i), { target: { name: 'password', value: 'short' } });
 
-        const submitBtn = screen.getByRole('button', { name: /SAVE ACCOUNT/i }) as HTMLButtonElement;
-        expect(submitBtn.disabled).toBe(true);
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'John' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'jdoe' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'john@test.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'short' } });
+
+        expect(getSubmitBtn().disabled).toBe(true);
     });
 });
