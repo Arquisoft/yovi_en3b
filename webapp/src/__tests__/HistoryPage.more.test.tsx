@@ -40,8 +40,6 @@ vi.mock('../i18n/useTranslation', () => ({
         defeat: 'DEFEAT',
       },
       labels: {
-        loadingH: 'Loading history...',
-        noMatches: 'No matches recorded yet.',
         partidas: 'MATCHES',
         winRate: 'WIN RATE',
         victorias: 'WINS',

@@ -6,7 +6,6 @@ import { SettingsProvider } from '../context/SettingsContext';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { checkWin } from '../components/GameScreen/yGameLogic';
-import { requestBotChatReply } from '../components/GameScreen/gameyChat.api';
 
 /**
  * Wraps the component in the necessary Context Providers (Routes and Settings).
