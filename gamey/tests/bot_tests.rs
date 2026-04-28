@@ -57,10 +57,8 @@ fn test_medium_bot_standard_behavior() {
     run_standard_bot_tests(&bot, "medium_bot");
 }
 
-/* Cuando arregléis el HardBot, solo tendréis que añadir esto:
 #[test]
 fn test_hard_bot_standard_behavior() {
     let bot = HardBot;
     run_standard_bot_tests(&bot, "hard_bot");
 }
-*/
