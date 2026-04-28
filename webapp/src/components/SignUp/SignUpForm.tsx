@@ -1,12 +1,16 @@
 // UBICACIÓN: webapp/src/components/SignUp/SignUpForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Check, X } from 'lucide-react';
-import { useSettings } from '../../context/SettingsContext'; // Import settings for playSound
+import { Eye, EyeOff, Check, X, Globe } from 'lucide-react'; 
+import { useSettings } from '../../context/SettingsContext'; 
+import { useI18n } from "../../i18n/useTranslation";
 import './SignUpForm.css';
 
 const SignUpForm: React.FC = () => {
-  const { playSound } = useSettings(); // Access sound player function
+  const { playSound, startBackgroundMusic } = useSettings(); // Funciones de sonido
+  const { t, language, setLanguage } = useI18n(); // Hook de traducción
+  const navigate = useNavigate();
+
   const AVATARS = ["🧩", "🎮", "🚀", "🏆", "🦊", "🐙"];
   
   const [formData, setFormData] = useState({
@@ -20,24 +24,25 @@ const SignUpForm: React.FC = () => {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  const passwordValidations = {
+  // VALIDACIÓN DINÁMICA: Se recalcula cada vez que cambia el password
+  const passwordValidations = useMemo(() => ({
     length: formData.password.length >= 8,
     hasUpper: /[A-Z]/.test(formData.password),
     hasNumber: /[0-9]/.test(formData.password),
     hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
-  };
+  }), [formData.password]);
 
   const allValidationsPass = Object.values(passwordValidations).every(Boolean);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value }); 
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value })); // Actualiza el estado de los inputs
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    playSound('click.mp3'); // Play sound when attempting to save
+    
     if (!allValidationsPass) return;
 
     setLoading(true);
@@ -59,17 +64,22 @@ const SignUpForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Signup response:', data);
         localStorage.setItem('username', formData.username);
         localStorage.setItem('userId', data.id || '');
-        console.log('Stored userId:', localStorage.getItem('userId'));
-        navigate('/menu'); 
+        
+        // SONIDO Y MÚSICA: Al ser éxito, disparamos el feedback y la música de fondo
+        playSound('click.mp3'); // Sonido de clic/éxito
+        startBackgroundMusic(); // Desbloquea e inicia la música del juego
+
+        setTimeout(() => {
+          navigate('/menu'); // Redirige al menú principal
+        }, 150); 
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "Error creating account. Please try again.");
+        setError(errorData.message || t.messages.errorCreatingAccount); // Error de la API traducido
       }
     } catch (err) {
-      setError("Cannot connect to the server. Please try again later.");
+      setError(t.messages.cannotConnectServer); // Error de conexión traducido
     } finally {
       setLoading(false);
     }
@@ -78,17 +88,44 @@ const SignUpForm: React.FC = () => {
   return (
     <div className="signup-container">
       <div className="signup-card">
-        <button 
-          className="boton-cerrar-fijo" 
-          onClick={() => {
-            playSound('click.mp3'); // Sound on close
-            navigate('/');
-          }}
-        >
-          &times;
-        </button>
+        {/* BOTONES DE CABECERA: Cerrar e Idioma */}
+        <div className="signup-header-actions">
+          <div className="language-selector-mini">
+            <Globe size={16} color="white" className="globe-icon" />
+            <button 
+              className={`lang-btn ${language === 'es' ? 'active' : ''}`} 
+              onClick={() => { playSound('click.mp3'); setLanguage('es'); }}
+            >
+              ES
+            </button>
+            <button 
+              className={`lang-btn ${language === 'en' ? 'active' : ''}`} 
+              onClick={() => { playSound('click.mp3'); setLanguage('en'); }}
+            >
+              EN
+            </button>
+            <button 
+              className={`lang-btn ${language === 'tr' ? 'active' : ''}`} 
+              onClick={() => { playSound('click.mp3'); setLanguage('tr'); }}
+            >
+              TR
+            </button>
+          </div>
+
+          <button 
+            className="boton-cerrar-fijo" 
+            onClick={() => {
+              playSound('click.mp3'); // Sonido al cerrar
+              navigate('/');
+            }}
+          >
+            &times;
+          </button>
+        </div>
         
-        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginBottom: '1.25rem' }}>SIGN UP</h1>
+        <h1 className="title-game cubic-text" style={{ fontSize: '2.2rem', marginTop: '10px' }}>
+          {t.labels.signup} 
+        </h1>
         
         <form onSubmit={handleSave} className="signup-form">
           <div className="avatar-display-section">
@@ -106,8 +143,8 @@ const SignUpForm: React.FC = () => {
                   type="button" 
                   className={`avatar-opt ${formData.avatarId === id ? 'active' : ''}`} 
                   onClick={() => {
-                    playSound('click.mp3'); // Sound when selecting an avatar
-                    setFormData({...formData, avatarId: id});
+                    playSound('click.mp3'); // Sonido al elegir avatar
+                    setFormData(prev => ({...prev, avatarId: id}));
                   }}
                 >
                   {emoji} 
@@ -117,36 +154,41 @@ const SignUpForm: React.FC = () => {
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text" htmlFor="signup-nickname">NICKNAME</label>
-            <input id="signup-nickname" name="nickname" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-nickname">{t.labels.nickname}</label>
+            <input id="signup-nickname" name="nickname" type="text" className="orbitron-text" value={formData.nickname} onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text" htmlFor="signup-username">USERNAME</label>
-            <input id="signup-username" name="username" type="text" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-username">{t.labels.username}</label>
+            <input id="signup-username" name="username" type="text" className="orbitron-text" value={formData.username} onChange={handleChange} required />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text" htmlFor="signup-email">EMAIL</label>
-            <input id="signup-email" name="email" type="email" className="orbitron-text" onChange={handleChange} required />
+            <label className="orbitron-text" htmlFor="signup-email">{t.labels.email}</label>
+            <input id="signup-email" name="email" type="email" className="orbitron-text" value={formData.email} onChange={handleChange} required />
           </div>
 
+          {/* SOLUCIÓN ALINEACIÓN: Agrupamos todo el bloque de contraseña */}
           <div className="input-group">
-            <label htmlFor="password" className="orbitron-text">PASSWORD</label>
+            <label htmlFor="password" className="orbitron-text">{t.labels.password}</label>
+            
+            {/* El wrapper y el botón DEBEN estar dentro del input-group */}
             <div className="password-wrapper">
               <input 
                 id="password"
                 name="password" 
                 type={showPass ? "text" : "password"} 
                 className="orbitron-text" 
+                value={formData.password}
                 onChange={handleChange} 
                 required 
+                autoComplete="new-password" 
               />
               <button 
                 type="button" 
                 className="eye-btn" 
                 onClick={() => {
-                  playSound('click.mp3'); // Sound when toggling visibility
+                  playSound('click.mp3'); // Sonido al alternar ojo
                   setShowPass(!showPass);
                 }}
               >
@@ -155,10 +197,18 @@ const SignUpForm: React.FC = () => {
             </div>
             
             <div className="validation-grid">
-              <div className={`val-item ${passwordValidations.length ? 'valid' : ''}`}>{passwordValidations.length ? <Check size={12}/> : <X size={12}/>} 8+ chars</div>
-              <div className={`val-item ${passwordValidations.hasUpper ? 'valid' : ''}`}>{passwordValidations.hasUpper ? <Check size={12}/> : <X size={12}/>} Uppercase</div>
-              <div className={`val-item ${passwordValidations.hasNumber ? 'valid' : ''}`}>{passwordValidations.hasNumber ? <Check size={12}/> : <X size={12}/>} Number</div>
-              <div className={`val-item ${passwordValidations.hasSpecial ? 'valid' : ''}`}>{passwordValidations.hasSpecial ? <Check size={12}/> : <X size={12}/>} Special</div>
+              <div className={`val-item ${passwordValidations.length ? 'valid' : ''}`}>
+                {passwordValidations.length ? <Check size={12}/> : <X size={12}/>} {t.validation.chars8}
+              </div>
+              <div className={`val-item ${passwordValidations.hasUpper ? 'valid' : ''}`}>
+                {passwordValidations.hasUpper ? <Check size={12}/> : <X size={12}/>} {t.validation.uppercase}
+              </div>
+              <div className={`val-item ${passwordValidations.hasNumber ? 'valid' : ''}`}>
+                {passwordValidations.hasNumber ? <Check size={12}/> : <X size={12}/>} {t.validation.number}
+              </div>
+              <div className={`val-item ${passwordValidations.hasSpecial ? 'valid' : ''}`}>
+                {passwordValidations.hasSpecial ? <Check size={12}/> : <X size={12}/>} {t.validation.special}
+              </div>
             </div>
           </div>
 
@@ -169,7 +219,7 @@ const SignUpForm: React.FC = () => {
             className="main-button btn-blue save-btn-compact"
             disabled={loading || !allValidationsPass || !formData.email || !formData.nickname || !formData.username}
           >
-            {loading ? 'CREATING...' : 'SAVE ACCOUNT'}
+            {loading ? t.buttons.creating : t.buttons.saveAccount}
           </button>
         </form>
       </div>
