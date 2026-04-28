@@ -17,14 +17,19 @@ Before(async function () {
   const devtools = false
 
   this.browser = await chromium.launch({ headless, slowMo, devtools })
+  this.context = await this.browser.newContext({
+    locale: 'es', 
+    viewport: { width: 1280, height: 720 } 
+  });
   this.page = await this.browser.newPage()
 })
 
 After(async function () {
-  if (this.page) await this.page.close()
-  if (this.browser) await this.browser.close()
-    this.context = await this.browser.newContext({
-    locale: 'en-US', 
-    viewport: { width: 1280, height: 720 } 
-  })
+ if (this.page && !this.page.isClosed()) {
+    await this.page.close();
+  }
+  if (this.context) {
+    await this.context.close();
+  }
+
 })
