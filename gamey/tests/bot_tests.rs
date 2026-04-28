@@ -2,6 +2,7 @@ use gamey::{Coordinates, GameY, Movement, YBot};
 // Asegúrate de que las rutas de importación coinciden con cómo tenéis exportados los bots en vuestro lib.rs
 use gamey::bot::easy::EasyBot;
 use gamey::bot::medium::MediumBot;
+use gamey::bot::hard::HardBot;
 
 /// Esta es la función MAESTRA. Acepta cualquier cosa que sea un YBot.
 fn run_standard_bot_tests(bot: &dyn YBot, expected_name: &str) {
@@ -57,10 +58,8 @@ fn test_medium_bot_standard_behavior() {
     run_standard_bot_tests(&bot, "medium_bot");
 }
 
-/* Cuando arregléis el HardBot, solo tendréis que añadir esto:
 #[test]
 fn test_hard_bot_standard_behavior() {
     let bot = HardBot;
     run_standard_bot_tests(&bot, "hard_bot");
 }
-*/
