@@ -80,15 +80,6 @@ Mapping of Building Blocks to Infrastructure::
 
 === Infrastructure Level 2
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you can include the internal structure of (some) infrastructure elements from level 1.
-
-Please copy the structure from level 1 for each selected element.
-****
-endif::arc42help[]
-
 ==== Docker Host (Server)
 
 image::deployment_server.png["Docker Host Detail"]
