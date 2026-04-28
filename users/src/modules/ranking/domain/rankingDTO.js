@@ -1,4 +1,4 @@
-const toRankingResponseDto = (ranking) => {
+const toRankingResponseDto = (user) => { 
   return {
     username: user.username,
     email: user.email,
@@ -6,6 +6,7 @@ const toRankingResponseDto = (ranking) => {
     nickname: user.nickname
   };
 };
+
 const toUserInputDto = (user) => {
   return {
     username: user.username,
