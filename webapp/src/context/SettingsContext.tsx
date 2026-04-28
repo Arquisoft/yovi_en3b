@@ -98,10 +98,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       audio.volume = volume / 100;
-      const playPromise = audio.play();
-      playPromise?.catch(err => console.error("Error en sonido FX:", err));
+      audio.play().catch(() => {});
     } catch (error) {
-      console.error("Error en sonido FX:", error);
+      console.error("Error playing sound");
     }
   };
 

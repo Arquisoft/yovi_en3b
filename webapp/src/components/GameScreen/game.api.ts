@@ -86,7 +86,7 @@ export async function finishMatch(
     try {
       error = await res.json();
     } catch {
-      error = { error: `${res.status} ${res.statusText}` };
+      error = { error: `Server error: ${res.status}` };
     }
     throw new Error(error.error || `Failed to finish match (${res.status})`);
   }
