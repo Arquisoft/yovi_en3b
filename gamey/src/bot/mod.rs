@@ -11,6 +11,7 @@
 
 pub mod easy;
 pub mod medium;
+pub mod hard;
 pub mod random;
 pub mod ybot;
 pub mod ybot_registry;
@@ -21,6 +22,7 @@ pub use llm_bot::{
     AnthropicClient, AnthropicMessage, AnthropicRequest, DifficultyLevel, LLMBot, *,
 };
 pub use medium::*;
+pub use hard::*;
 pub use random::*;
 pub use ybot::*;
 pub use ybot_registry::*;
