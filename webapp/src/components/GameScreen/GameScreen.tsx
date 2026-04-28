@@ -26,7 +26,8 @@ const GameScreen: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useI18n();
-    const { colorBlindMode, playSound, isMuted, setIsMuted } = useSettings(); // Added isMuted and setIsMuted
+    // Added confirmMove from settings context
+    const { colorBlindMode, playSound, isMuted, setIsMuted, confirmMove } = useSettings(); 
 
     const {
         size = 5,
@@ -185,15 +186,9 @@ const GameScreen: React.FC = () => {
         return () => clearInterval(timer);
     }, [timeLeft, gameResult]);
 
-    const handleClick = (cell: Cell) => {
-        const key = `${cell.x}-${cell.y}-${cell.z}`;
-        if (gameResult || botCooldown || boardState[key]) return;
-        playSound('click.mp3'); 
-        setPendingMove(cell);
-    };
-
-    const handleConfirm = () => {
-        if (!pendingMove || gameResult) return;
+    // Internal execution logic to avoid code duplication
+    const executeMove = (cell: Cell) => {
+        if (gameResult) return;
         playSound('place-tile.mp3'); 
 
         // Saves in the history of moves (for the undo)
@@ -202,7 +197,7 @@ const GameScreen: React.FC = () => {
         // Allows the undo button from being pressed
         setCanUndo(true);
 
-        const key = `${pendingMove.x}-${pendingMove.y}-${pendingMove.z}`;
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
 
         const newBoardState = { ...boardState, [key]: 1 };
         setBoardState(newBoardState);
@@ -253,6 +248,23 @@ const GameScreen: React.FC = () => {
             setCurrentPlayer(1);
             setBotCooldown(false);
         }, 1200);
+    };
+
+    const handleClick = (cell: Cell) => {
+        const key = `${cell.x}-${cell.y}-${cell.z}`;
+        if (gameResult || botCooldown || boardState[key]) return;
+
+        if (confirmMove) {
+            playSound('click.mp3'); 
+            setPendingMove(cell);
+        } else {
+            executeMove(cell);
+        }
+    };
+
+    const handleConfirm = () => {
+        if (!pendingMove || gameResult) return;
+        executeMove(pendingMove);
     };
 
     const handleUndo = () => {
@@ -342,9 +354,11 @@ const GameScreen: React.FC = () => {
                             <Undo2 size={18} /> 
                             <span>{t.buttons.undo}</span>
                     </button>
-                    <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
-                        <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
-                    </button>
+                    {confirmMove && (
+                        <button className="game-action-btn btn-confirm-action" onClick={handleConfirm} disabled={!pendingMove || botCooldown}>
+                            <CheckCircle2 size={18} /> <span>{t.buttons.confirm}</span>
+                        </button>
+                    )}
                     <button className="game-action-btn btn-exit-footer" onClick={() => { playSound('click.mp3'); setShowExitConfirmation(true); }}>
                         <LogOut size={18} /> <span>{t.buttons.exit}</span>
                     </button>
