@@ -6,6 +6,7 @@ import { SettingsProvider } from '../context/SettingsContext';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { checkWin } from '../components/GameScreen/yGameLogic';
+import { requestBotChatReply } from '../components/GameScreen/gameyChat.api';
 
 /**
  * Wraps the component in the necessary Context Providers (Routes and Settings).
@@ -44,6 +45,14 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
         muted: false
     };
 }));
+
+const mockLocalStorage = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+};
+vi.stubGlobal('localStorage', mockLocalStorage);
+mockLocalStorage.getItem.mockReturnValue('user-123');
 
 /**
  * Partial mock of 'react-router-dom'.
@@ -107,6 +116,10 @@ vi.mock('../components/GameScreen/game.api', () => ({
     finishMatch: vi.fn().mockResolvedValue({}),
     evaluateBoard: vi.fn().mockResolvedValue({ blue_score: 20, red_score: 18 }),
     getBotMove: vi.fn().mockResolvedValue({ x: 1, y: 0, z: 1 }),
+}));
+
+vi.mock('../components/GameScreen/gameyChat.api', () => ({
+    requestBotChatReply: vi.fn().mockResolvedValue('Hello! I am the bot.'),
 }));
 
 vi.mock('../components/GameScreen/MatchGraph', () => ({
@@ -301,7 +314,7 @@ describe('GameScreen', () => {
         expect(screen.getByText('Player 2')).toBeInTheDocument();
     });
 
-    test('TEST 18: allows user to type and send a message in chat', async () => {
+    test('TEST 18: allows user to type and send a message in chat and receives bot reply', async () => {
         renderWithProviders(<GameScreen />);
         const user = userEvent.setup();
         const input = screen.getByPlaceholderText('Type a message...');
@@ -317,6 +330,10 @@ describe('GameScreen', () => {
         
         expect(input).toHaveValue('');
         expect(screen.getByText('Hello Bot')).toBeInTheDocument();
+        
+        await waitFor(() => {
+            expect(screen.getByText('Hello! I am the bot.')).toBeInTheDocument();
+        }, { timeout: 2000 });
     });
 
     test('TEST 19: bot makes a move automatically after player confirmation', async () => {
