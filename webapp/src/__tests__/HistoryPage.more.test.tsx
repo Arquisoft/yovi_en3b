@@ -24,7 +24,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../context/SettingsContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal() as Record<string, unknown>;
   return {
     ...actual,
     useSettings: () => mockSettings,

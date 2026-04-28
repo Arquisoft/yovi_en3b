@@ -93,7 +93,6 @@ export const translations = {
       colorBlindMode: 'MODO DALTÓNICO',
       neonEffects: 'EFECTOS NEÓN',
       visuals: 'VISUALES',
-      partidas: 'PARTIDAS',
       wins: 'VICTORIAS',
     },
     messages: {
@@ -243,7 +242,6 @@ export const translations = {
       colorBlindMode: 'COLOR BLIND MODE',
       neonEffects: 'NEON EFFECTS',
       visuals: 'VISUALS',
-      partidas: 'GAMES',
       wins: 'WINS',
     },
     messages: {
@@ -393,7 +391,6 @@ export const translations = {
       colorBlindMode: 'RENK KÖRÜ MODU',
       neonEffects: 'NEON EFEKTLERİ',
       visuals: 'GÖRSELLER',
-      partidas: 'OYUNLAR',
       wins: 'KAZANMALAR',
     },
     messages: {

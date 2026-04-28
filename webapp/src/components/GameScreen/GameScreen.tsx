@@ -13,7 +13,7 @@ import { useI18n } from '../../i18n/useTranslation';
 import { useSettings } from '../../context/SettingsContext';
 import { HexGrid, Layout, Hexagon } from 'react-hexgrid';
 import { createMatch, finishMatch, evaluateBoard, getBotMove } from './game.api';
-import TutorBot from '../TutorBox/TutorBox';
+import { requestBotChatReply } from './gameyChat.api';
 import { MatchGraph } from './MatchGraph';
 
 export interface ScoreData {
@@ -47,10 +47,9 @@ const GameScreen: React.FC = () => {
     const [pendingMove, setPendingMove] = useState<Cell | null>(null);
     const [botCooldown, setBotCooldown] = useState(false);
     const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
-    const [messages, setMessages] = useState<{ sender: string, text: string }[]>([]);
+    const [messages, setMessages] = useState<{ sender: 'player' | 'bot', text: string }[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [matchId, setMatchId] = useState<string | null>(null);
-    const [isMatchCreating, setIsMatchCreating] = useState(false);
     const [matchError, setMatchError] = useState<string | null>(null);
     const [scoreHistory, setScoreHistory] = useState<ScoreData[]>([]);
     const lastEvaluatedTurn = useRef(0);
@@ -58,30 +57,17 @@ const GameScreen: React.FC = () => {
     const p1Color = colorBlindMode ? '#f59e0b' : '#60a5fa';
     const p2Color = colorBlindMode ? '#ffffff' : '#ef4444';
 
-    // Effect to create match on component mount
+    // 3. API Handlers (Init & Finish)
     useEffect(() => {
-        if (isMatchCreating || matchId) return;
-        if (!localStorage.getItem('userId')) return;
-        
-        const createGameMatch = async () => {
-            setIsMatchCreating(true);
+        const initMatch = async () => {
             try {
-                const match = await createMatch(
-                    true, // isBot=true (playing against bot)
-                    difficulty || 1 // use the actual difficulty (1=easy, 2=medium, 3=hard)
-                );
-                setMatchId(match.id);
-                setMatchError(null);
-            } catch (error) {
-                const msg = error instanceof Error ? error.message : 'Failed to create match';
-                console.error('Match creation error:', msg);
-                setMatchError(msg);
-            } finally {
-                setIsMatchCreating(false);
-            }
+                // Asegúrate de que difficulty tenga un valor por defecto si es undefined
+                const diffValue = difficulty !== undefined ? difficulty : 1;
+                const m = await createMatch(true, diffValue); // Enviamos el valor asegurado
+                setMatchId(m.id);
+            } catch (e) { console.error(e); }
         };
-        
-        createGameMatch();
+        initMatch();
     }, [difficulty]);
 
     // Effect to trigger game over sounds and finish match
@@ -102,6 +88,9 @@ const GameScreen: React.FC = () => {
                     const winnerId = gameResult === 'win' ? userId : 'bot';
                     await finishMatch(matchId, winnerId);
                     console.log(`Match finished with result: ${gameResult}`);
+                    if (gameResult === 'win') playSound('win.mp3');
+                    else playSound('gameover.mp3');
+                  
                 } catch (error) {
                     const msg = error instanceof Error ? error.message : 'Failed to finish match';
                     console.error('Match finish error:', msg);
@@ -161,12 +150,29 @@ const GameScreen: React.FC = () => {
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
-    const handleSendMessage = (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
+        const userMessage = inputValue.trim();
         playSound('click.mp3'); 
-        setMessages(prev => [...prev, { sender: 'player', text: inputValue.trim() }]);
+        setMessages(prev => [...prev, { sender: 'player', text: userMessage }]);
         setInputValue('');
+
+        try {
+            const difficultyMap = ['easy', 'medium', 'hard'] as const;
+            const reply = await requestBotChatReply({
+                messages: [...messages, { sender: 'player', text: userMessage }],
+                difficulty: difficultyMap[difficulty] ?? 'medium',
+                botId: 'robot',
+                size: size,
+                currentPlayer: 1,
+                boardState
+            });
+            setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
+        } catch (err) {
+            console.error('Chat error:', err);
+            setMessages(prev => [...prev, { sender: 'bot', text: '⚠️ Connection error. Please try again.' }]);
+        }
     };
 
     useEffect(() => {
@@ -211,8 +217,8 @@ const GameScreen: React.FC = () => {
         setBotCooldown(true);
         setTimeout(async () => {
             try {
-                const yenLayout = boardToYen(newBoard, size);
-                const turnCount = Object.keys(newBoard).length;
+                const yenLayout = boardToYen(newBoardState, size);
+                const turnCount = Object.keys(newBoardState).length;
                 const position = JSON.stringify({
                     size,
                     turn: turnCount,
@@ -226,19 +232,19 @@ const GameScreen: React.FC = () => {
                 else if (difficulty === 2) botId = 'hard_bot';
                 const coords = await getBotMove(position, botId);
                 const botKey = `${coords.x}-${coords.y}-${coords.z}`;
-                const afterBot = { ...newBoard, [botKey]: 2 };
+                const afterBot = { ...newBoardState, [botKey]: 2 };
                 setBoardState(afterBot);
                 playSound('place-tile.mp3');
                 if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
             } catch (error) {
                 console.error("Error getting bot move:", error);
                 // Fallback to random
-                const available = cells.filter(c => !newBoard[`${c.x}-${c.y}-${c.z}`]);
+                const available = cells.filter(c => !newBoardState[`${c.x}-${c.y}-${c.z}`]);
                 if (available.length > 0) {
                     const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % available.length;
                     const botCell = available[randomIndex];
                     const botKey = `${botCell.x}-${botCell.y}-${botCell.z}`;
-                    const afterBot = { ...newBoard, [botKey]: 2 };
+                    const afterBot = { ...newBoardState, [botKey]: 2 };
                     setBoardState(afterBot);
                     playSound('place-tile.mp3');
                     if (checkWin(afterBot, 2, size, cells)) setGameResult('lose');
@@ -376,7 +382,13 @@ const GameScreen: React.FC = () => {
                         </div>
                         <div className="chat-messages">
                             {messages.map((msg, index) => (
-                                <div key={index} className="message sent" style={{ backgroundColor: p1Color }}>{msg.text}</div>
+                                <div 
+                                    key={index} 
+                                    className={msg.sender === 'player' ? 'message sent' : 'message received'}
+                                    style={msg.sender === 'player' ? { backgroundColor: p1Color } : { backgroundColor: '#333', color: '#fff' }}
+                                >
+                                    {msg.text}
+                                </div>
                             ))}
                         </div>
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
