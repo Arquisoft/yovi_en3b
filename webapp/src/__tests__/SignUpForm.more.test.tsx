@@ -1,31 +1,24 @@
-
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { I18nProvider } from '../i18n/Provider';
 import SignUpForm from '../components/SignUp/SignUpForm';
 
 const mockNavigate = vi.fn();
 const mockPlaySound = vi.fn();
 
-const renderWithProviders = (ui: React.ReactElement) => {
-    return render(ui);
-};
-
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate,
+    MemoryRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('../context/SettingsContext', () => ({
-  useSettings: () => ({
-    playSound: mockPlaySound,
-  }),
+    useSettings: () => ({
+        playSound: mockPlaySound,
+        startBackgroundMusic: vi.fn(),
+    }),
+    SettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-/**
- * Global mock for the Web Audio API.
- * JSDOM (the test environment) does not support audio playback. 
- * This stub replaces the native 'Audio' constructor with a fake object 
- * to prevent "TypeError: Audio is not a constructor" or ".play() is undefined" errors.
- */
 vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     return {
         play: vi.fn().mockResolvedValue(undefined),
@@ -40,62 +33,61 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function () {
     };
 }));
 
+const getNicknameInput = () => document.querySelector('input[name="nickname"]') as HTMLInputElement;
+const getUsernameInput = () => document.querySelector('input[name="username"]') as HTMLInputElement;
+const getEmailInput    = () => document.querySelector('input[name="email"]')    as HTMLInputElement;
+const getPasswordInput = () => document.querySelector('input[name="password"]') as HTMLInputElement;
+const getSubmitBtn     = () => document.querySelector('button[type="submit"]')  as HTMLButtonElement;
+
+const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+        <I18nProvider>
+            {ui}
+        </I18nProvider>
+    );
+};
+
 describe('SignUpForm extra coverage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test('shows error when API returns non-ok response', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      json: () => Promise.resolve({ message: 'User exists' }),
-    } as Response);
-
-    renderWithProviders(<SignUpForm />);
-
-    fireEvent.change(screen.getByLabelText(/NICKNAME/i), {
-      target: { name: 'nickname', value: 'Nick' },
-    });
-    fireEvent.change(screen.getByLabelText(/USERNAME/i), {
-      target: { name: 'username', value: 'user' },
-    });
-    fireEvent.change(screen.getByLabelText(/EMAIL/i), {
-      target: { name: 'email', value: 'a@b.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/PASSWORD/i), {
-      target: { name: 'password', value: 'Password1!' },
+    beforeEach(() => {
+        vi.clearAllMocks();
+        localStorage.clear();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /save account/i }));
+    test('shows error when API returns non-ok response', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            json: () => Promise.resolve({ message: 'User exists' }),
+        } as Response);
 
-    expect(await screen.findByText(/User exists/i)).toBeDefined();
-  }, 10000);
+        renderWithProviders(<SignUpForm />);
 
-  test('navigates on successful signup', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({}),
-    } as Response);
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'Nick' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'user' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'a@b.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Password1!' } });
 
-    renderWithProviders(<SignUpForm />);
+        fireEvent.click(getSubmitBtn());
 
-    fireEvent.change(screen.getByLabelText(/NICKNAME/i), {
-      target: { name: 'nickname', value: 'Nick' },
-    });
-    fireEvent.change(screen.getByLabelText(/USERNAME/i), {
-      target: { name: 'username', value: 'user' },
-    });
-    fireEvent.change(screen.getByLabelText(/EMAIL/i), {
-      target: { name: 'email', value: 'a@b.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/PASSWORD/i), {
-      target: { name: 'password', value: 'Password1!' },
-    });
+        expect(await screen.findByText(/User exists/i)).toBeDefined();
+    }, 10000);
 
-    fireEvent.click(screen.getByRole('button', { name: /save account/i }));
+    test('navigates on successful signup', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({}),
+        } as Response);
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/menu');
-    });
-  }, 10000);
+        renderWithProviders(<SignUpForm />);
+
+        fireEvent.change(getNicknameInput(), { target: { name: 'nickname', value: 'Nick' } });
+        fireEvent.change(getUsernameInput(), { target: { name: 'username', value: 'user' } });
+        fireEvent.change(getEmailInput(),    { target: { name: 'email',    value: 'a@b.com' } });
+        fireEvent.change(getPasswordInput(), { target: { name: 'password', value: 'Password1!' } });
+
+        fireEvent.click(getSubmitBtn());
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/menu');
+        });
+    }, 10000);
 });
