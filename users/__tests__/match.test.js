@@ -178,8 +178,7 @@ describe('POST /matches/finish', () => {
             .set('Accept', 'application/json');
 
         expect(res.status).toBe(400);
-        //expect(res.body.error).toMatch(/winnerId|required/i);
-        expect(res.body.error).toBe(''); // We dont need "winnerId" anymore
+        expect(res.body.error).toMatch(/winnerId|required/i);
     });
 
     it('Returns 404 if match not found', async () => {

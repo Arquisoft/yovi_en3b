@@ -6,22 +6,34 @@ interface SettingsContextType {
   setBrightness: (v: number) => void;
   colorBlindMode: boolean;
   setColorBlindMode: (v: boolean) => void;
-  neonMode: boolean; // State for neon mode
-  toggleNeonMode: () => void; // Function to switch neon mode
-  volume: number;
-  setVolume: (v: number) => void;
-  isMuted: boolean;
-  setIsMuted: (v: boolean) => void;
-  playSound: (sound: string) => void;
-  startBackgroundMusic: () => void;
+  neonMode: boolean;
+  toggleNeonMode: () => void;
+  volume: number; 
+  setVolume: (v: number) => void; 
+  isMuted: boolean; 
+  setIsMuted: (v: boolean) => void; 
   confirmMove: boolean;
   setConfirmMove: (v: boolean) => void;
-  // CORRECCIÓN: Añadidos a la interfaz para que TS los reconozca
-  tutorEnabled: boolean; 
-  setTutorEnabled: (v: boolean) => void; 
+  tutorEnabled: boolean;
+  setTutorEnabled: (v: boolean) => void;
+  startBackgroundMusic: () => void;
+  playSound: (sound: string) => void; 
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+function createAudioSafely(src: string): HTMLAudioElement | null {
+  if (typeof Audio === 'undefined') {
+    return null;
+  }
+
+  try {
+    return new Audio(src);
+  } catch (error) {
+    console.error(`Could not initialize audio for ${src}`, error);
+    return null;
+  }
+}
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brightness, setBrightness] = useState(100);
@@ -39,12 +51,21 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setNeonMode((prev) => !prev); 
   };
 
+  // --- EFECTO DE BRILLO ---
   useEffect(() => {
-    document.documentElement.style.filter = `brightness(${brightness}%)`;
-  }, [brightness]);
+    // Aplicamos el filtro directamente al elemento raíz del documento
+    // Esto afectará a toda la webapp
+    document.documentElement.style.filter = `brightness(${brightness}%)`; // Apply brightness filter to the entire app
+  }, [brightness]); // Se ejecuta cada vez que mueves el slider de brillo
 
+  // Inicializar música de fondo
   useEffect(() => {
-    const audio = new Audio('/sounds/gameb.mp3');
+    const audio = createAudioSafely('/sounds/gameb.mp3');
+    if (!audio) {
+      bgMusicRef.current = null;
+      return undefined;
+    }
+
     audio.loop = true;
     bgMusicRef.current = audio;
     return () => audio.pause();
@@ -54,6 +75,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (bgMusicRef.current) {
       bgMusicRef.current.volume = volume / 100;
       bgMusicRef.current.muted = isMuted;
+      if (hasInteracted && !isMuted && volume > 0) {
+        bgMusicRef.current.play().catch(() => {});
+      }
     }
   }, [volume, isMuted]);
 
@@ -64,11 +88,20 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const playSound = (soundFile: string) => {
-    if (!hasInteracted) setHasInteracted(true);
+    if (!hasInteracted) setHasInteracted(true); 
     if (isMuted) return;
-    const audio = new Audio(`/sounds/${soundFile}`);
-    audio.volume = volume / 100;
-    audio.play().catch(err => console.error("FX Error:", err));
+
+    const audio = createAudioSafely(`/sounds/${soundFile}`);
+    if (!audio) {
+      return;
+    }
+
+    try {
+      audio.volume = volume / 100;
+      audio.play().catch(() => {});
+    } catch (error) {
+      console.error("Error playing sound");
+    }
   };
 
   return (

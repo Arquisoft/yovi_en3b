@@ -1,8 +1,7 @@
-// UBICACIÓN: webapp/src/components/SettingsModal/SettingsModal.tsx
-import React from 'react';
-import { useSettings } from '../../context/SettingsContext';
-import { useI18n } from '../../i18n/useTranslation';
-import '../../App.css';
+import React from 'react'; 
+import { useSettings } from '../../context/SettingsContext'; 
+import { useI18n } from '../../i18n/useTranslation'; 
+import '../../App.css'; 
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -10,6 +9,7 @@ interface SettingsModalProps {
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const { t } = useI18n();
+  const labels = t.labels as Record<string, string>;
   const {
     brightness, setBrightness,
     colorBlindMode, setColorBlindMode,
@@ -52,10 +52,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           {/* CONTROL DE BRILLO */}
           <div className="setting-item">
             <label className="modal-text">{t.labels.brightness}: {brightness}%</label>
-            <input
-              type="range" min="50" max="150"
-              value={brightness}
-              onChange={(e) => setBrightness(Number(e.target.value))} 
+            <input 
+              type="range" min="50" max="150" 
+              value={brightness} 
+              onChange={(e) => setBrightness(Number(e.target.value))} // Activa el useEffect del Contexto
               className="settings-slider"
             />
           </div>
@@ -110,7 +110,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           {/* CONFIRM MOVE */}
           <div className="setting-item">
             <label className="modal-text">
-              {t.labels.confirmMove || 'CONFIRMAR MOVIMIENTO'}
+              {labels.confirmMove || 'CONFIRMAR MOVIMIENTO'}
             </label>
             <button
               className={`opt-btn ${confirmMove ? 'active' : ''}`}
@@ -123,7 +123,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           {/* TUTOR BOT ENABLE/DISABLE */}
           <div className="setting-item">
             <label className="modal-text">
-              {t.labels.tutorEnabled || 'ASISTENTE TUTOR'}
+              {labels.tutorEnabled || 'ASISTENTE TUTOR'}
             </label>
             <button
               className={`opt-btn ${tutorEnabled ? 'active' : ''}`}

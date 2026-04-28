@@ -49,9 +49,10 @@ const RegisterForm: React.FC = () => {
           localStorage.setItem('token', token);
         }
         startBackgroundMusic(); 
-        localStorage.setItem('username', username);
-        localStorage.setItem('userId', data.id || '');
-        navigate('/menu'); 
+        localStorage.setItem('username', username); // Save username for global reference
+        localStorage.setItem('userId', data.id || ''); // Save user ID for match creation
+        console.log('Login stored userId:', localStorage.getItem('userId'));
+        navigate('/menu'); // Redirect user to the main menu
       } else {
         setError(data.message || t.messages.loginError); // Texto traducido
       }

@@ -20,7 +20,6 @@ const createMatch = async (matchDataOrBluePlayerId, redPlayerId, isBot, botDiffi
             isBot,
             botDifficulty,
         };
-
     const values = [
         matchData.bluePlayerId,
         matchData.redPlayerId,

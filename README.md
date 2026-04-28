@@ -211,6 +211,9 @@ This command will build the Docker images for both the `webapp` and `users` serv
 - User service API: [http://localhost:3000](http://localhost:3000)
 - Gamey API: [http://localhost:4000](http://localhost:4000)
 
+Chat with the bot requires `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) to be defined before starting Docker Compose so the `gamey` service can answer chat requests.
+The frontend expects Gamey on `http://localhost:4000` unless `VITE_GAMEY_URL` is overridden. Chat requests now fail gracefully if the service is unreachable or takes too long to respond. The optional `VITE_GAMEY_CHAT_TIMEOUT_MS` build variable can be used to change the frontend timeout (default: `15000` ms).
+
 ### Without Docker
 
 To run the project locally without Docker, you will need to run each component in a separate terminal.
@@ -267,6 +270,9 @@ The web application will be available at `http://localhost:5173`.
 
 At this moment the GameY application is not needed but once it is needed you should also start it from the command line.
 
+If you want the in-game chat to work locally, `gamey` must be running and `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) must be exported in the shell before starting it. The frontend expects Gamey on `http://localhost:4000` unless `VITE_GAMEY_URL` is overridden.
+If the bot takes too long to answer, the frontend now shows a timeout message instead of leaving the chat stuck in the loading state. You can adjust that limit with `VITE_GAMEY_CHAT_TIMEOUT_MS` (default: `15000` ms).
+
 ## Available Scripts
 
 Each component has its own set of scripts defined in its `package.json`. Here are some of the most important ones:
@@ -295,8 +301,52 @@ Each component has its own set of scripts defined in its `package.json`. Here ar
 - `npm run build`: Generates the documentation
 - `npm run deploy`: Deploys the documentation to GitHub Pages 
 
+---
+
+## 🔧 Setup Issues and Solutions
+
+### In-Game Chat Reliability
+
+**Issue:** The bot could appear to "not answer" even when the browser showed no visible error. In practice there were two fragile points in the frontend chat flow:
+- a browser audio error could interrupt message sending before the new chat message was rendered
+- a slow or unreachable `gamey` service could leave the UI waiting without useful feedback
+
+**Solution:** We hardened the chat flow in the frontend:
+- sound playback failures are now handled safely, so they do not block sending messages
+- chat requests now use a frontend timeout and display a clear fallback error
+- the chat panel auto-scrolls so new messages and bot replies are immediately visible
+
+**Configuration:**
+- `VITE_GAMEY_URL`: URL of the Gamey service. Defaults to `http://localhost:4000`
+- `VITE_GAMEY_CHAT_TIMEOUT_MS`: Optional frontend timeout for bot replies. Defaults to `15000`
+
+**Why this matters:**
+- A player message is still rendered even if the browser cannot play UI sounds
+- Users get visible feedback when Gamey is down or too slow
+- The chat feels more reliable both in local development and in deployed builds
+
+### Gamey Dockerfile - OpenSSL Dependencies
+
+**Issue:** The Gamey Rust application requires OpenSSL runtime libraries to function properly in the Docker container. Without these dependencies, the container would fail to start with errors like `cannot open shared object file: libssl.so.3: No such file or directory`.
+
+**Solution:** The `gamey/Dockerfile` was modified to include the necessary runtime dependencies in the final stage:
+
+```dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl3 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+**Why this matters:**
+- **libssl3**: Required by OpenSSL-dependent Rust crates (e.g., Anthropic API client)
+- **ca-certificates**: Necessary for HTTPS/TLS connections to external APIs
+- The multi-stage Docker build uses `rust:latest` for compilation, but `debian:bookworm-slim` for the runtime. The slim image doesn't include these dependencies by default.
+
+This ensures the Gamey service can start properly and communicate with external services via HTTPS.
 
 ---
+
 ## 👥 Contributors
 
 We are **Group EN3B**, a team of students at the University of Oviedo.

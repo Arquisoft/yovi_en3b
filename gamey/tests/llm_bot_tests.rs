@@ -1,4 +1,6 @@
-use gamey::bot::llm_bot::{DifficultyLevel, LLMBot, AnthropicClient, AnthropicRequest, AnthropicMessage};
+use gamey::bot::llm_bot::{
+    AnthropicClient, AnthropicMessage, AnthropicRequest, DifficultyLevel, LLMBot,
+};
 use gamey::{GameY, YBot, YEN};
 
 // ============================================================================
@@ -119,7 +121,7 @@ fn test_llm_bot_choose_move_empty_board() {
 
     assert!(move_result.is_some());
     let coords = move_result.unwrap();
-    
+
     // Verify coordinates are within valid range
     assert!(coords.x() < 3 || coords.y() < 3 || coords.z() < 3);
 }
@@ -201,7 +203,10 @@ fn test_llm_bot_easy_still_makes_moves() {
     // Multiple tries to ensure we still get moves even with 20% random
     for _ in 0..10 {
         let move_result = bot.choose_move(&game_y);
-        assert!(move_result.is_some(), "Easy bot should always return a move");
+        assert!(
+            move_result.is_some(),
+            "Easy bot should always return a move"
+        );
     }
 }
 
@@ -328,7 +333,6 @@ fn test_multiple_bots_same_difficulty() {
 // Board state formatting tests
 // ============================================================================
 
-
 // ============================================================================
 // LLMBot move selection - Random vs Strategic
 // ============================================================================
@@ -348,27 +352,22 @@ fn test_llm_bot_chooses_from_available_cells() {
     for _ in 0..10 {
         let coords = bot.choose_move(&game_y).expect("Bot should return a move");
         let index = coords.to_index(3);
-        assert!(game_y.available_cells().contains(&index), "Move should be from available cells");
+        assert!(
+            game_y.available_cells().contains(&index),
+            "Move should be from available cells"
+        );
     }
 }
 
 #[test]
 fn test_llm_bot_different_difficulties_behavior() {
-    let easy_bot = LLMBot::new(
-        "easy".to_string(),
-        DifficultyLevel::Easy,
-        "key".to_string(),
-    );
+    let easy_bot = LLMBot::new("easy".to_string(), DifficultyLevel::Easy, "key".to_string());
     let medium_bot = LLMBot::new(
         "medium".to_string(),
         DifficultyLevel::Medium,
         "key".to_string(),
     );
-    let hard_bot = LLMBot::new(
-        "hard".to_string(),
-        DifficultyLevel::Hard,
-        "key".to_string(),
-    );
+    let hard_bot = LLMBot::new("hard".to_string(), DifficultyLevel::Hard, "key".to_string());
 
     let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
     let game_y = GameY::try_from(yen).expect("Failed to create GameY");
@@ -396,7 +395,10 @@ fn test_llm_bot_consistency_multiple_calls() {
 
     // Multiple calls should always return a move
     for _ in 0..20 {
-        assert!(bot.choose_move(&game_y).is_some(), "Bot should consistently return moves");
+        assert!(
+            bot.choose_move(&game_y).is_some(),
+            "Bot should consistently return moves"
+        );
     }
 }
 
@@ -405,12 +407,10 @@ fn test_anthropic_request_serialization() {
     let request = AnthropicRequest {
         model: "claude-3-5-sonnet-20241022".to_string(),
         max_tokens: 100,
-        messages: vec![
-            AnthropicMessage {
-                role: "user".to_string(),
-                content: "test message".to_string(),
-            }
-        ],
+        messages: vec![AnthropicMessage {
+            role: "user".to_string(),
+            content: "test message".to_string(),
+        }],
     };
 
     let json = serde_json::to_string(&request).expect("Should serialize");
@@ -435,11 +435,7 @@ fn test_difficulty_level_serialization() {
 
 #[test]
 fn test_llm_bot_difficulty_getter() {
-    let bot = LLMBot::new(
-        "test".to_string(),
-        DifficultyLevel::Hard,
-        "key".to_string(),
-    );
+    let bot = LLMBot::new("test".to_string(), DifficultyLevel::Hard, "key".to_string());
 
     assert_eq!(bot.difficulty(), DifficultyLevel::Hard);
 }
@@ -483,7 +479,12 @@ fn test_llm_bot_move_valid_within_board() {
         "key".to_string(),
     );
 
-    let yen = YEN::new(4, 0, vec!['B', 'R'], ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....");
+    let yen = YEN::new(
+        4,
+        0,
+        vec!['B', 'R'],
+        ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....",
+    );
     let game_y = GameY::try_from(yen).expect("Failed to create GameY");
 
     for _ in 0..10 {

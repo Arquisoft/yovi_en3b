@@ -17,7 +17,6 @@ const updateRanking = async (userId, { totalMatches, winMatches } = {}) => {
   const newScore = 50 * (2 * newWin - newTotal);
 
   const values = [newTotal, newWin, newScore, userId];
-
   const { rows } = await db.query(queries.updateRanking, values);
   return rows[0];
 };
@@ -42,4 +41,11 @@ const getTotalRankingsCount = async () => {
   return rows[0].total;
 };
 
-module.exports = { addToRanking, updateRanking, getRankingByUser, getAllRankings, getGlobalRankings, getTotalRankingsCount };
+module.exports = {
+  addToRanking,
+  updateRanking,
+  getRankingByUser,
+  getAllRankings,
+  getGlobalRankings,
+  getTotalRankingsCount
+};

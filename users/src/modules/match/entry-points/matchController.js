@@ -45,7 +45,7 @@ async function finishMatch(req, res) {
     try {
         const { matchId, winnerId } = req.body;
         
-        if (!matchId) {
+        if (!matchId || !winnerId) {
             return res.status(400).json({ error: "matchId and winnerId are required" });
         }
         
@@ -60,54 +60,6 @@ async function finishMatch(req, res) {
     }
 }
 
-const evaluateBoard = async (req, res) => {
-    try {
-        /*
-        const { URL } = require('node:url');
-
-        const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
-
-        const rawUrl = process.env.BOT_SERVICE_URL ?? 'http://gamey:4000';
-        const parsedUrl = new URL(rawUrl);
-
-        if (!ALLOWED_HOSTS.includes(parsedUrl.hostname)) {
-            return res.status(500).json({ error: 'Invalid configuration' });
-        }
-
-        const rustResponse = await axios.post(
-            `${parsedUrl.origin}/v1/evaluate`,
-            req.body
-        );
-        */
-       // Validar estructura del payload (previene inyección desde datos de usuario)
-        const allowedKeys = ['size', 'turn', 'players', 'layout'];
-        const sanitizedPayload = {};
-        for (const key of allowedKeys) {
-            if (req.body[key] !== undefined) {
-                sanitizedPayload[key] = req.body[key];
-            }
-        }
-
-        const rustResponse = await axios.post(
-            `http://gamey:4000/v1/evaluate`,
-            sanitizedPayload
-        );
-
-        return res.status(200).json(rustResponse.data);
-
-    } catch (error) {
-        console.error("Error connecting to Rust engine:", error.message);
-        
-        if (error.response) {
-            return res.status(error.response.status).json(error.response.data);
-        }
-
-        return res.status(500).json({ 
-            error: "Internal server error connecting to game engine" 
-        });
-    }
-};
-
 module.exports = {
     getPlayerMatches,
     getPlayerMatchHistory,
@@ -115,5 +67,4 @@ module.exports = {
     getMatchHistory: getPlayerMatchHistory,
     createMatch,
     finishMatch,
-    evaluateBoard,
 };

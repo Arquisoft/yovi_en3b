@@ -1,6 +1,13 @@
 import React from 'react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 
 interface ScoreData {
@@ -14,10 +21,7 @@ interface MatchGraphProps {
 }
 
 export const MatchGraph: React.FC<MatchGraphProps> = ({ data }) => {
-  // If there is no data, we dont draw the graph
   if (!data || data.length === 0) return null;
-
-  console.log("Datos pintando la gráfica:", data);
 
   return (
     <div style={{ width: '100%', height: '180px', margin: '10px 0', minWidth: '200px' }}>

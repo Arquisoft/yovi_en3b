@@ -43,6 +43,7 @@ const findUserById = async (id) => {
     const result = await db.query(queries.findUserById, [id]);
     return result.rows[0];
 }
+
 module.exports = {
     createUser,
     findUserByUsername,
