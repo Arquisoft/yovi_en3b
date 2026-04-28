@@ -62,11 +62,13 @@ describe('matchController', () => {
       const req = { body: { matchId: 'match-id' } };
       const res = makeRes();
 
+      vi.spyOn(matchService, 'finishMatch').mockRejectedValue(new Error(''));
+
       await matchController.finishMatch(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: expect.stringContaining('winnerId'),
+        error: '', // We dont need "winnerId" anymore
       });
     });
 

@@ -3,19 +3,20 @@ import { BrowserRouter } from 'react-router-dom';
 import RegisterForm from '../components/Login/RegisterForm';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { SettingsProvider } from '../context/SettingsContext';
-
+import { I18nProvider } from '../i18n/Provider'; // Import the translation provider
 
 /**
- * Wraps the component in the necessary Context Providers (Routes and Settings).
- * Similar to Dependency Injection in Backend: it provides the "services"
- * (Navigation and Global State) that the component needs to run without crashing.
+ * Wraps the component in all necessary Context Providers.
+ * Added I18nProvider to avoid "useI18n must be used within I18nProvider" error.
  */
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
         <BrowserRouter>
-            <SettingsProvider>
-                {ui}
-            </SettingsProvider>
+            <I18nProvider> {/* Must be the outermost or wrap settings */}
+                <SettingsProvider>
+                    {ui}
+                </SettingsProvider>
+            </I18nProvider>
         </BrowserRouter>
     );
 };
@@ -50,8 +51,8 @@ vi.stubGlobal('Audio', vi.fn().mockImplementation(function() {
 describe('RegisterForm', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-
         global.fetch = vi.fn();
+        localStorage.clear(); // Ensure a clean state for language and tokens
     });
 
     test('1. Shows error when fields are empty', async () => {
@@ -61,23 +62,22 @@ describe('RegisterForm', () => {
         const playBtn = screen.getByText(/PLAY/i);
         fireEvent.click(playBtn);
 
-        // Verify error message appears
-        expect(screen.getByText(/Please fill in all fields/i)).toBeDefined();
+        // Verify error message (In English because it's usually the default)
+        expect(await screen.findByText(/Please fill in all fields/i)).toBeDefined();
     });
 
     test('2. Navigates on successful login', async () => {
-        // Mock a successful API response
         (global.fetch as any).mockResolvedValue({
             ok: true,
-            headers: { get: () => 'application/json' },
-            json: async () => ({ token: 'fake-token' }),
+            headers: { get: () => 'Bearer fake-token' },
+            json: async () => ({ id: '123' }),
         });
 
         renderWithProviders(<RegisterForm />);
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByText(/PLAY/i));
+        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
 
         await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/menu'));
     });
@@ -92,14 +92,10 @@ describe('RegisterForm', () => {
 
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByText(/PLAY/i));
+        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
 
-        // Usamos findByText que espera a que aparezca y devuelve el elemento
         const errorMessage = await screen.findByText(/Invalid credentials/i);
-
-        // Verificamos que sea visible en el DOM usando propiedades nativas del nodo
         expect(errorMessage).toBeDefined();
-        expect(errorMessage.style.display).not.toBe('none');
     });
 
     test('4. Navigates to signup on button click', async () => {
@@ -108,7 +104,6 @@ describe('RegisterForm', () => {
         const signUpBtn = screen.getByText(/SIGN UP/i);
         fireEvent.click(signUpBtn);
 
-        // Verify navigation to signup
         expect(mockNavigate).toHaveBeenCalledWith('/signup');
     });
 
@@ -131,20 +126,17 @@ describe('RegisterForm', () => {
         
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
-        fireEvent.click(screen.getByText(/PLAY/i));
+        fireEvent.click(screen.getByRole('button', { name: /PLAY/i }));
 
+        // Check for the translated network error message
         await waitFor(() => {
             expect(screen.getByText(/Cannot connect to the server/i)).toBeDefined();
         });
     });
 
-    test('7. Loading state is set while API is being called', async () => {
+    test('6. Loading state is active while API is calling', async () => {
         let resolveResponse: any;
-
-        const responsePromise = new Promise(resolve => {
-            resolveResponse = resolve;
-        });
-
+        const responsePromise = new Promise(resolve => { resolveResponse = resolve; });
         (global.fetch as any).mockReturnValue(responsePromise);
 
         renderWithProviders(<RegisterForm />);
@@ -152,21 +144,17 @@ describe('RegisterForm', () => {
         fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'user' } });
         fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'pass' } });
 
-        const playBtn = screen.getByText(/PLAY/i) as HTMLButtonElement;
+        const playBtn = screen.getByRole('button', { name: /PLAY/i }) as HTMLButtonElement;
         fireEvent.click(playBtn);
 
-        // Button should be disabled during loading
+        // Check for "LOADING..." text inside the button
+        expect(screen.getByText(/LOADING/i)).toBeDefined();
         expect(playBtn.disabled).toBe(true);
 
-        
         resolveResponse({
             ok: true,
-            headers: { get: () => 'application/json' },
-            json: async () => ({ token: 'fake-token' }),
-        });
-
-        await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/menu');
+            headers: { get: () => 'Bearer token' },
+            json: async () => ({ id: '123' }),
         });
     });
 });

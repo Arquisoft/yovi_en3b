@@ -45,7 +45,7 @@ async function finishMatch(req, res) {
     try {
         const { matchId, winnerId } = req.body;
         
-        if (!matchId || !winnerId) {
+        if (!matchId) {
             return res.status(400).json({ error: "matchId and winnerId are required" });
         }
         

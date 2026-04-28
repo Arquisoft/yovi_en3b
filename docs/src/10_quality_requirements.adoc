@@ -15,19 +15,9 @@ endif::arc42help[]
 
 The following quality tree provides a high-level overview of the quality attributes that are most important for the **GAME Y** system, broken down into specific evaluation areas and prioritized to guide architectural decisions.
 
-* **Quality**
-    * **Usability**
-        * Accessibility (Colorblind support) -> See [US-1]
-        * Internationalization (Multi-language) -> See [US-2]
-    * **Performance**
-        * AI Response Time (Bot algorithms) -> See [PE-1]
-        * UI Responsiveness (Hexagonal grid rendering) -> See [PE-2]
-    * **Security**
-        * Data Privacy (Password encryption with Bcrypt) -> See [SE-1]
-        * Input Validation (Registration integrity) -> See [SE-2]
-    * **Maintainability & Testability**
-        * Automated Testing (E2E & Integration with Playwright) -> See [MT-1]
-        * Architectural Cleanliness (Layer separation) -> See [MT-2]
+.Quality Tree
+image::10_1-quality-tree.png[]
+
 
 === Quality Scenarios
 

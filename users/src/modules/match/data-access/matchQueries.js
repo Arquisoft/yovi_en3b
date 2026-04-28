@@ -30,18 +30,10 @@ module.exports = {
         WHEN m.is_bot THEN NULL
         WHEN m.blue_player_id = $1 THEN red_user.photo
         ELSE blue_user.photo
-      END AS opponent_avatar_id,
-      ((latest_save.resulting_board_state::jsonb ->> 'size')::int) AS board_size
+      END AS opponent_avatar_id
     FROM matches m
     LEFT JOIN users blue_user ON blue_user.id = m.blue_player_id
     LEFT JOIN users red_user ON red_user.id = m.red_player_id
-    LEFT JOIN LATERAL (
-      SELECT resulting_board_state
-      FROM game_saves gs
-      WHERE gs.match_id = m.id
-      ORDER BY gs.move_number DESC
-      LIMIT 1
-    ) latest_save ON true
     WHERE m.blue_player_id = $1 OR m.red_player_id = $1
     ORDER BY m.created_at DESC;
    `,

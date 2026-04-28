@@ -68,9 +68,8 @@ We are a coordinated team working across different layers of the stack to delive
 yovi_en3b/
 ├── 📁 docs/                  # Arc42 documentation & meeting minutes
 ├── 📁 gamey/                 # Rust-based Game Engine (Logic & AI)
-├── 📁 restapi/               # Node.js + Express backend (Business Logic)
+├── 📁 users/               # Node.js + Express backend (Business Logic)
 ├── 📁 webapp/                # React + TypeScript frontend (User Interface)
-├── 📁 utils-development/     # Folder only for development notes or instructions
 └── 🐳 docker-compose.yml  # System orchestration
 ```
 
@@ -79,8 +78,8 @@ yovi_en3b/
 ## Basic Features
 
 - **User Registration**: The web application provides a simple form to register new users.
-- **User Service**: The user service receives the registration request, simulates some processing, and returns a welcome message.
-- **GameY**: A basic Game engine which only chooses a random piece.
+- **User Service**: The user service receives the registration request, it process the data sent and allow or disallow the registration.
+- **GameY**: A Game engine in which we can choose to play against an IA bot or a bot based on computational algorithms.
 
 ## Components
 
@@ -98,7 +97,7 @@ The `webapp` is a single-page application (SPA) created with [Vite](https://vite
 
 The `users` service is a simple REST API built with [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/).
 
-- `users-service.js`: The main file for the user service. It defines an endpoint `/createuser` to handle user creation.
+- `index.js`: The main file for the user service. It defines the different endpoints that will be used in the service (/users, /matches, /ranking).
 - `package.json`: Contains scripts to start the service.
 - `Dockerfile`: Defines the Docker image for the user service.
 

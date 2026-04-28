@@ -68,7 +68,7 @@ export async function createMatch(
  */
 export async function finishMatch(
   matchId: string,
-  winnerId: string
+  winnerId: string | null
 ): Promise<Match> {
   const res = await fetch(`${API_URL}/matches/finish`, {
     method: "POST",

@@ -1,16 +1,16 @@
 // UBICACIÓN: webapp/src/pages/HistoryPage/HistoryPage.tsx
-import React, { useEffect, useMemo, useState } from 'react'; 
-import { useNavigate } from 'react-router-dom'; 
-import { ArrowLeft, Trophy, XCircle, Calendar, Cpu, BarChart3, Target } from 'lucide-react'; 
-import { useSettings } from '../../context/SettingsContext'; 
-import { useI18n } from '../../i18n/useTranslation'; 
-import './HistoryPage.css'; 
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Trophy, XCircle, Calendar, Gauge, BarChart3, Target } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
+import { useI18n } from '../../i18n/useTranslation';
+import './HistoryPage.css';
 import { getMyMatchHistory, type MatchHistoryEntry } from './history.api';
 
 const HistoryPage: React.FC = () => {
-    const navigate = useNavigate(); 
-    const { t } = useI18n(); 
-    const { colorBlindMode, neonMode, playSound } = useSettings(); 
+    const navigate = useNavigate();
+    const { t } = useI18n();
+    const { colorBlindMode, neonMode, playSound } = useSettings();
     const [matches, setMatches] = useState<MatchHistoryEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -39,14 +39,16 @@ const HistoryPage: React.FC = () => {
 
     // Lógica simplificada: si no es 'win', es 'lose' (por abandono o derrota real)
     const processedMatches = useMemo(() => {
-        return matches.map(m => ({
-            ...m,
-            result: m.result === 'win' ? 'win' : 'lose'
-        }));
+        return matches
+            //.filter(m => m.status === 'finished')
+            .map(m => ({
+                ...m,
+                result: m.result === 'win' ? 'win' : 'lose'
+            }));
     }, [matches]);
 
-    const totalMatches = processedMatches.length; 
-    const wins = processedMatches.filter(m => m.result === 'win').length; 
+    const totalMatches = processedMatches.length;
+    const wins = processedMatches.filter(m => m.result === 'win').length;
     const winRate = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0;
 
     const formatMatchDate = (value: string) => new Date(value).toLocaleDateString('en-CA');
@@ -55,12 +57,20 @@ const HistoryPage: React.FC = () => {
         return result === 'win' ? t.buttons.victory : t.buttons.defeat;
     };
 
+    const getDifficultyStyle = (opponent: string) => {
+        const lowerName = opponent.toLowerCase();
+        if (lowerName.includes('easy')) return { label: 'Easy', className: 'diff-easy' };
+        if (lowerName.includes('medium')) return { label: 'Medium', className: 'diff-medium' };
+        if (lowerName.includes('hard')) return { label: 'Hard', className: 'diff-hard' };
+        return { label: opponent, className: '' };
+    };
+
     return (
         <div className={`history-container ${colorBlindMode ? 'color-blind' : ''} ${neonMode ? 'neon-mode' : ''}`}>
             <header className="history-header">
                 <h1 className="title-game">{t.buttons.history}</h1>
                 <button className="icon-btn-back" onClick={() => { playSound('click.mp3'); navigate('/menu'); }}>
-                    <ArrowLeft size={35} /> 
+                    <ArrowLeft size={35} />
                 </button>
             </header>
 
@@ -98,18 +108,20 @@ const HistoryPage: React.FC = () => {
                 {!loading && !error && processedMatches.map((match) => (
                     <div key={match.id} className={`history-card ${match.result}`}>
                         <div className="card-status-icon">
-                            {match.result === 'win' ? 
-                                <Trophy size={32} className="icon-win" /> : 
+                            {match.result === 'win' ?
+                                <Trophy size={32} className="icon-win" /> :
                                 <XCircle size={32} className="icon-lose" />
                             }
                         </div>
-                        
+
                         <div className="card-details">
                             <div className="detail-row">
                                 <Calendar size={16} /> <span>{formatMatchDate(match.date)}</span>
                             </div>
                             <div className="detail-row">
-                                <Cpu size={16} /> <span>{t.labels.vs} {match.opponent}</span>
+                                <Gauge size={16} /> <span className={`difficulty-badge ${getDifficultyStyle(match.opponent).className}`}>
+                                    {getDifficultyStyle(match.opponent).label}
+                                </span>
                             </div>
                         </div>
 

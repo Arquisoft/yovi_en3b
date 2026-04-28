@@ -1,4 +1,4 @@
-// UBICACIÓN: webapp/src/i18n/translations.ts (o donde guardes tus strings)
+// UBICACIÓN: webapp/src/i18n/translations.ts
 
 export const translations = {
   es: {
@@ -42,6 +42,7 @@ export const translations = {
       history: 'HISTORIAL',
       victory: 'VICTORIA',
       defeat: 'DERROTA',
+      signupLink: 'REGÍSTRATE', // Enlace en la pantalla de Login
     },
     labels: {
       noMatches: 'Aún no se han registrado partidas.',
@@ -86,6 +87,7 @@ export const translations = {
       email: 'EMAIL',
       password: 'CONTRASEÑA',
       signup: 'REGISTRO',
+      noAccount: '¿NO TIENES CUENTA?',
       dontHaveAccount: '¿NO TIENES CUENTA?',
       enterName: 'Introduce tu nombre',
       typeMessage: 'Escribe un mensaje...',
@@ -94,6 +96,11 @@ export const translations = {
       neonEffects: 'EFECTOS NEÓN',
       visuals: 'VISUALES',
       wins: 'VICTORIAS',
+    },
+    placeholders: {
+      enterUsername: 'Introduce tu nombre',
+      enterNickname: 'Tu apodo en el juego',
+      enterEmail: 'correo@ejemplo.com',
     },
     messages: {
       loading: 'CARGANDO...',
@@ -135,19 +142,19 @@ export const translations = {
     },
     tutor: {
       tips: [
-    "¡Intenta conectar los bordes del triángulo!",
-    "Las esquinas son clave para cerrar el paso al rival.",
-    "No pierdas de vista el centro del tablero.",
-    "¡Bloquea al robot antes de que conecte sus piezas!",
-    "Piensa dos pasos por delante, como un maestro.",
-    "Si controlas los bordes, controlas el juego.",
-    "Busca crear una 'V' para ramificar tus opciones.",
-    "No te centres solo en un lado, el tablero es traicionero.",
-    "A veces la mejor defensa es un buen ataque.",
-    "Recuerda que las esquinas cuentan para ambos lados.",
-    "Analiza bien el último movimiento del bot.",
-    "¡No te rindas! Cada pieza cuenta en la estrategia final."
-  ]
+        "¡Intenta conectar los bordes del triángulo!",
+        "Las esquinas son clave para cerrar el paso al rival.",
+        "No pierdas de vista el centro del tablero.",
+        "¡Bloquea al robot antes de que conecte sus piezas!",
+        "Piensa dos pasos por delante, como un maestro.",
+        "Si controlas los bordes, controlas el juego.",
+        "Busca crear una 'V' para ramificar tus opciones.",
+        "No te centres solo en un lado, el tablero es traicionero.",
+        "A veces la mejor defensa es un buen ataque.",
+        "Recuerda que las esquinas cuentan para ambos lados.",
+        "Analiza bien el último movimiento del bot.",
+        "¡No te rindas! Cada pieza cuenta en la estrategia final."
+      ]
     }
   },
   en: {
@@ -173,7 +180,7 @@ export const translations = {
       logout: 'LOGOUT',
       spanish: 'SPANISH',
       english: 'ENGLISH',
-      turkish: 'TURKISH', 
+      turkish: 'TURKISH',
       yesExitAndLose: 'YES, EXIT AND LOSE',
       backToGame: 'BACK TO THE GAME',
       playNow: 'PLAY NOW',
@@ -191,6 +198,7 @@ export const translations = {
       history: 'HISTORY',
       victory: 'VICTORY',
       defeat: 'DEFEAT',
+      signupLink: 'SIGN UP',
     },
     labels: {
       noMatches: 'No matches recorded yet.',
@@ -205,7 +213,7 @@ export const translations = {
       rankingTitle: 'GLOBAL RANKING',
       user: 'USER',
       position: 'POSITION',
-      winRate: 'WIN %', 
+      winRate: 'WIN %',
       displayName: 'DISPLAY NAME',
       selectLevel: 'SELECT LEVEL',
       userProfile: 'USER PROFILE',
@@ -235,6 +243,7 @@ export const translations = {
       email: 'EMAIL',
       password: 'PASSWORD',
       signup: 'SIGN UP',
+      noAccount: "DON'T HAVE AN ACCOUNT?",
       dontHaveAccount: "DON'T HAVE AN ACCOUNT?",
       enterName: 'Enter your name',
       typeMessage: 'Type a message...',
@@ -243,6 +252,11 @@ export const translations = {
       neonEffects: 'NEON EFFECTS',
       visuals: 'VISUALS',
       wins: 'WINS',
+    },
+    placeholders: {
+      enterUsername: 'Enter your username',
+      enterNickname: 'Your in-game nickname',
+      enterEmail: 'email@example.com',
     },
     messages: {
       loading: 'LOADING...',
@@ -283,20 +297,20 @@ export const translations = {
       step3Text: 'To win, your path must connect all three sides of the triangular board. Corners count as part of both sides they touch!',
     },
     tutor: {
-     tips: [
-    "Try to connect the edges of the triangle!",
-    "Corners are key to blocking your opponent.",
-    "Don't lose sight of the center of the board.",
-    "Block the robot before it connects its pieces!",
-    "Think two steps ahead, like a master.",
-    "If you control the edges, you control the game.",
-    "Try creating a 'V' shape to branch out your options.",
-    "Don't just focus on one side; the board is tricky.",
-    "Sometimes the best defense is a good offense.",
-    "Remember, corners count for both sides they touch.",
-    "Analyze the bot's last move carefully.",
-    "Don't give up! Every piece matters in the end game."
-  ]
+      tips: [
+        "Try to connect the edges of the triangle!",
+        "Corners are key to blocking your opponent.",
+        "Don't lose sight of the center of the board.",
+        "Block the robot before it connects its pieces!",
+        "Think two steps ahead, like a master.",
+        "If you control the edges, you control the game.",
+        "Try creating a 'V' shape to branch out your options.",
+        "Don't just focus on one side; the board is tricky.",
+        "Sometimes the best defense is a good offense.",
+        "Remember, corners count for both sides they touch.",
+        "Analyze the bot's last move carefully.",
+        "Don't give up! Every piece matters in the end game."
+      ]
     }
   },
   tr: {
@@ -340,6 +354,7 @@ export const translations = {
       history: 'GEÇMİŞ',
       victory: 'GALİBİYET',
       defeat: 'MAĞLUBİYET',
+      signupLink: 'KAYIT OL',
     },
     labels: {
       noMatches: 'Henüz kayıtlı maç yok.',
@@ -384,6 +399,7 @@ export const translations = {
       email: 'E-POSTA',
       password: 'ŞİFRE',
       signup: 'KAYIT OL',
+      noAccount: 'HESABINIZ YOK MU?',
       dontHaveAccount: 'HESABINIZ YOK MU?',
       enterName: 'Adınızı girin',
       typeMessage: 'Mesaj yazın...',
@@ -392,6 +408,11 @@ export const translations = {
       neonEffects: 'NEON EFEKTLERİ',
       visuals: 'GÖRSELLER',
       wins: 'KAZANMALAR',
+    },
+    placeholders: {
+      enterUsername: 'Kullanıcı adınızı girin',
+      enterNickname: 'Oyun içi takma adınız',
+      enterEmail: 'eposta@ornek.com',
     },
     messages: {
       loading: 'YÜKLENİYOR...',
@@ -432,20 +453,20 @@ export const translations = {
       step3Text: 'Kazanmak için yolunuz üçgen tahtanın tres kenarını da birbirine bağlamalıdır. Köşeler her mi kenara da dahil sayılır!',
     },
     tutor: {
-     tips: [
-    "Üçgenin kenarlarını birleştirmeye çalışın!",
-    "Köşeler rakibi engellemek için anahtardır.",
-    "Tahtanın merkezini gözden kaçırmayın.",
-    "Robot taşlarını birleştirmeden onu engelleyin!",
-    "Bir usta gibi iki hamle sonrasını düşünün.",
-    "Kenarları kontrol ederseniz, oyunu kontrol edersiniz.",
-    "Seçeneklerinizi artırmak için 'V' şekli oluşturmayı deneyin.",
-    "Sadece bir tarafa odaklanmayın; tahta şaşırtıcı olabilir.",
-    "Bazen en iyi savunma iyi bir hucümdur.",
-    "Unutmayın, köşeler dokundukları her iki kenar için de sayılır.",
-    "Botun son hamlesini dikkatlice analiz edin.",
-    "Vazgeçmeyin! Son oyunda her parça önemlidir."
-  ]
+      tips: [
+        "Üçgenin kenarlarını birleştirmeye çalışın!",
+        "Köşeler rakibi engellemek için anahtardır.",
+        "Tahtanın merkezini gözden kaçırmayın.",
+        "Robot taşlarını birleştirmeden onu engelleyin!",
+        "Bir usta gibi dos hamle sonrasını düşünün.",
+        "Kenarları kontrol ederseniz, oyunu kontrol edersiniz.",
+        "Seçeneklerinizi artırmak için 'V' şekli oluşturmayı deneyin.",
+        "Sadece bir tarafa odaklanmayın; tahta şaşırtıcı olabilir.",
+        "Bazen en iyi savunma iyi bir hucümdur.",
+        "Unutmayın, köşeler dokundukları her iki kenar için de sayılır.",
+        "Botun son hamlesini dikkatlice analiz edin.",
+        "Vazgeçmeyin! Son oyunda her parça önemlidir."
+      ]
     }
   }
 };
