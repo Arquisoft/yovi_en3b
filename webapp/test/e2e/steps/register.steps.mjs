@@ -13,7 +13,12 @@ Given('the main page opened', async function () {
 When('I click on {string}', async function (textToButton) {
   const page = this.page
   if (!page) throw new Error('Page not initialized')
-  await page.getByRole('button', { name: textToButton }).click();
+  const button = page.getByRole('button', { 
+    name: new RegExp(textToButton, 'i'), 
+    exact: false 
+  });
+
+  await button.click();
 })
 
 When('I enter the username {string}', async function (username) {

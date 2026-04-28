@@ -23,4 +23,8 @@ Before(async function () {
 After(async function () {
   if (this.page) await this.page.close()
   if (this.browser) await this.browser.close()
+    this.context = await this.browser.newContext({
+    locale: 'en-US', 
+    viewport: { width: 1280, height: 720 } 
+  })
 })
