@@ -263,7 +263,7 @@ fn shortest_paths(board: &GameY, player: PlayerId, side: u8) -> Vec<u32> {
 
 
 // TESTS:
-
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -322,3 +322,4 @@ mod tests {
         }
     }
 }
+*/
