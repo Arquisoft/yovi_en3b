@@ -48,6 +48,10 @@ async function finishMatch(req, res) {
         if (!matchId) {
             return res.status(400).json({ error: "matchId and winnerId are required" });
         }
+
+        if (!winnerId) {
+            return res.status(400).json({ error: "winnerId is required" });
+        }
         
         const result = await matchService.finishMatch(matchId, winnerId);
         res.status(200).json({ 
