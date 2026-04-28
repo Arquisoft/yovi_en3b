@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useSettings } from '../../context/SettingsContext'; 
+import { useI18n } from "../../i18n/useTranslation";
+import { Globe } from 'lucide-react'; // Icono opcional para el selector
 import './RegisterForm.css'; 
 
 const RegisterForm: React.FC = () => {
@@ -10,15 +12,22 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate(); 
-  const { playSound, startBackgroundMusic } = useSettings(); // Usamos la nueva función explícita
+  
+  // Extraemos t (traducciones), language (actual) y setLanguage (función para cambiar)
+  const i18n = useI18n();
+  const { playSound, startBackgroundMusic } = useSettings();
+
+  // Verificación de seguridad por si el contexto aún no carga
+  if (!i18n) return null;
+  const { t, language, setLanguage } = i18n;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault(); 
-    playSound('click.mp3'); // Sonido de feedback táctil corto (siempre suena)
+    playSound('click.mp3'); 
     setError(null);
 
     if (!username.trim() || !password.trim()) {
-      setError('Please fill in all fields.'); 
+      setError(t.messages.fillAllFields); // Texto traducido
       return;
     }
 
@@ -34,26 +43,20 @@ const RegisterForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // 1. We get the header
         const authHeader = res.headers.get('Authorization');
-        
-        // 2. We verify that the token arises an we isolate it (Bearer + XXXXXX)
         if (authHeader && authHeader.startsWith('Bearer ')) {
           const token = authHeader.split(' ')[1]; 
-          // Save auth token to local storage
           localStorage.setItem('token', token);
         }
-        // --- ÉXITO: Iniciamos la música de fondo aquí ---
         startBackgroundMusic(); 
-        localStorage.setItem('username', username); // Save username for global reference
-        localStorage.setItem('userId', data.id || ''); // Save user ID for match creation
-        console.log('Login stored userId:', localStorage.getItem('userId'));
+        localStorage.setItem('username', username);
+        localStorage.setItem('userId', data.id || '');
         navigate('/menu'); 
       } else {
-        setError(data.message || 'Error in the login. Please check your credentials.');
+        setError(data.message || t.messages.loginError); // Texto traducido
       }
     } catch (err) {
-      setError('Cannot connect to the server. Please try again later.');
+      setError(t.messages.cannotConnectServer); // Texto traducido
       console.error("Connection error:", err);
     } finally {
       setLoading(false); 
@@ -63,27 +66,50 @@ const RegisterForm: React.FC = () => {
   return (
     <div className="login-container"> 
       <div className="login-card">
-        <h1 className="title-game cubic-text" style={{ fontSize: '3rem' }}>GAME Y</h1>
+        
+        {/* --- NUEVO: SELECTOR DE IDIOMA --- */}
+        <div className="language-selector-container">
+          <Globe size={18} className="globe-icon" />
+          <button 
+            type="button"
+            className={`lang-btn ${language === 'es' ? 'active' : ''}`}
+            onClick={() => setLanguage('es')}
+          >ES</button>
+          <button 
+            type="button"
+            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+            onClick={() => setLanguage('en')}
+          >EN</button>
+          <button 
+            type="button"
+            className={`lang-btn ${language === 'tr' ? 'active' : ''}`}
+            onClick={() => setLanguage('tr')}
+          >TR</button>
+        </div>
+
+        <h1 className="title-game cubic-text" style={{ fontSize: '9rem' }}>GAME Y</h1>
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
-            <label className="orbitron-text" htmlFor="login-username">USERNAME</label>
+            <label className="orbitron-text" htmlFor="login-username">
+              {t.labels.username}
+            </label>
             <input
               id="login-username"
-              name="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)} 
               className="orbitron-text"
-              placeholder="Enter your name"
+              placeholder={t.placeholders?.enterUsername || "User..."}
             />
           </div>
 
           <div className="input-group">
-            <label className="orbitron-text" htmlFor="login-password">PASSWORD</label>
+            <label className="orbitron-text" htmlFor="login-password">
+              {t.labels.password}
+            </label>
             <input
               id="login-password"
-              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)} 
@@ -95,11 +121,13 @@ const RegisterForm: React.FC = () => {
           {error && <p className="error-text orbitron-text">{error}</p>}
 
           <button type="submit" className="main-button btn-blue play-btn" disabled={loading}>
-            {loading ? 'LOADING...' : 'PLAY'} 
+            {loading ? t.buttons.loading : t.buttons.play} 
           </button>
     
           <div className="auth-footer">
-            <span className="orbitron-text" style={{ color: '#64748b' }}>DON'T HAVE AN ACCOUNT? </span>
+            <span className="orbitron-text" style={{ color: '#64748b' }}>
+              {t.labels.dontHaveAccount} 
+            </span>
             <button 
               type="button" 
               className="auth-link" 
@@ -108,10 +136,9 @@ const RegisterForm: React.FC = () => {
                 navigate('/signup');
               }}
             > 
-              SIGN UP
+              {t.buttons.signupLink || t.labels.signup}
             </button>
           </div>
-        
         </form>
       </div>
     </div>
