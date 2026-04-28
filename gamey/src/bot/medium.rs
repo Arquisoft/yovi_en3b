@@ -103,3 +103,64 @@ impl YBot for MediumBot {
         best_move
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{GameY, Movement, Coordinates};
+
+    #[test]
+    fn test_medium_bot_name() {
+        // Comprobamos que devuelve su nombre correctamente
+        let bot = MediumBot;
+        assert_eq!(bot.name(), "medium_bot");
+    }
+
+    #[test]
+    fn test_medium_bot_first_move() {
+        // 1. Tablero vacío (usamos tamaño 3 o 4 para que las simulaciones de Monte Carlo sean rápidas en el test)
+        let board = GameY::new(3); 
+        let bot = MediumBot;
+
+        // 2. Le pedimos que piense su primer movimiento
+        let chosen_move = bot.choose_move(&board);
+        
+        // 3. Comprobamos que devuelve algo
+        assert!(chosen_move.is_some());
+    }
+
+    #[test]
+    fn test_medium_bot_mid_game() {
+        // 1. Empezamos una partida
+        let mut board = GameY::new(3);
+        let bot = MediumBot;
+
+        // 2. Simulamos un par de movimientos usando las celdas disponibles
+        let available = board.available_cells();
+        let first_cell = Coordinates::from_index(available[0], board.board_size());
+        let second_cell = Coordinates::from_index(available[1], board.board_size());
+
+        // Juega el jugador 0
+        let p0 = board.next_player().unwrap();
+        board.add_move(Movement::Placement {
+            player: p0,
+            coords: first_cell.clone(),
+        }).unwrap();
+
+        // Juega el jugador 1
+        let p1 = board.next_player().unwrap();
+        board.add_move(Movement::Placement {
+            player: p1,
+            coords: second_cell.clone(),
+        }).unwrap();
+
+        // 3. Le toca al bot pensar (aquí ejecutará sus simulaciones de Monte Carlo)
+        let chosen_move = bot.choose_move(&board);
+        assert!(chosen_move.is_some());
+
+        // 4. Verificamos que respeta las reglas y no pisa celdas ocupadas
+        let chosen_coords = chosen_move.unwrap();
+        assert_ne!(chosen_coords, first_cell);
+        assert_ne!(chosen_coords, second_cell);
+    }
+}
