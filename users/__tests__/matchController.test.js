@@ -68,7 +68,7 @@ describe('matchController', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
-        error: '', // We dont need "winnerId" anymore
+        error: 'matchId and winnerId are required',
       });
     });
 
