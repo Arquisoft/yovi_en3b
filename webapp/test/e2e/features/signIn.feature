@@ -5,5 +5,5 @@ Feature: User Register
     Given the main page opened
     When I write the username "User"
     And I write the password "Test@123456"
-    And I click on "PLAY"
+    And I click on "JUGAR"
     Then I should see the page for playing
