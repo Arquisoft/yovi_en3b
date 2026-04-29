@@ -16,7 +16,7 @@ impl YBot for EasyBot {
 
         // Get bots team
         let my_player = board.next_player()?;
-
+        
         // Assign the players team (blue or read) acording to the bots team
         let opponent = if my_player.id() == 0 {
             PlayerId::new(1)
@@ -24,18 +24,19 @@ impl YBot for EasyBot {
             PlayerId::new(0)
         };
 
+
         // Check if the bot has a winning moovement
         let board_size = board.board_size();
         for &cell_idx in available_cells {
             let coords = Coordinates::from_index(cell_idx, board_size);
-
+            
             let mut simulated_board = board.clone();
-
+            
             let movement = Movement::Placement {
                 player: my_player,
                 coords,
             };
-
+            
             // If it has one, it places it
             if simulated_board.add_move(movement).is_ok() && simulated_board.check_game_over() {
                 return Some(coords);
@@ -47,12 +48,12 @@ impl YBot for EasyBot {
             let coords = Coordinates::from_index(cell_idx, board_size);
 
             let mut simulated_board = board.clone();
-
+            
             let movement = Movement::Placement {
                 player: opponent,
                 coords,
             };
-
+            
             // If he has one, the bot places in it so that the player can't win
             if simulated_board.add_move(movement).is_ok() && simulated_board.check_game_over() {
                 return Some(coords);

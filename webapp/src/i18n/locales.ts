@@ -95,7 +95,7 @@ export const translations = {
       colorBlindMode: 'MODO DALTÓNICO',
       neonEffects: 'EFECTOS NEÓN',
       visuals: 'VISUALES',
-      wins: 'VICTORIAS',
+      confirmMove: 'CONFIRMAR MOVIMIENTO',
     },
     placeholders: {
       enterUsername: 'Introduce tu nombre',
@@ -251,7 +251,7 @@ export const translations = {
       colorBlindMode: 'COLOR BLIND MODE',
       neonEffects: 'NEON EFFECTS',
       visuals: 'VISUALS',
-      wins: 'WINS',
+      confirmMove: 'CONFIRM MOVEMENT',
     },
     placeholders: {
       enterUsername: 'Enter your username',
@@ -407,7 +407,7 @@ export const translations = {
       colorBlindMode: 'RENK KÖRÜ MODU',
       neonEffects: 'NEON EFEKTLERİ',
       visuals: 'GÖRSELLER',
-      wins: 'KAZANMALAR',
+      confirmMove: 'HAREKETİ ONAYLA',
     },
     placeholders: {
       enterUsername: 'Kullanıcı adınızı girin',

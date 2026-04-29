@@ -27,12 +27,12 @@ vi.mock('../i18n/useTranslation', () => ({
         defeat: 'DERROTA',
       },
       labels: {
-        loadingH: 'CARGANDO HISTORIAL...',
-        noMatches: 'Sin partidas',
-        partidas: 'PARTIDAS',
-        winRate: '% DE VICTORIAS',
-        victorias: 'VICTORIAS',
         vs: 'contra',
+        partidas: 'PARTIDAS',    
+        winRate: 'WIN RATE',   
+        victorias: 'VICTORIAS', 
+        loadingH: 'Cargando...',
+        noMatches: 'No hay partidas'
       },
     },
   }),

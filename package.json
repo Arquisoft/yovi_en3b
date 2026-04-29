@@ -1,7 +1,4 @@
 {
-  "scripts": {
-    "test": "npm --prefix users test -- --run && npm --prefix webapp test -- --run"
-  },
   "dependencies": {
     "axios": "^1.15.0",
     "bcrypt": "^6.0.0",

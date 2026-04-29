@@ -94,7 +94,7 @@ describe('game API service', () => {
       json: () => Promise.reject(new Error('invalid json')),
     } as unknown as Response);
 
-    await expect(finishMatch('match-3', 'user-1')).rejects.toThrow('Server error: 500');
+    await expect(finishMatch('match-3', 'user-1')).rejects.toThrow('500 Server Error');
   });
 
 

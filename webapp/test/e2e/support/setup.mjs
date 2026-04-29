@@ -1,7 +1,7 @@
 import { setWorldConstructor, Before, After, setDefaultTimeout } from '@cucumber/cucumber'
 import { chromium } from 'playwright'
 
-setDefaultTimeout(30_000)
+setDefaultTimeout(60_000)
 
 class CustomWorld {
   browser = null
@@ -21,9 +21,6 @@ Before(async function () {
 })
 
 After(async function () {
- if (this.page && !this.page.isClosed()) {
-    await this.page.close();
-    await this.browser.close();
-  }
-
+  if (this.page) await this.page.close()
+  if (this.browser) await this.browser.close()
 })

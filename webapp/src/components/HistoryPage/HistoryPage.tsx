@@ -23,13 +23,7 @@ const HistoryPage: React.FC = () => {
                 const history = await getMyMatchHistory();
                 if (!cancelled) setMatches(history);
             } catch (fetchError) {
-                if (!cancelled) {
-                    const message =
-                        fetchError instanceof Error && fetchError.message
-                            ? fetchError.message
-                            : 'Could not load match history';
-                    setError(message);
-                }
+                if (!cancelled) setError('Could not load history');
             } finally {
                 if (!cancelled) setLoading(false);
             }

@@ -104,4 +104,76 @@ The team decided to adopt the functional programming paradigm for implementing t
 
 * **Easier maintenance:** Since we do not have complex inheritance hierarchies, it is easier to understand what each isolated function does.
 
+---
 
+=== ADR-006: Separation of Matches and Game Saves
+**Status:** Accepted
+
+**Context:**
+We initially considered tracking game history and board positions directly within the `matches` table. However, updating the database on every single turn would overload the server and create a bottleneck.
+
+**Decision:**
+We will create a dedicated `game_saves` table. The `matches` table will only be queried/updated at the start and end of a game. The active game state will only be stored in `game_saves` when the user explicitly clicks the "Save" button or exits the match.
+
+**Consequences:**
+
+* Massively reduces database load and network traffic.
+
+* Keeps the `matches` table clean and strictly for historical tracking.
+
+* Introduces slightly more complex logic in the backend to manage two tables instead of one.
+
+---
+
+=== ADR-007: Polyglot Architecture (TypeScript & Rust)
+**Status:** Accepted
+
+**Context:**
+The project requires a scalable web interface, a user management system, and a highly performant game engine to evaluate moves and execute AI bot strategies.
+
+**Decision:**
+The system is implemented using a polyglot approach. The `YOVI Web Client` and `Users API` are developed in **TypeScript** (React and Node.js) to leverage the vast web ecosystem. The `GameY Service` (evaluation and strategy module) is implemented in **Rust** to guarantee memory safety and high calculation speed for the AI.
+
+**Consequences:**
+
+* Maximizes the performance of the AI engine while keeping web development agile.
+
+* Increases cognitive load on the development team, as they must maintain codebases and tooling for two entirely different programming ecosystems.
+
+---
+
+=== ADR-008: Stateless Game Engine Communication (YEN & JSON)
+**Status:** Accepted
+
+**Context:**
+Because the frontend and the game engine are decoupled and written in different languages, they need a standardized, language-agnostic way to exchange complex board layouts and game states.
+
+**Decision:**
+Communication between the Web Client/Bots and the Rust Game Engine is strictly done via stateless **JSON messages** over HTTP, utilizing the standard **YEN (Y-Game Extended Notation)** for board representation. The Rust module acts as a stateless REST service (basic web service interface).
+
+**Consequences:**
+
+* Ensures perfect decoupling; the Rust engine does not need to store active sessions in its memory.
+
+* Makes it extremely easy for external third-party bots to integrate with the API.
+
+* Requires serialization/deserialization overhead for every move.
+
+---
+
+=== ADR-009: Cloud Infrastructure & CI/CD
+**Status:** Accepted
+
+**Context:**
+To fulfill the requirement of making the application publicly accessible and easily maintainable, we need a reliable deployment strategy that minimizes manual intervention.
+
+**Decision:**
+The system will be deployed to a **public cloud provider** utilizing Docker containerization. Furthermore, all deployments will be handled via automated **CI/CD pipelines** (Continuous Integration and Continuous Deployment).
+
+**Consequences:**
+
+* Guarantees that the code running in production exactly matches the tested codebase.
+
+* Allows rapid, zero-downtime updates to the web application and game engine.
+
+* Requires an initial time investment to write and configure the pipeline scripts (e.g., GitHub Actions).

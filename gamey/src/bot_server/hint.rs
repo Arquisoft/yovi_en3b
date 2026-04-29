@@ -61,7 +61,7 @@ pub async fn get_hint(
     Json(yen): Json<YEN>,
 ) -> Result<Json<HintResponse>, Json<ErrorResponse>> {
     check_api_version(&params.api_version)?;
-
+    
     let game_y = match GameY::try_from(yen) {
         Ok(game) => game,
         Err(err) => {
@@ -74,7 +74,7 @@ pub async fn get_hint(
     };
 
     let difficulty = params.difficulty.as_deref().unwrap_or("medium");
-
+    
     // Validate difficulty level
     if !["easy", "medium", "hard"].contains(&difficulty) {
         return Err(Json(ErrorResponse::error(
@@ -96,7 +96,7 @@ pub async fn get_hint(
     // For now, provide a strategic hint based on board analysis
     // In production, this would call the LLM for actual intelligent hints
     let hint = generate_strategic_hint(&game_y, difficulty);
-
+    
     // Suggest the first available move (in production, LLM would choose the best)
     let first_available = available_cells[0];
     let coords = Coordinates::from_index(first_available, game_y.board_size());
@@ -149,7 +149,11 @@ mod tests {
         let response = HintResponse {
             api_version: "v1".to_string(),
             hint: "Test hint".to_string(),
-            suggested_move: Some(SuggestedMove { x: 1, y: 0, z: 0 }),
+            suggested_move: Some(SuggestedMove {
+                x: 1,
+                y: 0,
+                z: 0,
+            }),
             difficulty: "medium".to_string(),
         };
         assert_eq!(response.api_version, "v1");
@@ -221,12 +225,12 @@ mod tests {
     #[test]
     fn test_strategic_hint_easy_board_empty() {
         use crate::{GameY, YEN};
-
+        
         let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
-
+        
         let hint = generate_strategic_hint(&board, "easy");
-
+        
         assert!(hint.contains("central") || hint.contains("filled"));
         assert!(hint.len() > 10);
     }
@@ -234,12 +238,12 @@ mod tests {
     #[test]
     fn test_strategic_hint_medium_board_partial() {
         use crate::{GameY, YEN};
-
+        
         let yen = YEN::new(3, 2, vec!['B', 'R'], "B/R./.B.".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
-
+        
         let hint = generate_strategic_hint(&board, "medium");
-
+        
         assert!(hint.contains("connecting") || hint.contains("filled"));
         assert!(hint.len() > 10);
     }
@@ -247,12 +251,12 @@ mod tests {
     #[test]
     fn test_strategic_hint_hard_board_advanced() {
         use crate::{GameY, YEN};
-
+        
         let yen = YEN::new(3, 4, vec!['B', 'R'], "B/RB/.BR".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
-
+        
         let hint = generate_strategic_hint(&board, "hard");
-
+        
         assert!(hint.contains("Critical") || hint.contains("filled"));
         assert!(hint.len() > 10);
     }
@@ -260,30 +264,30 @@ mod tests {
     #[test]
     fn test_strategic_hint_invalid_difficulty_fallback() {
         use crate::{GameY, YEN};
-
+        
         let yen = YEN::new(2, 0, vec!['B', 'R'], "./..".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
-
+        
         let hint = generate_strategic_hint(&board, "unknown");
-
+        
         assert!(hint.contains("consider") || hint.contains("carefully"));
     }
 
     #[test]
     fn test_strategic_hint_all_difficulties() {
         use crate::{GameY, YEN};
-
+        
         let yen = YEN::new(3, 1, vec!['B', 'R'], "B/BR/.R.".to_string());
         let board = GameY::try_from(yen).expect("Failed to create GameY");
-
+        
         let easy_hint = generate_strategic_hint(&board, "easy");
         let med_hint = generate_strategic_hint(&board, "medium");
         let hard_hint = generate_strategic_hint(&board, "hard");
-
+        
         // All should be different
         assert_ne!(easy_hint, med_hint);
         assert_ne!(med_hint, hard_hint);
-
+        
         // All should have content
         assert!(!easy_hint.is_empty());
         assert!(!med_hint.is_empty());
@@ -293,23 +297,17 @@ mod tests {
     #[test]
     fn test_strategic_hint_different_board_sizes() {
         use crate::{GameY, YEN};
-
+        
         let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "./..".to_string()))
             .expect("Failed to create GameY");
         let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
             .expect("Failed to create GameY");
-        let board4 = GameY::try_from(YEN::new(
-            4,
-            0,
-            vec!['B', 'R'],
-            ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....",
-        ))
-        .expect("Failed to create GameY");
-
+        let board4 = GameY::try_from(YEN::new(4, 0, vec!['B', 'R'], ".".to_string() + "/" + ".." + "/" + "..." + "/" + "....")).expect("Failed to create GameY");
+        
         let hint2 = generate_strategic_hint(&board2, "medium");
         let hint3 = generate_strategic_hint(&board3, "medium");
         let hint4 = generate_strategic_hint(&board4, "medium");
-
+        
         // Hints should reflect different board sizes
         assert!(hint2.contains("3") || hint2.contains("filled"));
         assert!(hint3.contains("6") || hint3.contains("filled"));

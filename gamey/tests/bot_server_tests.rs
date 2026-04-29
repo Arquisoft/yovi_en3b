@@ -2,9 +2,7 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use gamey::{
-    ErrorResponse, MoveResponse, RandomBot, YBotRegistry, YEN, create_router, state::AppState,
-};
+use gamey::{YBotRegistry, YEN, create_router, state::AppState, RandomBot, MoveResponse, ErrorResponse};
 use http_body_util::BodyExt;
 use std::sync::Arc;
 use tower::ServiceExt;
@@ -307,7 +305,7 @@ async fn test_randombot_is_default_bot() {
 async fn test_randombot_available_on_startup() {
     let registry = default_registry();
     let names = registry.names();
-
+    
     assert!(names.contains(&"random_bot".to_string()));
     assert!(!names.is_empty());
 }
@@ -337,11 +335,7 @@ async fn test_randombot_returns_valid_coordinates() {
     let move_response: MoveResponse = serde_json::from_slice(&body).unwrap();
 
     // Verify the move has valid coordinates
-    assert!(
-        move_response.coords.x() < 3
-            || move_response.coords.y() < 3
-            || move_response.coords.z() < 3
-    );
+    assert!(move_response.coords.x() < 3 || move_response.coords.y() < 3 || move_response.coords.z() < 3);
 }
 
 // ============================================================================
@@ -418,9 +412,7 @@ async fn test_hint_endpoint_with_valid_request() {
                 .method("POST")
                 .uri("/v1/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -428,12 +420,7 @@ async fn test_hint_endpoint_with_valid_request() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let hint_response: gamey::bot_server::HintResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize hint response");
 
@@ -454,9 +441,7 @@ async fn test_hint_endpoint_default_difficulty() {
                 .method("POST")
                 .uri("/v1/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -464,12 +449,7 @@ async fn test_hint_endpoint_default_difficulty() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let hint_response: gamey::bot_server::HintResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize");
 
@@ -490,9 +470,7 @@ async fn test_hint_endpoint_with_full_board() {
                 .method("POST")
                 .uri("/v1/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -500,12 +478,7 @@ async fn test_hint_endpoint_with_full_board() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let hint_response: gamey::bot_server::HintResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize");
 
@@ -543,9 +516,7 @@ async fn test_hint_endpoint_with_invalid_api_version() {
                 .method("POST")
                 .uri("/v2/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -553,12 +524,7 @@ async fn test_hint_endpoint_with_invalid_api_version() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let error_response: ErrorResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize");
 
@@ -580,9 +546,7 @@ async fn test_hint_endpoint_multiple_requests() {
                     .method("POST")
                     .uri("/v1/ybot/hint")
                     .header("content-type", "application/json")
-                    .body(Body::from(
-                        serde_json::to_string(&yen).expect("Failed to serialize"),
-                    ))
+                    .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                     .expect("Failed to build request"),
             )
             .await
@@ -590,12 +554,7 @@ async fn test_hint_endpoint_multiple_requests() {
 
         assert_eq!(response.status(), StatusCode::OK);
 
-        let body = response
-            .into_body()
-            .collect()
-            .await
-            .expect("Failed to collect body")
-            .to_bytes();
+        let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
         let _hint_response: gamey::bot_server::HintResponse =
             serde_json::from_slice(&body).expect("Failed to deserialize");
     }
@@ -613,9 +572,7 @@ async fn test_hint_endpoint_large_board() {
                 .method("POST")
                 .uri("/v1/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -623,12 +580,7 @@ async fn test_hint_endpoint_large_board() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let hint_response: gamey::bot_server::HintResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize");
 
@@ -649,9 +601,7 @@ async fn test_hint_endpoint_with_medium_difficulty() {
                 .method("POST")
                 .uri("/v1/ybot/hint")
                 .header("content-type", "application/json")
-                .body(Body::from(
-                    serde_json::to_string(&yen).expect("Failed to serialize"),
-                ))
+                .body(Body::from(serde_json::to_string(&yen).expect("Failed to serialize")))
                 .expect("Failed to build request"),
         )
         .await
@@ -659,12 +609,7 @@ async fn test_hint_endpoint_with_medium_difficulty() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = response
-        .into_body()
-        .collect()
-        .await
-        .expect("Failed to collect body")
-        .to_bytes();
+    let body = response.into_body().collect().await.expect("Failed to collect body").to_bytes();
     let hint_response: gamey::bot_server::HintResponse =
         serde_json::from_slice(&body).expect("Failed to deserialize");
 

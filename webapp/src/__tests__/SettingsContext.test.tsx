@@ -60,22 +60,4 @@ describe('SettingsContext', () => {
 
     expect(mockAudios).toHaveLength(1);
   });
-
-  it('swallows synchronous audio constructor errors when playing a sound', () => {
-    const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <SettingsProvider>{children}</SettingsProvider>
-    );
-    const audioConstructor = globalThis.Audio as unknown as ReturnType<typeof vi.fn>;
-
-    const { result } = renderHook(() => useSettings(), { wrapper });
-    audioConstructor.mockImplementationOnce(() => {
-      throw new Error('Audio unavailable');
-    });
-
-    expect(() => {
-      act(() => {
-        result.current.playSound('click.mp3');
-      });
-    }).not.toThrow();
-  });
 });

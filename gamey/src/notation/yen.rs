@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 ///   "layout": "B/BR/.R."
 /// }
 /// ```
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct YEN {
     /// The board size (length of one side of the triangle).
     size: u32,

@@ -7,8 +7,7 @@
 //! - Server: Run as an HTTP server for bot API
 
 use crate::{
-    Coordinates, EasyBot, GameAction, MediumBot, Movement, RandomBot, RenderOptions, YBot,
-    YBotRegistry, game,
+    Coordinates, GameAction, Movement, RandomBot, EasyBot, MediumBot, RenderOptions, YBot, YBotRegistry, game,
 };
 use crate::{GameStatus, GameY, PlayerId};
 use anyhow::Result;
@@ -36,7 +35,7 @@ pub struct CliArgs {
     pub bot: String,
 
     /// Port to run the server on (only used with --mode=server)
-    #[arg(short, long, default_value_t = 4000)]
+    #[arg(short, long, default_value_t = 3000)]
     pub port: u16,
 }
 
@@ -296,7 +295,13 @@ pub fn parse_idx(part: &str, bound: u32) -> Result<u32, String> {
 }
 
 /// Application logic for a Move command (Human + optional Bot response)
-fn handle_place_command(game: &mut GameY, idx: u32, player: PlayerId, mode: Mode, bot: &dyn YBot) {
+fn handle_place_command(
+    game: &mut GameY,
+    idx: u32,
+    player: PlayerId,
+    mode: Mode,
+    bot: &dyn YBot,
+) {
     let coords = Coordinates::from_index(idx, game.board_size());
     let movement = Movement::Placement { player, coords };
 
@@ -510,3 +515,4 @@ mod tests {
         assert!(debug.contains("5"));
     }
 }
+

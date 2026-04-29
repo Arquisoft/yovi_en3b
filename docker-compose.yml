@@ -45,7 +45,6 @@ services:
       - "80:80"
     depends_on:
       - users
-      - gamey
     networks:
       - monitor-net
 
@@ -55,13 +54,6 @@ services:
     image: ghcr.io/arquisoft/yovi_en3b-gamey:latest
     ports:
       - "4000:4000"
-    dns:
-      - "8.8.8.8"
-      - "1.1.1.1"
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - GEMINI_MODEL=${GEMINI_MODEL}
     networks:
       - monitor-net
 

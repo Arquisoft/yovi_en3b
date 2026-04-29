@@ -61,7 +61,6 @@ describe('userProfile API service', () => {
         it('should send a POST request to change the nickname', async () => {
             const mockUsername = 'testuser';
             localStorage.setItem('username', mockUsername);
-            localStorage.setItem('token', 'fake-token');
             const patch = { displayName: 'NewNickname', avatarId: 'avatar_02' };
 
             const mockResponse = {
@@ -73,7 +72,7 @@ describe('userProfile API service', () => {
             (fetch as any).mockResolvedValue({
                 ok: true,
                 json: () => Promise.resolve(mockResponse),
-            });
+            }); 
 
             const result = await updateMyProfile(patch);
 
@@ -81,10 +80,10 @@ describe('userProfile API service', () => {
                 `${API_URL}/users/changeNicknameAndPhoto`,
                 expect.objectContaining({
                     method: 'POST',
-                    headers: {
+                    headers: expect.objectContaining({ 
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer fake-token'
-                    },
+                        'Authorization': expect.stringContaining('Bearer') 
+                    }),
                     body: JSON.stringify({
                         username: mockUsername,
                         nickname: patch.displayName,

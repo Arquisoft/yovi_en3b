@@ -14,23 +14,12 @@ CREATE TABLE IF NOT EXISTS matches (
     red_player_id UUID REFERENCES users(id), -- Null if you play against a BOT
     is_bot BOOLEAN DEFAULT false,
     bot_difficulty INT DEFAULT 0, -- 0 if you play against a real local player, 1=Easy, 2=Medium, 3=Hard
-    winner_id UUID REFERENCES users(id), -- Null if the match hasn't ended yet or if there is a tie
+    winner_id UUID REFERENCES users(id), -- 0 if the match hasn't ended yet, 1 if the bot wins the match, otherwise winners id
     status VARCHAR(20) DEFAULT 'in_progress', -- 'in_progress', 'finished', 'abandoned'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP
 );
 
--- GameSave table: stores move history and game state progression
-CREATE TABLE IF NOT EXISTS game_saves (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    match_id UUID NOT NULL REFERENCES matches(id), -- The match moves and state belongs to
-    move_number INT NOT NULL,                      -- Move sequence (1, 2, 3...)
-    player_last_move VARCHAR(10),                  -- Barycentric. Null in PvP.
-    bot_last_move VARCHAR(10),                     -- Barycentric. Null in PvP.
-    resulting_board_state JSONB NOT NULL,          -- YEN notation JSON (size, turn, layout)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(match_id, move_number)                  -- Prevents duplicate move numbers per match
-);
 
 -- Rankings table: stores aggregated stats per user
 CREATE TABLE IF NOT EXISTS rankings (

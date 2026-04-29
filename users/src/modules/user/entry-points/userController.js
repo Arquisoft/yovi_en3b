@@ -1,6 +1,6 @@
 const userService = require('../domain/userService');
 const userDto = require('../domain/userDTO');
-const authutils = require('../../../auth/authUtils');
+const { generateUserToken } = require('../../../auth/authUtils');
 
 // POST /users/createuser
 //Here the service for creating a user is called. 
@@ -57,12 +57,9 @@ const findUserByUsername = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const user =await userService.loginUser(req.body);
-        const token = authutils.generateUserToken(user);
-        res
-            .set('Authorization', `Bearer ${token}`)
-            .type('application/json')
-            .status(200)
-            .send(JSON.stringify(userDto.toUserResponseDto(user)));
+        const token = generateUserToken(user)
+        res.setHeader('Authorization', `Bearer ${token}`);
+        res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
         if (error.message === "Missing fields") {
@@ -84,7 +81,8 @@ const loginUser = async (req, res) => {
     //500: server error
 const changePassword = async (req, res) => {
     try {
-        const user =await userService.changePassword(req.body);
+        const data = {id: req.user.id, username: req.user.username, currentPassword: req.body.currentPassword, newPassword: req.body.newPassword};
+        const user =await userService.changePassword(data);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);
@@ -94,8 +92,7 @@ const changePassword = async (req, res) => {
         return res.type('application/json').status(500).send(JSON.stringify({ error: "Internal server error"}));
     }
 };
-
-// POST /users/changeNickname
+// POST /users/changeNicknameAndPhoto
 //Changes the nickname of the indicated user
 // STATUS:
     //200: resource successfully updated
@@ -103,7 +100,8 @@ const changePassword = async (req, res) => {
     //500: server error
 const changeNicknameAndPhoto = async (req, res) => {
     try {
-        const user =await userService.changeNickname(req.body);
+        const data = {id: req.user.id, username: req.user.username, photo: req.body.photo, nickname: req.body.nickname};
+        const user =await userService.changeNicknameAndPhoto(data);
         res.type('application/json').status(200).send(JSON.stringify(userDto.toUserResponseDto(user)));
     } catch (error) {
         console.log(error);

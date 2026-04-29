@@ -1,20 +1,17 @@
-//! LLM-based bot implementation with difficulty levels using a public chat API.
+//! LLM-based bot implementation with difficulty levels using Anthropic Claude.
 //!
-//! This module provides [`LLMBot`], a bot powered by Gemini API that can:
+//! This module provides [`LLMBot`], a bot powered by Anthropic's Claude API that can:
 //! - Play with different difficulty levels (Easy: 20%, Medium: 10%, Hard: 3% random moves)
 //! - Provide strategic hints using the same LLM decision making
 //! - Make intelligent moves based on game analysis
 
 use crate::{Coordinates, GameY, YBot};
-use rand::Rng;
 use rand::prelude::IndexedRandom;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-const GEMINI_BASE_URL: &str = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_GEMINI_MODEL: &str = "gemini-2.5-flash-lite";
-
-/// Difficulty levels for the LLM bot.
+/// Difficulty levels for the LLM Anthropic bot.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DifficultyLevel {
     /// Easy mode: 20% chance of random moves
@@ -36,26 +33,7 @@ impl DifficultyLevel {
     }
 }
 
-/// Resolves the API key for the LLM provider from environment variables.
-///
-/// Supports `GEMINI_API_KEY` and `GOOGLE_API_KEY`.
-pub fn resolve_llm_api_key() -> Option<String> {
-    std::env::var("GEMINI_API_KEY")
-        .ok()
-        .filter(|value| !value.trim().is_empty())
-        .or_else(|| {
-            std::env::var("GOOGLE_API_KEY")
-                .ok()
-                .filter(|value| !value.trim().is_empty())
-        })
-}
-
-/// Human-readable error message for missing LLM key.
-pub fn missing_llm_api_key_message() -> &'static str {
-    "Missing GEMINI_API_KEY or GOOGLE_API_KEY environment variable"
-}
-
-/// Legacy request structure kept for test/backward compatibility.
+/// Request structure for Anthropic API
 #[derive(Debug, Serialize)]
 pub struct AnthropicRequest {
     pub model: String,
@@ -69,7 +47,7 @@ pub struct AnthropicMessage {
     pub content: String,
 }
 
-/// Legacy response structure kept for test/backward compatibility.
+/// Response structure from Anthropic API
 #[derive(Debug, Deserialize)]
 pub struct AnthropicResponse {
     pub content: Vec<AnthropicContent>,
@@ -80,79 +58,14 @@ pub struct AnthropicContent {
     pub text: String,
 }
 
-#[derive(Debug, Serialize)]
-struct GeminiGenerateContentRequest {
-    contents: Vec<GeminiContentRequest>,
-    #[serde(rename = "generationConfig")]
-    generation_config: GeminiGenerationConfig,
-}
-
-#[derive(Debug, Serialize)]
-struct GeminiContentRequest {
-    role: String,
-    parts: Vec<GeminiPartRequest>,
-}
-
-#[derive(Debug, Serialize)]
-struct GeminiPartRequest {
-    text: String,
-}
-
-#[derive(Debug, Serialize)]
-struct GeminiGenerationConfig {
-    #[serde(rename = "maxOutputTokens")]
-    max_output_tokens: u32,
-    temperature: f32,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiGenerateContentResponse {
-    candidates: Option<Vec<GeminiCandidate>>,
-    #[serde(rename = "promptFeedback")]
-    prompt_feedback: Option<GeminiPromptFeedback>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiCandidate {
-    content: Option<GeminiContentResponse>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiContentResponse {
-    parts: Option<Vec<GeminiPartResponse>>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiPartResponse {
-    text: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiPromptFeedback {
-    #[serde(rename = "blockReason")]
-    block_reason: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiErrorEnvelope {
-    error: GeminiErrorBody,
-}
-
-#[derive(Debug, Deserialize)]
-struct GeminiErrorBody {
-    message: String,
-}
-
-/// LLM API client for move decisions and hints.
-///
-/// The type name is preserved for backward compatibility with existing code/tests.
+/// Anthropic Claude API client for move decisions and hints
 pub struct AnthropicClient {
     pub api_key: String,
     pub client: reqwest::Client,
 }
 
 impl AnthropicClient {
-    /// Create a new LLM client with the given API key.
+    /// Create a new Anthropic client with the given API key
     pub fn new(api_key: String) -> Self {
         AnthropicClient {
             api_key,
@@ -160,7 +73,7 @@ impl AnthropicClient {
         }
     }
 
-    /// Get a strategic move from the configured LLM.
+    /// Get a strategic move from Claude
     pub async fn get_move_decision(
         &self,
         board: &GameY,
@@ -208,23 +121,15 @@ impl AnthropicClient {
         self.call_anthropic_text(&prompt).await
     }
 
-    /// Get a free-form chat response from the LLM using a caller-provided prompt.
-    pub async fn get_chat_response(&self, prompt: &str) -> Result<String, String> {
-        self.call_anthropic_text(prompt).await
-    }
-
     async fn call_anthropic(&self, prompt: &str) -> Result<Option<Coordinates>, String> {
         let response_text = self.call_anthropic_text(prompt).await?;
-
+        
         // Parse response in format "x,y,z"
         let trimmed = response_text.trim().trim_matches(|c| c == '(' || c == ')');
         let parts: Vec<&str> = trimmed.split(',').collect();
-
+        
         if parts.len() != 3 {
-            return Err(format!(
-                "Invalid coordinate format from LLM: {}",
-                response_text
-            ));
+            return Err(format!("Invalid coordinate format from Claude: {}", response_text));
         }
 
         let x = parts[0]
@@ -244,84 +149,41 @@ impl AnthropicClient {
     }
 
     async fn call_anthropic_text(&self, prompt: &str) -> Result<String, String> {
-        let model = std::env::var("GEMINI_MODEL")
-            .ok()
-            .filter(|value| !value.trim().is_empty())
-            .unwrap_or_else(|| DEFAULT_GEMINI_MODEL.to_string());
-
-        let request = GeminiGenerateContentRequest {
-            contents: vec![GeminiContentRequest {
+        let request = AnthropicRequest {
+            model: "claude-3-5-sonnet-20241022".to_string(),
+            max_tokens: 100,
+            messages: vec![AnthropicMessage {
                 role: "user".to_string(),
-                parts: vec![GeminiPartRequest {
-                    text: prompt.to_string(),
-                }],
+                content: prompt.to_string(),
             }],
-            generation_config: GeminiGenerationConfig {
-                max_output_tokens: 100,
-                temperature: 0.7,
-            },
         };
 
-        let url = format!("{}/{}:generateContent", GEMINI_BASE_URL, model);
         let response = self
             .client
-            .post(&url)
-            .header("x-goog-api-key", &self.api_key)
+            .post("https://api.anthropic.com/v1/messages")
+            .header("x-api-key", &self.api_key)
+            .header("anthropic-version", "2023-06-01")
             .header("Content-Type", "application/json")
             .json(&request)
             .send()
             .await
-            .map_err(|e| format!("Failed to call Gemini API: {}", e))?;
+            .map_err(|e| format!("Failed to call Anthropic API: {}", e))?;
 
         if !response.status().is_success() {
-            let status = response.status();
             let error_text = response.text().await.unwrap_or_default();
-
-            let parsed_message = serde_json::from_str::<GeminiErrorEnvelope>(&error_text)
-                .ok()
-                .map(|payload| payload.error.message)
-                .filter(|message| !message.trim().is_empty())
-                .unwrap_or(error_text);
-
-            return Err(format!("Gemini API error ({}): {}", status, parsed_message));
+            return Err(format!("Anthropic API error: {}", error_text));
         }
 
-        let data: GeminiGenerateContentResponse = response
+        let data: AnthropicResponse = response
             .json()
             .await
-            .map_err(|e| format!("Failed to parse Gemini response: {}", e))?;
+            .map_err(|e| format!("Failed to parse Anthropic response: {}", e))?;
 
-        if let Some(block_reason) = data
-            .prompt_feedback
-            .as_ref()
-            .and_then(|feedback| feedback.block_reason.clone())
-        {
-            return Err(format!("Gemini blocked prompt: {}", block_reason));
+        if data.content.is_empty() {
+            return Err("Empty response from Claude".to_string());
         }
 
-        let text = data
-            .candidates
-            .unwrap_or_default()
-            .into_iter()
-            .find_map(|candidate| {
-                candidate.content.and_then(|content| {
-                    content.parts.and_then(|parts| {
-                        let merged = parts
-                            .into_iter()
-                            .filter_map(|part| part.text)
-                            .collect::<Vec<_>>()
-                            .join("");
-                        if merged.trim().is_empty() {
-                            None
-                        } else {
-                            Some(merged)
-                        }
-                    })
-                })
-            })
-            .ok_or_else(|| "Empty response from Gemini".to_string())?;
-
-        Ok(text)
+        Ok(data.content[0].text.clone())
     }
 
     fn format_board_state(&self, board: &GameY) -> String {
@@ -344,7 +206,11 @@ pub struct LLMBot {
 
 impl LLMBot {
     /// Create a new LLM bot with the specified difficulty
-    pub fn new(name: String, difficulty: DifficultyLevel, api_key: String) -> Self {
+    pub fn new(
+        name: String,
+        difficulty: DifficultyLevel,
+        api_key: String,
+    ) -> Self {
         LLMBot {
             name,
             difficulty,
@@ -358,8 +224,8 @@ impl LLMBot {
     }
 
     /// Decide whether to make a random move based on difficulty
-    #[allow(dead_code)]
     fn should_make_random_move(&self) -> bool {
+        let probability = self.difficulty.random_move_probability();
         let mut rng = rand::rng();
         let random_value: f32 = rng.random::<f32>() * 100.0;
         self.should_make_random_move_with_value(random_value)
@@ -408,6 +274,8 @@ impl LLMBot {
         Some(Coordinates::from_index(*cell, board.board_size()))
     }
 }
+
+
 
 #[cfg(test)]
 mod tests {
@@ -520,13 +388,21 @@ mod tests {
 
     #[test]
     fn test_llm_bot_creation_all_difficulties() {
-        let bot_easy = LLMBot::new("easy".to_string(), DifficultyLevel::Easy, "key".to_string());
+        let bot_easy = LLMBot::new(
+            "easy".to_string(),
+            DifficultyLevel::Easy,
+            "key".to_string(),
+        );
         let bot_medium = LLMBot::new(
             "medium".to_string(),
             DifficultyLevel::Medium,
             "key".to_string(),
         );
-        let bot_hard = LLMBot::new("hard".to_string(), DifficultyLevel::Hard, "key".to_string());
+        let bot_hard = LLMBot::new(
+            "hard".to_string(),
+            DifficultyLevel::Hard,
+            "key".to_string(),
+        );
 
         assert_eq!(bot_easy.difficulty(), DifficultyLevel::Easy);
         assert_eq!(bot_medium.difficulty(), DifficultyLevel::Medium);
@@ -570,7 +446,11 @@ mod tests {
 
     #[test]
     fn test_should_make_random_move_with_value() {
-        let bot = LLMBot::new("bot".to_string(), DifficultyLevel::Easy, "key".to_string());
+        let bot = LLMBot::new(
+            "bot".to_string(),
+            DifficultyLevel::Easy,
+            "key".to_string(),
+        );
 
         // Easy has 20% probability
         assert!(bot.should_make_random_move_with_value(0.0));
@@ -585,11 +465,7 @@ mod tests {
 
         let board = GameY::try_from(YEN::new(1, 0, vec!['B', 'R'], "B".to_string()))
             .expect("Failed to create board");
-        let bot = LLMBot::new(
-            "bot".to_string(),
-            DifficultyLevel::Medium,
-            "key".to_string(),
-        );
+        let bot = LLMBot::new("bot".to_string(), DifficultyLevel::Medium, "key".to_string());
 
         assert!(bot.choose_move(&board).is_none());
     }
@@ -646,13 +522,13 @@ mod tests {
     #[test]
     fn test_format_board_state() {
         let client = AnthropicClient::new("key".to_string());
-
+        
         use crate::{GameY, YEN};
         let yen = YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string());
         let board = GameY::try_from(yen).expect("Failed to create board");
-
+        
         let board_state = client.format_board_state(&board);
-
+        
         assert!(board_state.contains("Total cells"));
         assert!(board_state.contains("Available cells"));
     }
@@ -660,17 +536,17 @@ mod tests {
     #[test]
     fn test_format_board_state_different_sizes() {
         let client = AnthropicClient::new("key".to_string());
-
+        
         use crate::{GameY, YEN};
-
+        
         let board2 = GameY::try_from(YEN::new(2, 0, vec!['B', 'R'], "./..".to_string()))
             .expect("Failed to create board");
         let board3 = GameY::try_from(YEN::new(3, 0, vec!['B', 'R'], "./../...".to_string()))
             .expect("Failed to create board");
-
+        
         let state2 = client.format_board_state(&board2);
         let state3 = client.format_board_state(&board3);
-
+        
         // Different board sizes should produce different states
         assert_ne!(state2, state3);
         assert!(state2.len() > 0);
