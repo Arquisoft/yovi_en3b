@@ -79,7 +79,8 @@ jobs:
         run: |
           cd webapp
           npm run test:e2e -- --exit
-        JWT_SECRET: "secrete_for_tests"
+        env:
+          JWT_SECRET: "secrete_for_tests"
 
   docker-push-users:
     name: Publish users image
