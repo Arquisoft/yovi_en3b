@@ -64,6 +64,40 @@ const SignUpForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
+
+
+        /// NUEVO CODIGO
+        try {
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'; 
+      const res = await fetch(`${API_URL}/users/loginUser`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: formData.username, password: formData.password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        const authHeader = res.headers.get('Authorization');
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1]; 
+          localStorage.setItem('token', token);
+        }
+        startBackgroundMusic(); 
+        localStorage.setItem('username', formData.username);
+        localStorage.setItem('userId', data.id || '');
+        navigate('/menu'); 
+      } else {
+        setError(data.message || t.messages.loginError); // Texto traducido
+      }
+    } catch (err) {
+      setError(t.messages.cannotConnectServer); // Texto traducido
+      console.error("Connection error:", err);
+    } finally {
+      setLoading(false); 
+    }
+    /// FIN DEL NUEVO CODIGO
+
         localStorage.setItem('username', formData.username);
         localStorage.setItem('userId', data.id || '');
         
