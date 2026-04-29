@@ -78,7 +78,7 @@ jobs:
       - name: Run E2E tests (start servers and run cucumber)
         run: |
           cd webapp
-          npm run test:e2e
+          npm run test:e2e -- --exit
         env:
           JWT_SECRET: "un_secreto_falso_y_rapido_para_que_pasen_los_tests"
 
