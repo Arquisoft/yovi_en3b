@@ -1,3 +1,16 @@
+/**
+ * ============================================================================
+ * FILE: matchController.js
+ * LAYER: Controller
+ * DESCRIPTION: Acts as the middleman between HTTP routes and the business logic.
+ * It extracts data from the HTTP request (req.body, req.params),
+ * calls the appropriate Service, and formats the HTTP response.
+ * DEPENDENCIES: 
+ * - Called by: `matchRoutes.js`
+ * - Calls: `matchService.js` for business logic.
+ * - Calls: `axios` to communicate with external microservices (Rust bot).
+ * ============================================================================
+ */
 const matchService = require('../domain/matchService');
 const axios = require('axios');
 
@@ -60,26 +73,13 @@ async function finishMatch(req, res) {
     }
 }
 
+/**
+ * Evaluates the current board state by communicating with the Rust Game Engine.
+ * It sanitizes the payload to prevent injection attacks before forwarding it.
+ */
 const evaluateBoard = async (req, res) => {
     try {
-        /*
-        const { URL } = require('node:url');
-
-        const ALLOWED_HOSTS = ['gamey', 'localhost', '20.199.16.53'];
-
-        const rawUrl = process.env.BOT_SERVICE_URL ?? 'http://gamey:4000';
-        const parsedUrl = new URL(rawUrl);
-
-        if (!ALLOWED_HOSTS.includes(parsedUrl.hostname)) {
-            return res.status(500).json({ error: 'Invalid configuration' });
-        }
-
-        const rustResponse = await axios.post(
-            `${parsedUrl.origin}/v1/evaluate`,
-            req.body
-        );
-        */
-       // Validar estructura del payload (previene inyección desde datos de usuario)
+        // Validate payload structure (prevents injection from user data)
         const allowedKeys = ['size', 'turn', 'players', 'layout'];
         const sanitizedPayload = {};
         for (const key of allowedKeys) {
@@ -88,6 +88,7 @@ const evaluateBoard = async (req, res) => {
             }
         }
 
+        // Call the internal Rust microservice
         const rustResponse = await axios.post(
             `http://gamey:4000/v1/evaluate`,
             sanitizedPayload

@@ -1,4 +1,12 @@
-// File to write the queries required for the matches management
+/**
+ * ============================================================================
+ * FILE: matchQueries.js
+ * LAYER: Queries (SQL Strings)
+ * DESCRIPTION: Stores all PostgreSQL queries used for the matches module.
+ * DEPENDENCIES: 
+ * - Imported exclusively by `matchRepository.js`.
+ * ============================================================================
+ */
 module.exports = {
   createMatch: `
     INSERT INTO matches (blue_player_id, red_player_id, is_bot, bot_difficulty, status)

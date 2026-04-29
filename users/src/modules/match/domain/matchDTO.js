@@ -1,3 +1,12 @@
+/**
+ * ============================================================================
+ * FILE: matchDTO.js
+ * LAYER: Data Transfer Object (DTO)
+ * DESCRIPTION: Formats the data objects that enter and exit the backend.
+ * Ensures the Frontend receives consistent structures without
+ * exposing sensitive database fields.
+ * ============================================================================
+ */
 const toMatchResponseDto = (match) => {
     return {
       bluePlayerId: match.bluePlayerId,
@@ -9,7 +18,8 @@ const toMatchResponseDto = (match) => {
       ended_at: match.ended_at
     };
   };
-  const toMatchInputDto = (match) => {
+  
+const toMatchInputDto = (match) => {
     return {
         bluePlayerId: match.bluePlayerId,
         redPlayerId: match.redPlayerId,
@@ -19,9 +29,9 @@ const toMatchResponseDto = (match) => {
         winner_id: match.winner_id,
         ended_at: match.ended_at
     };
-  };
-  
-  module.exports = { 
+};
+
+module.exports = { 
     toMatchResponseDto,
     toMatchInputDto 
-  };
+};

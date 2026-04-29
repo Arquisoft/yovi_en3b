@@ -1,3 +1,15 @@
+/**
+ * ============================================================================
+ * FILE: matchRepository.js
+ * LAYER: Repository (Data Access)
+ * DESCRIPTION: Executes the raw database queries. Abstracting DB calls here
+ * makes it easier to mock the DB during testing.
+ * DEPENDENCIES: 
+ * - Called by: `matchService.js`
+ * - Calls: `matchQueries.js` (for the SQL strings)
+ * - Calls: `db.js` (the PostgreSQL connection pool)
+ * ============================================================================
+ */
 const db = require('../../../db/db.js');
 const queries = require('./matchQueries.js');
 
@@ -47,4 +59,11 @@ const finishMatch = async (matchId, winnerId) => {
     return rows[0];
 };
 
-module.exports = { findMatchesByPlayerId, findMatchHistoryByPlayerId, createMatch, getMatchById, getMatchesByPlayer, finishMatch };
+module.exports = { 
+    findMatchesByPlayerId, 
+    findMatchHistoryByPlayerId, 
+    createMatch, 
+    getMatchById, 
+    getMatchesByPlayer, 
+    finishMatch 
+};

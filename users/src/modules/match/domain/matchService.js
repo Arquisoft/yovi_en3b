@@ -1,3 +1,15 @@
+/**
+ * ============================================================================
+ * FILE: matchService.js
+ * LAYER: Service (Domain Logic)
+ * DESCRIPTION: Contains the core business logic and rules for match management.
+ * Validates data, handles match creation, and calculates results.
+ * DEPENDENCIES: 
+ * - Called by: `matchController.js`
+ * - Calls: `matchRepository.js` to execute DB operations.
+ * - Calls: `rankingService.js` to update player global scores.
+ * ============================================================================
+ */
 const matchRepository = require('../data-access/matchRepository');
 const rankingService = require('../../ranking/domain/rankingService');
 
@@ -11,7 +23,7 @@ const createMatch = async (dataOrBluePlayerId, redPlayerId, isBot, botDifficulty
             botDifficulty,
         };
 
-    // 1. Validaciones lógicas
+    // 1. Logical validations
     if (!data.bluePlayerId) {
         throw new Error("You need a Blue Player ID.");
     }
@@ -24,7 +36,7 @@ const createMatch = async (dataOrBluePlayerId, redPlayerId, isBot, botDifficulty
         throw new Error("If you don't play against a BOT, you need a Red Player ID.");
     }
 
-    // 2. Create and save
+    // 2. Create and save in DB
     const newMatch = await matchRepository.createMatch({
         bluePlayerId: data.bluePlayerId,
         redPlayerId: data.redPlayerId || null,
@@ -49,6 +61,10 @@ async function getMatchesForPlayer(playerId) {
     return matches;
 }
 
+/**
+ * Retrieves the match history and formats the output for the frontend.
+ * Maps raw database status into visual results ('win', 'lose').
+ */
 async function getMatchHistoryForPlayer(playerId) {
     if (!playerId) {
         throw new Error("You must select a player ID");
@@ -81,7 +97,12 @@ async function getMatchHistoryForPlayer(playerId) {
     });
 }
 
+/**
+ * Concludes a match and triggers ranking updates for the players involved.
+ * Communicates with the Ranking Module to sum total matches and wins.
+ */
 const finishMatch = async (matchId, winnerId) => {
+    // 1. Mark match as finished in DB
     const match = await matchRepository.finishMatch(matchId, winnerId);
     if (!match) {
         throw new Error('Match not found');
@@ -90,13 +111,17 @@ const finishMatch = async (matchId, winnerId) => {
     const bluePlayerId = match.blue_player_id;
     const redPlayerId = match.red_player_id;
 
+    // 2. Validate winner
     if (winnerId !== null && winnerId !== bluePlayerId && winnerId !== redPlayerId) {
         throw new Error('Winner ID is not a player in this match');
     }
 
+    // 3. Update global rankings via rankingService
     if (winnerId === null) {
+        // Draw scenario: Add +1 to total matches, +0 to wins
         await rankingService.updateOrInitializeRanking(bluePlayerId, 1, 0);
     } else {
+        // Win scenario: Add +1 win to the winner, and +0 wins to the loser
         const loser = winnerId === bluePlayerId ? redPlayerId : bluePlayerId;
         await rankingService.updateOrInitializeRanking(winnerId, 1, 1);
         if (loser) {
@@ -107,6 +132,7 @@ const finishMatch = async (matchId, winnerId) => {
     return match;
 };
 
+// Helper function to translate bot difficulty numbers into readable strings
 function getDifficultyLabel(botDifficulty) {
     switch (botDifficulty) {
         case 0:
