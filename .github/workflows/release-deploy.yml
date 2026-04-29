@@ -78,7 +78,8 @@ jobs:
       - name: Run E2E tests (start servers and run cucumber)
         run: |
           cd webapp
-          npm run test:e2e
+          npm run test:e2e -- --exit
+        JWT_SECRET: "secrete_for_tests"
 
   docker-push-users:
     name: Publish users image
